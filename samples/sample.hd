@@ -1,0 +1,39 @@
+// This should have a constant size
+Header : {
+	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
+	IDK     : u32;
+	Version : u32;
+	ResNum  : u32;
+}
+
+// This should have variable size
+FilesHeaders : [Header.ResNum] {
+	Filename	: [..] #char;
+	Null        : #char = '\0' ; // this is a constant 
+	ROFF		: u32;
+	Size      	: u32;
+	Unknown1  	: u32;
+	Unknown2   	: u32;
+};
+// variable size
+FilesData : [Header.ResNum]
+{
+	IF Header.Tag[3]== "A"{
+	   Read it.Size;
+	}
+	
+	IF Header.Tag[3]== "C"{
+	   PackedBlockSize = Read sizeof(u32);
+	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedData = Read PackedBlockSize;
+	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   decompress(data,PackedBlockSize, UnpackedData);
+	}
+};
+
+/*
+code :: () {
+	Proccess Header no_out;
+	Proccess FilesHeaders;
+	Proceess FilesData;
+}*/

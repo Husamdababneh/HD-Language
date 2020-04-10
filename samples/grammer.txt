@@ -1,0 +1,25 @@
+
+
+S     -> H B C $
+H     -> Header : { Decls }
+B	  -> Body : { Bs  }
+Ds    -> D Ds | &
+D     -> IDENT : TV ;
+
+TV    -> TYPE |
+	  	 TYPE =  VALUE |
+		 = VALUE
+
+VALUE -> LETIRAL |
+	  	 REFERENCED
+
+TYPE  -> u8      | u16 |
+		 u32     | u64 |
+		 float32 | float64 |
+		 string  | char
+
+NAME : TYPE = VALUE;
+NAME : TYPE  = VALUE;
+NAME := VALUE ; // Type inffered
+
+IDENT -> [ a-z A-z _ ]+ [ a-z A-z _ 0-9]*
