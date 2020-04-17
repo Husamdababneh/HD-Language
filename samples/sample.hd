@@ -1,4 +1,10 @@
-// This should have a constant size
+/* This should have a constant size
+
+   			   */
+
+// Hello This is also a comment
+
+/* This is also */ 
 Header : {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
 	IDK     : u32;
@@ -9,7 +15,7 @@ Header : {
 // This should have variable size
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
-	Null        : #char = '\0' ; // this is a constant 
+	Null        : #char = "\0" ; // this is a constant 
 	ROFF		: u32;
 	Size      	: u32;
 	Unknown1  	: u32;

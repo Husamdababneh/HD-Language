@@ -8,11 +8,21 @@
 
 #pragma once
 #include <string>
+#include "common.h"
 
 extern const char* Keywords[];
 extern const char* TokenTypeName[];
 
-enum ETOKEN
+
+enum class ELITERALTYPE 
+{
+	NONE = 0,  // Error
+	STRING,
+	INTEGER,
+	FLOAT
+};
+
+enum class  ETOKEN
 {
 	NONE = 0,
 	IDENT,
@@ -26,19 +36,44 @@ struct Token
 	ETOKEN Type = ETOKEN::NONE;
 	union
 	{
+		String name;
 		bool boolean;
-		int value;
-		char strValue[1024]; // ?????
+		int integer;
+		float32 float32;
+		float64 float64;
+		String value;
 	};
 };
 
 struct LexerState
 {
-	std::fstream file; // to keep track were we are
-	int numberOfTokens; // statistics ??
+	LexerState(const char * filepath);
+	~LexerState();
+
+	String input;				// Data
+	int input_cursor;			// to keep track were we are
+
+
+	int current_line_number;
+	int current_char_index;
+	int previous_token_line_number;
+	//int numberOfTokens;
+
+
+	Token peek_next_token();
+	Token peek_token(int lookAhead);
+	void eat_token(int count = 0);
+	
+
+	inline u8& peek_next_character();
+	inline u8& peek_character(int lookAhead = 0);
+	inline void eat_character();
+	
+	LexerState() = delete;					 // copy constructor
+	LexerState(const LexerState& ) = delete; // copy constructor
 };
 
-Token getNextToken(LexerState& state);
-bool initLexer(LexerState& state, const char * file);
-void finitLexer(LexerState& state);
+
 std::ostream& operator<<(std::ostream& stream, Token& token);
+std::ostream& operator<<(std::ostream& stream,String& data);
+

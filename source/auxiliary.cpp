@@ -49,7 +49,7 @@ Arguments ParseArguments(int argc, char ** argv)
 		std::cout << "Usage : " << argv[0]
 				  << " -inputfile:<inputfilename> "
 				  << " -outputfile:<outputfilename> "
-				  << " -binarys:<binarystructurefilename> \n";
+				  << " -binary:<binarystructurefilename> \n";
 	}
 	return args;
 }

@@ -12,7 +12,7 @@
 #include "main.h"
 #include "lex.h"
 #include "auxiliary.h"
-
+#include "common.h"
 constexpr bool verbos = false;
 // @Robusstness(Husam):Very error prone
 
@@ -21,23 +21,22 @@ int main(int argc, char ** argv)
 {
 
 	Arguments args = ParseArguments(argc, argv);
-
 	// NOTE(Husam):  ParseArguments should report the errors.
 	if(!args.isSet)
 		return -1;
 
-	Parse
-	LexerState lexer;
-	initLexer(lexer, args.structureFile);
-	auto token = getNextToken(lexer);
-	while(token.Type != ETOKEN::NONE)
-	{
-		std::cout << token << "\n";
-		token = getNextToken(lexer);
-	}
+	LexerState lexer(args.structureFile);
 
-	
-	defer(finitLexer(lexer));
+	// This is just a test 
+	int TokenCount = 0;
+	while(TokenCount < 8)
+	{
+		auto token = lexer.peek_next_token();
+		if(token.Type != token.ETOKEN::NONE){
+			TokenCount++;
+			std::cout << token << "\n";
+		}
+	}
 
 }
 
