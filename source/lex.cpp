@@ -200,14 +200,31 @@ u8& LexerState::peek_character(int lookAhead)
 	return input[input_cursor + lookAhead];
 }
 
+void LexerState::eat_characters(int count)
+{
+	for(int a = 0; a < count; a++)
+		eat_character();
+}
+
 void LexerState::eat_character()
 {
-	input_cursor++;
-	if(input[input_cursor] == '\n')
+	
+	switch(input[input_cursor++])
 	{
-		previous_token_line_number = current_line_number;
-		current_line_number++;
-		current_char_index = 1;
+	  case '\n':
+		  previous_token_line_number = current_line_number;
+		  current_line_number++;
+		  current_char_index = 0;
+		  break;
+	  case '\t':
+		  current_char_index+=4;
+		  break;
+	  case '\r':
+		  current_char_index = 0;
+		  break;
+	  default:
+		  current_char_index++;
+		  break;
 	}
 }
 
@@ -229,7 +246,7 @@ LexerState::LexerState(const char * filepath)
 	}
 	input.count = length;
 	input_cursor = 0;
-	current_line_number = 0;
+	current_line_number = 1;
 	current_char_index = 0;
 	previous_token_line_number = 0;
 	fclose(file);
@@ -247,7 +264,11 @@ Token LexerState::peek_next_token()
 	// @TODO: init a token and return it.
 	Token token;
 	bool stop = false;
-	assert(input.count > input_cursor);
+	if(input_cursor >= input.count)
+	{
+		token.Type = ETOKEN::ERROR;
+		return token ;
+	}
 	char ch = peek_character();
 	switch(ch)
 	{
@@ -256,34 +277,30 @@ Token LexerState::peek_next_token()
 		  char next = peek_next_character();
 		  int temp = input_cursor + 2;
 		  if(next  == '/'){
-			  while(input[temp++] != '\n');
+			  while(input[temp] != '\n'){temp++;}
 			  token.Type = ETOKEN::COMMENT;
-			  token.value = String{&input[input_cursor], (u64)temp - input_cursor - 1 };
-			  input_cursor = temp;
+			  token.value = String{&input[input_cursor], (u64)temp - input_cursor};
+			  token.start_position = get_current_position();
+			  eat_characters(temp - input_cursor);
+			  token.end_position = get_current_position();
 			  return token;
 		  }else if (next == '*'){
 			  while(input[temp++] != '*' );
-			  if(peek_character(temp - input_cursor) != '/')
+			  if(input[temp++] != '/')
 				  abort();
-			  temp++;
 			  token.Type = ETOKEN::COMMENT;
 			  token.value = String{&input[input_cursor], (u64)temp - input_cursor};
-			  input_cursor = temp;
+			  token.start_position = get_current_position();
+			  eat_characters(temp - input_cursor);
+			  token.end_position = get_current_position();
 			  return token;
 		  }else{
 			  // @Todo: Report Errors.:
 		  }
 		  break;
 	  }
-	  case ':' : case '{': case '}':
-	  case '[' : case ']': case '#':
-	  case '"' : case '.': case '=':
-	  case '(' : case ')': case ',':
-	  case '\t': case ' ': case ';':
-	  case '\n':
-		  // [[fallthrough]]
 	  default:
-		  input_cursor++;
+		  eat_characters(1);
 		  break;
 	}
 	
@@ -305,7 +322,11 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 		  //std::cout << token.name;
 		  break;
 	  case ETOKEN::COMMENT:
-		  stream << token.value;
+		  std::cout << "Starts at {" << token.start_position.line << ", "
+		  			<< token.start_position.index << "}" << " Ends at {"
+					<< token.end_position.line << ", " << token.end_position.index
+					<< "}" << token.value;
+		  //stream << token.value;
 		  break;
 	  case ETOKEN::LITERAL:
 	  case ETOKEN::NONE:

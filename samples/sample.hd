@@ -1,6 +1,5 @@
-/* This should have a constant size
-
-   			   */
+/* This is a comment
+*/
 
 // Hello This is also a comment
 
@@ -11,16 +10,18 @@ Header : {
 	Version : u32;
 	ResNum  : u32;
 }
+			/* aa */
 
 // This should have variable size
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
-	Null        : #char = "\0" ; // this is a constant 
+	Null		: #char = "\0" ; // this is a constant 
 	ROFF		: u32;
-	Size      	: u32;
-	Unknown1  	: u32;
-	Unknown2   	: u32;
+	Size		: u32;
+	Unknown1	: u32;
+	Unknown2	: u32;
 };
+
 // variable size
 FilesData : [Header.ResNum]
 {

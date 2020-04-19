@@ -19,7 +19,6 @@ constexpr bool verbos = false;
 
 int main(int argc, char ** argv)
 {
-
 	Arguments args = ParseArguments(argc, argv);
 	// NOTE(Husam):  ParseArguments should report the errors.
 	if(!args.isSet)
@@ -27,15 +26,13 @@ int main(int argc, char ** argv)
 
 	LexerState lexer(args.structureFile);
 
-	// This is just a test 
-	int TokenCount = 0;
-	while(TokenCount < 8)
+	// This is just a test
+	for(auto token = lexer.peek_next_token();
+		token.Type != ETOKEN::ERROR;
+		token = lexer.peek_next_token())
 	{
-		auto token = lexer.peek_next_token();
-		if(token.Type != token.ETOKEN::NONE){
-			TokenCount++;
+		if (token.Type == ETOKEN::COMMENT)
 			std::cout << token << "\n";
-		}
 	}
 
 }

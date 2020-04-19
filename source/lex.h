@@ -29,11 +29,21 @@ enum class  ETOKEN
 	KEYWORD,
 	LITERAL,
 	COMMENT,
+	ERROR
+};
+
+struct Position
+{
+	u64 line, index;
 };
 
 struct Token
 {
 	ETOKEN Type = ETOKEN::NONE;
+
+	Position start_position;
+	Position end_position;
+	
 	union
 	{
 		String name;
@@ -51,12 +61,12 @@ struct LexerState
 	~LexerState();
 
 	String input;				// Data
-	int input_cursor;			// to keep track were we are
+	u64 input_cursor;			// to keep track were we are
 
 
-	int current_line_number;
-	int current_char_index;
-	int previous_token_line_number;
+	u64 current_line_number;
+	u64 current_char_index;
+	u64 previous_token_line_number;
 	//int numberOfTokens;
 
 
@@ -68,6 +78,9 @@ struct LexerState
 	inline u8& peek_next_character();
 	inline u8& peek_character(int lookAhead = 0);
 	inline void eat_character();
+	inline void eat_characters(int count = 1);
+
+	Position get_current_position() {return {current_line_number, current_char_index};}
 	
 	LexerState() = delete;					 // copy constructor
 	LexerState(const LexerState& ) = delete; // copy constructor
