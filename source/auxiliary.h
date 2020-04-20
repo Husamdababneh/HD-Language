@@ -7,6 +7,7 @@
     ========================================================================*/
 #pragma once
 
+#include <fstream>
 extern constexpr int MAX_ARG_COUNT = 3 + 1; // + 1 for executable call string
 #define BINARY "binary:"
 #define INPUT  "input:"
@@ -21,7 +22,8 @@ struct Arguments
 };
 
 Arguments ParseArguments(int argc, char ** argv);
-
+int read_entire_file(FILE* file, void** data_return);
+int read_entire_file(const char* file, void** data_return);	
 template <typename F>
 struct Defer
 {

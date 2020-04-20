@@ -76,11 +76,12 @@ struct LexerState
 	
 
 	inline u8& peek_next_character();
-	inline u8& peek_character(int lookAhead = 0);
+	inline u8& peek_character(u64 lookAhead = 0);
 	inline void eat_character();
-	inline void eat_characters(int count = 1);
+	inline void eat_characters(u64 count = 1);
 
 	Position get_current_position() {return {current_line_number, current_char_index};}
+	Position get_position_from_cursor(u64 cursor);
 	
 	LexerState() = delete;					 // copy constructor
 	LexerState(const LexerState& ) = delete; // copy constructor

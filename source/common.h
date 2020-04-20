@@ -26,7 +26,7 @@ struct myString
 {
 	u8* data;
 	u64 count;
-	u8& operator[]  (int i) {
+	u8& operator[]  (u64 i) {
 		assert(i < count);
 		return data[i];
 	}

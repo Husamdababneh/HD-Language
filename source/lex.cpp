@@ -4,7 +4,8 @@
    $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Defines Lexer functionality & Data Structures
-   ========================================================================*/
+   ========================================================================*/ 
+
 
 #include <iostream>
 #include <fstream>
@@ -12,8 +13,11 @@
 #include <sstream>
 #include <cassert>
 #include <cctype>
+
 #include "lex.h"
+
 #include "common.h"
+#include "auxiliary.h"
 
 const char* Keywords [] = {
 	"u32", "u8", "char","if", "else", "while", "for",
@@ -33,40 +37,6 @@ const char* TokenTypeName [] = {
 
 
 constexpr extern int KeywordsCount = sizeof(Keywords)/sizeof(const char *);
-
-void consumeComment(LexerState* state)
-{
-	char ch = state->input.data[state->input_cursor];
-	if(ch == '*')
-	{
-		state->input_cursor++;
-		while(true)
-		{
-			if(state->input.data[state->input_cursor++] == '*')
-			{
-				if(state->input.data[state->input_cursor] == '/')
-					state->input_cursor++;
-				// report error
-				//else
-				break;
-			}
-		}		  
-	}
-	else if(ch == '/')
-	{
-		state->input_cursor++;
-		while(true)
-		{
-			if(state->input.data[state->input_cursor++] == '\n')
-				break;
-		}
-	}
-	else
-	{
-		//TODO: report error 
-	}
-}
-
 
 bool IsReserved(std::string& string)
 {
@@ -100,116 +70,53 @@ ELITERALTYPE IsLiteral(std::string& string)
 	return ELITERALTYPE::NONE;
 }
 
-Token CreateToken(std::stringstream& string)
-{
-	// Check if it's reserved ?
-	Token token;
-	if(IsReserved(string.str()))
-	{
-		token.Type  =  ETOKEN::KEYWORD;
-	}
-	else if (string.str().c_str()[0] == '/')
-	{
-		token.Type  =  ETOKEN::COMMENT;
 
-	}
-	if (IsLiteral(string.str()) != ELITERALTYPE::NONE)
+// @CleanUp Is this usefull ?? 
+Position LexerState::get_position_from_cursor(u64 cursor)
+{
+	Position result = {0};
+
+	for(u64 temp = 0; temp < cursor; temp++)
 	{
-		token.Type  =  ETOKEN::COMMENT;
+		switch(input[temp])
+		{
+		  case '\n':
+			  result.line++;
+			  result.index = 0;
+			  break;
+		  case '\t':
+			  result.index+=4;
+			  break;
+		  default:
+			  result.index++;
+			  break;
+		}
 	}
-	else
-	{
-		token.Type  =  ETOKEN::IDENT;
-	}
-	return token;
 	
+	return result;
 }
-#ifdef WIN32
-#define fileno _fileno
-#define fstat _fstat
-#define stat _stat
-#endif
-static int read_entire_file(FILE* file, void** data_return)
-{
-	assert(file);
-    int descriptor = fileno(file);
-
-    struct stat file_stats;
-    int result = fstat(descriptor, &file_stats);
-    if (result == -1) return -1;
-
-    int length = file_stats.st_size;
-
-    unsigned char *data = new unsigned char[length];
-
-    fseek(file, 0, SEEK_SET);
-    int success = fread((void *)data, length, 1, file);
-    if (success < 1) {
-        delete [] data;
-        return -1;
-    }
-
-    *data_return = data;
-    return length;
-}
-
-static int read_entire_file(const char *filepath , void** data_return)
-{
-	
-	FILE* file = fopen(filepath, "rb");
-	if(!file)
-	{
-		std::cout << "Couldn't find file [" << file  << "]\n" ;
-		return false;
-	}
-	assert(file);
-    int descriptor = fileno(file);
-
-    struct stat file_stats;
-    int result = fstat(descriptor, &file_stats);
-    if (result == -1) return -1;
-
-    int length = file_stats.st_size;
-
-    unsigned char *data = new unsigned char[length];
-
-    fseek(file, 0, SEEK_SET);
-    int success = fread((void *)data, length, 1, file);
-    if (success < 1) {
-        delete [] data;
-        return -1;
-    }
-
-    *data_return = data;
-    return length;
-}
-
-#ifdef WIN32
-#undefine fileno
-#undefine fstat 
-#undefine stat
-#endif
 
 u8& LexerState::peek_next_character()
 {
 	return input[input_cursor + 1];
 }
 
-u8& LexerState::peek_character(int lookAhead)
+u8& LexerState::peek_character(u64 lookAhead)
 {
 	return input[input_cursor + lookAhead];
 }
 
-void LexerState::eat_characters(int count)
+void LexerState::eat_characters(u64 count)
 {
 	for(int a = 0; a < count; a++)
 		eat_character();
 }
 
+
 void LexerState::eat_character()
 {
 	
-	switch(input[input_cursor++])
+	switch(input[input_cursor])
 	{
 	  case '\n':
 		  previous_token_line_number = current_line_number;
@@ -219,13 +126,11 @@ void LexerState::eat_character()
 	  case '\t':
 		  current_char_index+=4;
 		  break;
-	  case '\r':
-		  current_char_index = 0;
-		  break;
 	  default:
 		  current_char_index++;
 		  break;
 	}
+	input_cursor++;
 }
 
 LexerState::LexerState(const char * filepath)
@@ -267,7 +172,7 @@ Token LexerState::peek_next_token()
 	if(input_cursor >= input.count)
 	{
 		token.Type = ETOKEN::ERROR;
-		return token ;
+		return token;
 	}
 	char ch = peek_character();
 	switch(ch)
@@ -275,13 +180,13 @@ Token LexerState::peek_next_token()
 	  case '/':
 	  {
 		  char next = peek_next_character();
-		  int temp = input_cursor + 2;
+		  u64 temp = input_cursor + 2;
 		  if(next  == '/'){
 			  while(input[temp] != '\n'){temp++;}
 			  token.Type = ETOKEN::COMMENT;
-			  token.value = String{&input[input_cursor], (u64)temp - input_cursor};
+			  token.value = String{&input[input_cursor], temp - input_cursor};
 			  token.start_position = get_current_position();
-			  eat_characters(temp - input_cursor);
+			  eat_characters(temp - input_cursor -1);
 			  token.end_position = get_current_position();
 			  return token;
 		  }else if (next == '*'){
@@ -289,18 +194,19 @@ Token LexerState::peek_next_token()
 			  if(input[temp++] != '/')
 				  abort();
 			  token.Type = ETOKEN::COMMENT;
-			  token.value = String{&input[input_cursor], (u64)temp - input_cursor};
+			  token.value = String{&input[input_cursor], temp - input_cursor};
 			  token.start_position = get_current_position();
-			  eat_characters(temp - input_cursor);
+			  eat_characters(temp - input_cursor -1);
 			  token.end_position = get_current_position();
 			  return token;
 		  }else{
-			  // @Todo: Report Errors.:
+			  // @Todo: Check for other types of tokens
+			  eat_characters();
 		  }
 		  break;
 	  }
 	  default:
-		  eat_characters(1);
+		  eat_characters();
 		  break;
 	}
 	
@@ -310,7 +216,6 @@ Token LexerState::peek_next_token()
 
 std::ostream& operator<<(std::ostream& stream, Token& token)
 {
-	// @Todo:  
 	stream << TokenTypeName[(int)token.Type] << ": ";
 
 	switch(token.Type)
@@ -322,10 +227,10 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 		  //std::cout << token.name;
 		  break;
 	  case ETOKEN::COMMENT:
-		  std::cout << "Starts at {" << token.start_position.line << ", "
-		  			<< token.start_position.index << "}" << " Ends at {"
-					<< token.end_position.line << ", " << token.end_position.index
-					<< "}" << token.value;
+		  stream << "Starts at {" << token.start_position.line << ", "
+				 << token.start_position.index << "}" << " Ends at {"
+				 << token.end_position.line << ", " << token.end_position.index
+				 << "}\n" << token.value;
 		  //stream << token.value;
 		  break;
 	  case ETOKEN::LITERAL:
@@ -339,9 +244,9 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 
 std::ostream& operator<<(std::ostream& stream,String& data)
 {
-    u8 temp = 0;
+    u64 temp = 0;
 	while(temp < data.count)
-		stream << data[(int)temp++];
+		stream << data[temp++];
 	
 	return stream;
 }
