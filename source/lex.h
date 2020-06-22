@@ -8,7 +8,8 @@
 
 #pragma once
 #include <string>
-#include "common.h"
+
+#include "String.h"
 
 extern const char* Keywords[];
 extern const char* TokenTypeName[];
@@ -22,16 +23,22 @@ enum class ELITERALTYPE
 	FLOAT
 };
 
-enum class  ETOKEN
+enum class  ETOKEN : u64
 {
-	NONE = 0,
-	IDENT,
+	ZERO = 0,
+	IDENT = 256,
 	KEYWORD,
 	LITERAL,
 	COMMENT,
+	MULTILINE_COMMENT,
+	DEFINE,
+	DEFINEANDASSIGN,
+	OPERATOR,
+	NONE,
 	ERROR
 };
-
+#define MAGIC_ENUM_RANGE_MAX u64(ETOKEN::ERROR)
+#include "magic_enum.hpp"
 struct Position
 {
 	u64 line, index;
@@ -62,7 +69,7 @@ struct LexerState
 
 	String input;				// Data
 	u64 input_cursor;			// to keep track were we are
-
+	StringView cursor;			// new cursor type 
 
 	u64 current_line_number;
 	u64 current_char_index;
@@ -71,6 +78,7 @@ struct LexerState
 
 
 	Token peek_next_token();
+
 	Token peek_token(int lookAhead);
 	void eat_token(int count = 0);
 	
@@ -87,7 +95,7 @@ struct LexerState
 	LexerState(const LexerState& ) = delete; // copy constructor
 };
 
-
+// @Todo(Husam): I should create my own printing function....
 std::ostream& operator<<(std::ostream& stream, Token& token);
 std::ostream& operator<<(std::ostream& stream,String& data);
 

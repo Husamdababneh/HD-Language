@@ -17,25 +17,13 @@
 #include "lex.h"
 
 #include "common.h"
+#include "String.h"
 #include "auxiliary.h"
 
 const char* Keywords [] = {
 	"u32", "u8", "char","if", "else", "while", "for",
 	"continue", "delete", "new", "InputFile", "OutputDir"
 };
-
-const char* Seperators [] = {
-	";", ":", "{", "}",
-	"(", ")", "[", "]",
-	"..", ".",
-};
-
-const char* TokenTypeName [] = {
-	"NONE", "ID", "KEYWORD", "LITERAL",
-	"COMMENT", "SEPARATOR"
-};
-
-
 constexpr extern int KeywordsCount = sizeof(Keywords)/sizeof(const char *);
 
 bool IsReserved(std::string& string)
@@ -63,7 +51,7 @@ ELITERALTYPE IsLiteral(std::string& string)
 			  break;
 		}
 		// @Todo(Husam) : Report Error
-		if(std::isdigit(ch) == 0)
+		if(std::isdigit((unsigned char)ch) == 0)
 			return ELITERALTYPE::NONE;
 	}
 	
@@ -101,7 +89,7 @@ u8& LexerState::peek_next_character()
 	return input[input_cursor + 1];
 }
 
-u8& LexerState::peek_character(u64 lookAhead)
+u8& LexerState::peek_character(u64 lookAhead /* = 0 */)
 {
 	return input[input_cursor + lookAhead];
 }
@@ -151,6 +139,8 @@ LexerState::LexerState(const char * filepath)
 	}
 	input.count = length;
 	input_cursor = 0;
+	cursor.string = &input;
+	cursor.cursor = 0;
 	current_line_number = 1;
 	current_char_index = 0;
 	previous_token_line_number = 0;
@@ -163,28 +153,28 @@ LexerState::~LexerState()
 	delete[] input.data;
 	input.data = nullptr;
 }
- 
+
 Token LexerState::peek_next_token()
 {
 	// @TODO: init a token and return it.
-	Token token;
-	bool stop = false;
+	
 	if(input_cursor >= input.count)
-	{
-		token.Type = ETOKEN::ERROR;
-		return token;
-	}
-	char ch = peek_character();
+		return {ETOKEN::ERROR , 0 , 0};
+	
+	Token token;
+	u8 ch = peek_character();
+
 	switch(ch)
 	{
+		// @Todo(Husam):Handle nested multiline comments.
 	  case '/':
 	  {
-		  char next = peek_next_character();
+		  u8 next = peek_next_character();
 		  u64 temp = input_cursor + 2;
 		  if(next  == '/'){
 			  while(input[temp] != '\n'){temp++;}
 			  token.Type = ETOKEN::COMMENT;
-			  token.value = String{&input[input_cursor], temp - input_cursor};
+			  token.value = String{temp - input_cursor, &input[input_cursor]};
 			  token.start_position = get_current_position();
 			  eat_characters(temp - input_cursor -1);
 			  token.end_position = get_current_position();
@@ -193,20 +183,71 @@ Token LexerState::peek_next_token()
 			  while(input[temp++] != '*' );
 			  if(input[temp++] != '/')
 				  abort();
-			  token.Type = ETOKEN::COMMENT;
-			  token.value = String{&input[input_cursor], temp - input_cursor};
+			  token.Type = ETOKEN::MULTILINE_COMMENT;
+			  token.value = String{temp - input_cursor, &input[input_cursor]};
 			  token.start_position = get_current_position();
-			  eat_characters(temp - input_cursor -1);
+			  eat_characters(temp - input_cursor - 1);
 			  token.end_position = get_current_position();
 			  return token;
 		  }else{
-			  // @Todo: Check for other types of tokens
+			  // @Todo: Check for other types of tokens.
 			  eat_characters();
 		  }
-		  break;
 	  }
+	  break;
+	  case '+':  case '-':  case '*':
+		  token.Type = (ETOKEN) ch;
+		  token.value = String{1, &input[input_cursor]};
+		  token.start_position = get_current_position();
+		  eat_character();
+		  token.end_position = get_current_position();
+		  break;
+	  case '#':
+		  // Compile Time Execution operator
+		  // What follows # should be executed at compile time (Just Like Jai)
+		  eat_character();		// this is here so we don't break the lexer for now
+		  break;
+	  case '"':
+	  {
+		  u64 temp = input_cursor + 1;
+		  //u64 index = find_first_character('"');
+		  while(input[temp++] != '"');//{temp++;}
+		  token.Type = ETOKEN::LITERAL;
+		  token.value = String{temp - input_cursor - 2, &input[input_cursor+1]};
+		  token.start_position = get_current_position();
+		  eat_characters(temp - input_cursor);
+		  token.end_position = get_current_position();
+		  return token;
+	  }
+	  break;
+	  case ':':
+	  {
+		  u8 next = peek_next_character(); 
+		  if(next == ':') { // "define" TOKEN :
+			  u64 temp = input_cursor + 2;
+			  token.Type = ETOKEN::DEFINE;
+			  token.value = String{2, &input[input_cursor]};
+			  token.start_position = get_current_position();
+			  eat_characters(2);
+			  token.end_position = get_current_position();
+			  return token;
+		  } else if(next == '=')  {				// "define and assign" TOKEN :=
+			  u64 temp = input_cursor + 2;
+			  token.Type = ETOKEN::DEFINEANDASSIGN;
+			  token.value = String{2, &input[input_cursor]};
+			  token.start_position = get_current_position();
+			  eat_characters(2);
+			  token.end_position = get_current_position();
+			  return token;
+		  }
+		  eat_character();
+	  }
+	  break;
+	  case ' ': case '\t':
+		  eat_character();
+		  break;
 	  default:
-		  eat_characters();
+		  eat_character();
 		  break;
 	}
 	
@@ -216,8 +257,13 @@ Token LexerState::peek_next_token()
 
 std::ostream& operator<<(std::ostream& stream, Token& token)
 {
-	stream << TokenTypeName[(int)token.Type] << ": ";
 
+	auto& name = magic_enum::enum_name(token.Type); 
+	u64 size =  name.size();
+	stream << name << ": "
+		   << "samples\\sample.hd(" << token.start_position.line << ","
+		   << token.start_position.index << ")\n";
+	
 	switch(token.Type)
 	{
 	  case ETOKEN::IDENT:
@@ -227,13 +273,15 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 		  //std::cout << token.name;
 		  break;
 	  case ETOKEN::COMMENT:
-		  stream << "Starts at {" << token.start_position.line << ", "
-				 << token.start_position.index << "}" << " Ends at {"
-				 << token.end_position.line << ", " << token.end_position.index
-				 << "}\n" << token.value;
-		  //stream << token.value;
+	  case ETOKEN::MULTILINE_COMMENT:
 		  break;
+	  case ETOKEN::OPERATOR:
 	  case ETOKEN::LITERAL:
+	  case ETOKEN::DEFINE:
+	  case ETOKEN::DEFINEANDASSIGN:
+		  stream// << std::string(size, ' ')
+			  << token.value << '\n';
+		  break;
 	  case ETOKEN::NONE:
 	  default:
 		  break;
@@ -241,12 +289,18 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 	return stream;
 }
 
-
 std::ostream& operator<<(std::ostream& stream,String& data)
 {
     u64 temp = 0;
 	while(temp < data.count)
+	{
+		if (data[temp] == '\r')
+		{
+			temp++;
+			continue;
+		}
 		stream << data[temp++];
+	}
 	
 	return stream;
 }

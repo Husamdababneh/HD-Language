@@ -7,8 +7,7 @@
    ========================================================================*/
 #pragma once
 
-#include <cassert>
-#include <iostream>
+
 typedef unsigned char       u8;
 typedef unsigned short      u16;
 typedef unsigned int        u32;
@@ -22,16 +21,6 @@ typedef signed long long  s64;
 typedef float  float32;
 typedef double float64;
 
-struct myString
-{
-	u8* data;
-	u64 count;
-	u8& operator[]  (u64 i) {
-		assert(i < count);
-		return data[i];
-	}
 
-};
-typedef myString String;
 
 

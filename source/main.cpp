@@ -1,6 +1,6 @@
 /*
   main.cpp -- This project is aimed to create a languages which
-  is capable of defineing (binray encoded data) data structures
+  is capable of defineing (binray encoded data) data structures and proccess on them
 */
 
 #include <iostream>
@@ -25,15 +25,19 @@ int main(int argc, char ** argv)
 		return -1;
 
 	LexerState lexer(args.structureFile);
-
+	std::fstream outfile("tokens.txt", std::ios::out| std::ios::binary);
 	// This is just a test
 	for(auto token = lexer.peek_next_token();
 		token.Type != ETOKEN::ERROR;
 		token = lexer.peek_next_token())
 	{
-		if (token.Type == ETOKEN::COMMENT)
-			std::cout << token << "\n";
+		if ((token.Type != ETOKEN::NONE) &&
+			!(token.Type == ETOKEN::COMMENT ||
+			 token.Type == ETOKEN::MULTILINE_COMMENT))
+		{
+			outfile << token << "\n";
+			std::cout  << token << "\n";
+		}
 	}
-
 }
 

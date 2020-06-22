@@ -20,6 +20,7 @@ Header : {
 	ResNum  : u32;
 }
 			/* aa */
+			
 
 // This should have variable size
 FilesHeaders : [Header.ResNum] {
@@ -32,13 +33,13 @@ FilesHeaders : [Header.ResNum] {
 };
 
 // variable size
-FilesData : [Header.ResNum]
+FilesData :: [Header.ResNum]
 {
-	IF Header.Tag[3]== "A"{
+	IF Header.Tag[3]== "A" {
 	   Read it.Size;
 	}
 	
-	IF Header.Tag[3]== "C"{
+	IF Header.Tag[3]== "C" {
 	   PackedBlockSize = Read sizeof(u32);
 	   UnpackedBlockSize = Read sizeof(u32);
 	   PackedData = Read PackedBlockSize;
@@ -47,9 +48,10 @@ FilesData : [Header.ResNum]
 	}
 };
 
-/*
+
 code :: () {
 	Proccess Header no_out;
 	Proccess FilesHeaders;
 	Proceess FilesData;
-}*/
+	b = a + 5;
+}
