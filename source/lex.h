@@ -35,10 +35,11 @@ enum class  ETOKEN : u64
 	DEFINEANDASSIGN,
 	OPERATOR,
 	NONE,
+	// EOF Not working
+	EOFA,
 	ERROR
 };
-#define MAGIC_ENUM_RANGE_MAX u64(ETOKEN::ERROR)
-#include "magic_enum.hpp"
+
 struct Position
 {
 	u64 line, index;
@@ -85,14 +86,15 @@ struct LexerState
 
 	inline u8& peek_next_character();
 	inline u8& peek_character(u64 lookAhead = 0);
-	inline void eat_character();
+	inline u8  eat_character();
 	inline void eat_characters(u64 count = 1);
 
-	Position get_current_position() {return {current_line_number, current_char_index};}
+	Position get_current_position() { return {current_line_number, current_char_index}; }
 	Position get_position_from_cursor(u64 cursor);
 	
 	LexerState() = delete;					 // copy constructor
 	LexerState(const LexerState& ) = delete; // copy constructor
+
 };
 
 // @Todo(Husam): I should create my own printing function....

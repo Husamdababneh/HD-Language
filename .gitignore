@@ -1,2 +1,4 @@
 /bin-int/
 /bin/
+/**/*.obj
+/**/*.xml

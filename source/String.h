@@ -17,7 +17,7 @@ struct myString
 	u8* data;
 	
 	u8& operator[]  (u64 i) {
-		assert(i < count);
+		assert(i <= count);
 		return data[i];
 	}
 
@@ -36,6 +36,19 @@ struct myStringView
 	u8& operator[]  (u64 i) {
 		return (*string)[i];
 	}		
+};
+
+// @Temp(Husam):.
+// @IMPORTANT(Husam): Memory ??.
+template<typename T>
+struct Array
+{
+	Array(size_t _count): count(_count) {
+		if(count != 0)
+			data = new T[count];
+	}
+	size_t count = 0;
+	T* data = nullptr;
 };
 
 typedef myString String;

@@ -25,19 +25,18 @@ int main(int argc, char ** argv)
 		return -1;
 
 	LexerState lexer(args.structureFile);
-	std::fstream outfile("tokens.txt", std::ios::out| std::ios::binary);
+	//std::fstream outfile("tokens.txt", std::ios::out| std::ios::binary);
+
 	// This is just a test
 	for(auto token = lexer.peek_next_token();
-		token.Type != ETOKEN::ERROR;
+		token.Type != ETOKEN::EOFA;
 		token = lexer.peek_next_token())
 	{
-		if ((token.Type != ETOKEN::NONE) &&
-			!(token.Type == ETOKEN::COMMENT ||
-			 token.Type == ETOKEN::MULTILINE_COMMENT))
-		{
-			outfile << token << "\n";
-			std::cout  << token << "\n";
-		}
+			//outfile << token << "\n";
+			std::cout  << token;
+
 	}
+	//outfile.close();
+	
 }
 

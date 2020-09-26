@@ -30,7 +30,7 @@ goto :eof
 pushd bin-int
 REM This echo is important for emacs compilation mode
 echo Entering directory `bin-int'
-cl /analyze  %~1  %Files% %~2  /link /LIBPATH:"..\lib\"
+cl  %~1  %Files% %~2  /link /LIBPATH:"..\lib\"
 REM This echo is important for emacs compilation mode
 echo Leaving  directory `bin-int'
 popd

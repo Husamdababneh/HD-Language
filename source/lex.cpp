@@ -13,6 +13,7 @@
 #include <sstream>
 #include <cassert>
 #include <cctype>
+#include <cstdlib>
 
 #include "lex.h"
 
@@ -101,7 +102,7 @@ void LexerState::eat_characters(u64 count)
 }
 
 
-void LexerState::eat_character()
+u8 LexerState::eat_character()
 {
 	
 	switch(input[input_cursor])
@@ -119,6 +120,7 @@ void LexerState::eat_character()
 		  break;
 	}
 	input_cursor++;
+	return input[input_cursor - 1];
 }
 
 LexerState::LexerState(const char * filepath)
@@ -128,14 +130,14 @@ LexerState::LexerState(const char * filepath)
 	if(!file)
 	{
 		std::cout << "Couldn't find file [" << filepath  << "]\n" ;
-		return;
+		exit(1);
 	}
 	
 	int length = read_entire_file(file, (void**)&input.data);
 	if (length < 0)
 	{
 		std::cout << "Couldn't read  file: [" << filepath  << "]\n" ;
-		return;
+		exit(1);
 	}
 	input.count = length;
 	input_cursor = 0;
@@ -159,48 +161,55 @@ Token LexerState::peek_next_token()
 	// @TODO: init a token and return it.
 	
 	if(input_cursor >= input.count)
-		return {ETOKEN::ERROR , 0 , 0};
+		return { ETOKEN::EOFA , 0 , 0 };
 	
-	Token token;
-	u8 ch = peek_character();
-
+	Token token = {};
+	u8 ch = eat_character();
 	switch(ch)
 	{
 		// @Todo(Husam):Handle nested multiline comments.
 	  case '/':
 	  {
-		  u8 next = peek_next_character();
-		  u64 temp = input_cursor + 2;
+		  u8 next = peek_character();
+		  int temp = input_cursor;
 		  if(next  == '/'){
-			  while(input[temp] != '\n'){temp++;}
 			  token.Type = ETOKEN::COMMENT;
-			  token.value = String{temp - input_cursor, &input[input_cursor]};
 			  token.start_position = get_current_position();
-			  eat_characters(temp - input_cursor -1);
+			  while(eat_character() != '\n');
+			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
 			  token.end_position = get_current_position();
 			  return token;
-		  }else if (next == '*'){
-			  while(input[temp++] != '*' );
-			  if(input[temp++] != '/')
-				  abort();
+		  } else if (next == '*'){
+			  // @Important(Husam):Add logic to handle coments inside comments.
+			  // @Important(Husam): In c++ you can't nest multiline comments.
 			  token.Type = ETOKEN::MULTILINE_COMMENT;
-			  token.value = String{temp - input_cursor, &input[input_cursor]};
 			  token.start_position = get_current_position();
-			  eat_characters(temp - input_cursor - 1);
+			  while(input_cursor < input.count ){
+				  u8 eaten = eat_character();
+				  u8 next_to_be_eaten = peek_character();
+				  if(eaten == '*' && next_to_be_eaten == '/'){
+					  eat_character();
+					  break;
+				  }
+			  };
+			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
 			  token.end_position = get_current_position();
 			  return token;
 		  }else{
-			  // @Todo: Check for other types of tokens.
-			  eat_characters();
+			  token.Type = ETOKEN::ERROR;
+			  token.start_position = get_current_position();
+			  eat_characters(temp - input_cursor);
+			  token.end_position = get_current_position();
+			  return token;
+			  // eat_characters();
 		  }
 	  }
 	  break;
 	  case '+':  case '-':  case '*':
-		  token.Type = (ETOKEN) ch;
-		  token.value = String{1, &input[input_cursor]};
-		  token.start_position = get_current_position();
-		  eat_character();
-		  token.end_position = get_current_position();
+		  // token.Type = (ETOKEN) ch;
+		  // token.value = String{1, &input[input_cursor]};
+		  // token.start_position = get_current_position();
+		  // token.end_position = get_current_position();
 		  break;
 	  case '#':
 		  // Compile Time Execution operator
@@ -209,45 +218,27 @@ Token LexerState::peek_next_token()
 		  break;
 	  case '"':
 	  {
-		  u64 temp = input_cursor + 1;
-		  //u64 index = find_first_character('"');
-		  while(input[temp++] != '"');//{temp++;}
-		  token.Type = ETOKEN::LITERAL;
-		  token.value = String{temp - input_cursor - 2, &input[input_cursor+1]};
-		  token.start_position = get_current_position();
-		  eat_characters(temp - input_cursor);
-		  token.end_position = get_current_position();
-		  return token;
+		  // u64 temp = input_cursor + 1;
+		  // //u64 index = find_first_character('"');
+		  // while(input[temp++] != '"');//{temp++;}
+		  // token.Type = ETOKEN::LITERAL;
+		  // token.value = String{temp - input_cursor - 2, &input[input_cursor+1]};
+		  // token.start_position = get_current_position();
+		  // eat_characters(temp - input_cursor);
+		  // token.end_position = get_current_position();
+		  // return token;
 	  }
 	  break;
 	  case ':':
 	  {
-		  u8 next = peek_next_character(); 
-		  if(next == ':') { // "define" TOKEN :
-			  u64 temp = input_cursor + 2;
-			  token.Type = ETOKEN::DEFINE;
-			  token.value = String{2, &input[input_cursor]};
-			  token.start_position = get_current_position();
-			  eat_characters(2);
-			  token.end_position = get_current_position();
-			  return token;
-		  } else if(next == '=')  {				// "define and assign" TOKEN :=
-			  u64 temp = input_cursor + 2;
-			  token.Type = ETOKEN::DEFINEANDASSIGN;
-			  token.value = String{2, &input[input_cursor]};
-			  token.start_position = get_current_position();
-			  eat_characters(2);
-			  token.end_position = get_current_position();
-			  return token;
-		  }
-		  eat_character();
+
 	  }
 	  break;
 	  case ' ': case '\t':
-		  eat_character();
+		  
 		  break;
 	  default:
-		  eat_character();
+		  
 		  break;
 	}
 	
@@ -258,34 +249,37 @@ Token LexerState::peek_next_token()
 std::ostream& operator<<(std::ostream& stream, Token& token)
 {
 
-	auto& name = magic_enum::enum_name(token.Type); 
-	u64 size =  name.size();
-	stream << name << ": "
-		   << "samples\\sample.hd(" << token.start_position.line << ","
-		   << token.start_position.index << ")\n";
+	// auto name = "Unknown";
+	// if(token.Type == ETOKEN::ERROR)
+	// 	name = "Error";
+	// stream << name << ": "
+	// 	   << "samples\\sample.hd(" << token.start_position.line << ","
+	// 	   << token.start_position.index << ")\n";
 	
 	switch(token.Type)
 	{
 	  case ETOKEN::IDENT:
-		  //std::cout << token.name;
+		  stream << "IDENT: \n" << token.name << "\n";
 		  break;
 	  case ETOKEN::KEYWORD:
-		  //std::cout << token.name;
+		  stream << "KEYWORD: \n" << token.name << "\n";
 		  break;
 	  case ETOKEN::COMMENT:
 	  case ETOKEN::MULTILINE_COMMENT:
+		  stream << "Comment: \n" << token.value << "\n"; 
 		  break;
 	  case ETOKEN::OPERATOR:
 	  case ETOKEN::LITERAL:
 	  case ETOKEN::DEFINE:
 	  case ETOKEN::DEFINEANDASSIGN:
-		  stream// << std::string(size, ' ')
-			  << token.value << '\n';
+		  break;
+	  case ETOKEN::ERROR:
 		  break;
 	  case ETOKEN::NONE:
 	  default:
 		  break;
 	}
+	
 	return stream;
 }
 
