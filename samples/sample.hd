@@ -5,16 +5,24 @@
    $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Defines Lexer functionality & Data Structures
-   ========================================================================*/
-   
+   ========================================================================*/ 
+#pragma
+/s
 #pragma once
-/* This is a comment
-*/
+/* This is a comment */
 
 // Hello This is also a comment
 
-/* This is also */ 
-Header : {
+/* This is also */
+
+/*
+	This is multiline comment 
+	/*
+		This is nested multiline comment 
+	*/
+*/
+
+Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
 	IDK     : u32;
 	Version : u32;

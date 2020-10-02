@@ -25,7 +25,31 @@ const char* Keywords [] = {
 	"u32", "u8", "char","if", "else", "while", "for",
 	"continue", "delete", "new", "InputFile", "OutputDir"
 };
+
+
 constexpr extern int KeywordsCount = sizeof(Keywords)/sizeof(const char *);
+
+static inline bool isWhitechar(u8 c){
+	if (c == '\t' ||
+		c ==  '\n' ||
+		c ==  ' ')
+		return true;
+	return false;
+}
+
+static inline bool isAlphabet(u8 c){
+	if (c >= 97 && c <= 122) return true;
+	if (c >= 65 && c <= 90)	 return true;
+	return false;
+}
+
+static inline bool isInLireralChar(u8 c){
+	if (c >= 97 && c <= 122) return true;
+	if (c >= 65 && c <= 90)	 return true;
+	if (c == '_')  return true;
+	if (c >= 48 && c <= 57) return true;
+	return false;
+}
 
 bool IsReserved(std::string& string)
 {
@@ -61,28 +85,9 @@ ELITERALTYPE IsLiteral(std::string& string)
 
 
 // @CleanUp Is this usefull ?? 
-Position LexerState::get_position_from_cursor(u64 cursor)
+inline Position LexerState::get_position_from_cursor(u64 cursor)
 {
-	Position result = {0};
-
-	for(u64 temp = 0; temp < cursor; temp++)
-	{
-		switch(input[temp])
-		{
-		  case '\n':
-			  result.line++;
-			  result.index = 0;
-			  break;
-		  case '\t':
-			  result.index+=4;
-			  break;
-		  default:
-			  result.index++;
-			  break;
-		}
-	}
-	
-	return result;
+	return { current_line_number ,  current_char_index };	
 }
 
 u8& LexerState::peek_next_character()
@@ -101,6 +106,16 @@ void LexerState::eat_characters(u64 count)
 		eat_character();
 }
 
+u8 LexerState::eat_until_character()
+{
+	// TODO: checks
+	while(true){
+		auto ch = eat_character();
+		if (isWhitechar(ch)) continue;
+		return ch;
+	}
+	return 0;
+}
 
 u8 LexerState::eat_character()
 {
@@ -156,6 +171,18 @@ LexerState::~LexerState()
 	input.data = nullptr;
 }
 
+
+// TODO: @Important !!!! : String Implementation ASAP
+// TODO: @Important !!!! : String Implementation ASAP
+// TODO: @Important !!!! : String Implementation ASAP
+// TODO: @Important !!!! : String Implementation ASAP
+// TODO: @Important !!!! : String Implementation ASAP
+// TODO: @Important !!!! : String Implementation ASAP
+// @(TEMP):
+#define SS(x) String { sizeof(x), (u8*)x }
+#define ERRSTRING(x) String { sizeof(x), (u8*)x }
+
+// Rename to eat_next_token
 Token LexerState::peek_next_token()
 {
 	// @TODO: init a token and return it.
@@ -165,83 +192,108 @@ Token LexerState::peek_next_token()
 	
 	Token token = {};
 	u8 ch = eat_character();
+	int temp = input_cursor;
+	token.start_position = get_current_position();
 	switch(ch)
 	{
 		// @Todo(Husam):Handle nested multiline comments.
 	  case '/':
 	  {
 		  u8 next = peek_character();
-		  int temp = input_cursor;
+		  
 		  if(next  == '/'){
 			  token.Type = ETOKEN::COMMENT;
-			  token.start_position = get_current_position();
 			  while(eat_character() != '\n');
 			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
-			  token.end_position = get_current_position();
 			  return token;
 		  } else if (next == '*'){
-			  // @Important(Husam):Add logic to handle coments inside comments.
-			  // @Important(Husam): In c++ you can't nest multiline comments.
 			  token.Type = ETOKEN::MULTILINE_COMMENT;
-			  token.start_position = get_current_position();
+			  int nested_level = 1;			  
 			  while(input_cursor < input.count ){
 				  u8 eaten = eat_character();
 				  u8 next_to_be_eaten = peek_character();
+				  if (eaten == '/' && next_to_be_eaten == '*'){
+					  eat_character();
+					  nested_level++;
+				  }
 				  if(eaten == '*' && next_to_be_eaten == '/'){
 					  eat_character();
-					  break;
+					  nested_level--;
+					  continue;
 				  }
+				  if (nested_level == 0) break;	  
 			  };
 			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
-			  token.end_position = get_current_position();
-			  return token;
-		  }else{
+			  break;	  
+		  } else {
+			  // division ?? 
 			  token.Type = ETOKEN::ERROR;
-			  token.start_position = get_current_position();
-			  eat_characters(temp - input_cursor);
-			  token.end_position = get_current_position();
-			  return token;
+			  eat_character();
+			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
+			  //token.value = ERRSTRING("Not an error !! :-) ");
+			  break;	  
 			  // eat_characters();
 		  }
 	  }
 	  break;
-	  case '+':  case '-':  case '*':
-		  // token.Type = (ETOKEN) ch;
-		  // token.value = String{1, &input[input_cursor]};
-		  // token.start_position = get_current_position();
-		  // token.end_position = get_current_position();
+	  case '+': case '-': case '*': case '{': case '}':
+	  case '[': case ']': case '=': case ';': case '.':
+	  case '(': case ')': case ',':
+		  token.Type = (ETOKEN) ch;
+		  token.value = String{1, &input[input_cursor]};
 		  break;
 	  case '#':
 		  // Compile Time Execution operator
 		  // What follows # should be executed at compile time (Just Like Jai)
-		  eat_character();		// this is here so we don't break the lexer for now
+		  token.Type = ETOKEN::DIRECTIVE;
+		  // This is not right .. the behaviour should be to stop on first whitespace
+		  // but since i'm getting used to the lexer i wanted to try some stuff - Husam 9/28/2020
+		  while(true){
+			  auto eaten = eat_character();
+			  if(eaten == ' ' || eaten == '\t' || eaten == ';' || eaten == '\n')
+				  break;
+		  };
+		  token.value = String { input_cursor  - temp , &input[temp - 1]};
 		  break;
 	  case '"':
 	  {
-		  // u64 temp = input_cursor + 1;
-		  // //u64 index = find_first_character('"');
-		  // while(input[temp++] != '"');//{temp++;}
-		  // token.Type = ETOKEN::LITERAL;
-		  // token.value = String{temp - input_cursor - 2, &input[input_cursor+1]};
-		  // token.start_position = get_current_position();
-		  // eat_characters(temp - input_cursor);
-		  // token.end_position = get_current_position();
-		  // return token;
+		  while(eat_character() != '"');
+		  token.Type = ETOKEN::LITERAL;
+		  token.value = String{input_cursor - temp + 1, &input[temp - 1]};
+		  break;	  
 	  }
 	  break;
 	  case ':':
 	  {
-
+		  auto next = eat_until_character();
+		  token.value = String{input_cursor - temp, &input[temp - 1]};
+		  if (next == ':')  token.Type = ETOKEN::DOUBLECOLON; // uninitailizaed 
+		  else if (next == '=')  token.Type = ETOKEN::COLONEQUAL; // initialized
+		  else  {
+			  token.Type = ETOKEN::COLON;
+			  token.value = String{1, &input[temp - 1]};
+		  } 
+		  eat_character();
+		  
+		  break;	  
+		  
 	  }
 	  break;
-	  case ' ': case '\t':
-		  
-		  break;
+	  case ' ': case '\t': case '\n': case '\r': break;
 	  default:
-		  
+		  if (isAlphabet(ch)){
+			  while(true){
+				  auto next = eat_character();
+				  if (!isInLireralChar(next))
+					  break;
+				  
+			  };
+			  token.Type = ETOKEN::LITERAL;
+			  token.value = String{input_cursor - temp , &input[temp - 1]};
+		  }
 		  break;
 	}
-	
+	token.end_position = get_current_position();	
 	return token;
 }
 
@@ -252,28 +304,49 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 	// auto name = "Unknown";
 	// if(token.Type == ETOKEN::ERROR)
 	// 	name = "Error";
-	// stream << name << ": "
-	// 	   << "samples\\sample.hd(" << token.start_position.line << ","
-	// 	   << token.start_position.index << ")\n";
+	
 	
 	switch(token.Type)
 	{
 	  case ETOKEN::IDENT:
-		  stream << "IDENT: \n" << token.name << "\n";
+		  stream << "IDENT: " << token.name << "--\n";
 		  break;
 	  case ETOKEN::KEYWORD:
-		  stream << "KEYWORD: \n" << token.name << "\n";
+		  stream << "KEYWORD: " << token.name << "--\n";
 		  break;
 	  case ETOKEN::COMMENT:
+		  break;
 	  case ETOKEN::MULTILINE_COMMENT:
-		  stream << "Comment: \n" << token.value << "\n"; 
+		  // stream << "Position: "  << "samples\\sample.hd("
+		  // 		 << token.start_position.line << ","
+		  // 		 << token.start_position.index << ")->("
+		  // 		 << token.end_position.line << ","
+		  // 		 << token.end_position.index << ")\n";
+		  //stream << "MULTILINE_COMMENT: \n" << token.value << "--\n";
 		  break;
 	  case ETOKEN::OPERATOR:
+		  break;
 	  case ETOKEN::LITERAL:
-	  case ETOKEN::DEFINE:
-	  case ETOKEN::DEFINEANDASSIGN:
+		  stream << "LITERAL: " << token.value << "--\n";
+		  break;
+		  // case ETOKEN::DEFINE:
+		  // 	  break;
+		  // case ETOKEN::DEFINEANDASSIGN:
+		  // 	  break;
+	  case ETOKEN::COLON:
+		  stream << "COLON: " << token.value << "--\n";
+		  break;
+	  case ETOKEN::DOUBLECOLON:
+		  stream << "DOUBLECOLON: " << token.value << "--\n";
+		  break;
+	  case ETOKEN::COLONEQUAL:
+		  stream << "COLONEQUAL: " << token.value << "--\n";
+		  break;
+	  case ETOKEN::DIRECTIVE:
+		  stream << "DIRECTIVE: " << token.value << "--\n";
 		  break;
 	  case ETOKEN::ERROR:
+		  stream << "ERROR: " << token.value << "--\n";
 		  break;
 	  case ETOKEN::NONE:
 	  default:
@@ -285,7 +358,7 @@ std::ostream& operator<<(std::ostream& stream, Token& token)
 
 std::ostream& operator<<(std::ostream& stream,String& data)
 {
-    u64 temp = 0;
+	u64 temp = 0;
 	while(temp < data.count)
 	{
 		if (data[temp] == '\r')

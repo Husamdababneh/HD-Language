@@ -31,9 +31,15 @@ enum class  ETOKEN : u64
 	LITERAL,
 	COMMENT,
 	MULTILINE_COMMENT,
+	/*
 	DEFINE,
 	DEFINEANDASSIGN,
+	*/
+	COLON,
+	DOUBLECOLON,
+	COLONEQUAL,
 	OPERATOR,
+	DIRECTIVE,
 	NONE,
 	// EOF Not working
 	EOFA,
@@ -86,8 +92,11 @@ struct LexerState
 
 	inline u8& peek_next_character();
 	inline u8& peek_character(u64 lookAhead = 0);
+	
 	inline u8  eat_character();
+	inline u8 eat_until_character();
 	inline void eat_characters(u64 count = 1);
+	
 
 	Position get_current_position() { return {current_line_number, current_char_index}; }
 	Position get_position_from_cursor(u64 cursor);

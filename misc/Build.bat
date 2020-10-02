@@ -3,10 +3,10 @@
 IF NOT EXIST .\bin-int mkdir bin-int
 IF NOT EXIST .\bin mkdir bin
 
-
-set CommonFlags=/Fe:..\bin\main.exe /std:c++17 
-set ReleaseFlags=%CommonFlags% /EHsc /MTd
-set DebugFlags=%CommonFlags% /W2 /Z7 /EHsc /DEBUG:FULL /MDd
+REM Clean
+set CommonFlags=/Fe:..\bin\main.exe /std:c++17 /EHsc
+set ReleaseFlags=%CommonFlags% /MTd /Ob3x
+set DebugFlags=%CommonFlags% /W2 /Z7  /Od /DEBUG:FULL /MDd
 
 REM   Wild card  not sure if we really want this ?? 
 set Files=../source/*.cpp		
@@ -30,7 +30,7 @@ goto :eof
 pushd bin-int
 REM This echo is important for emacs compilation mode
 echo Entering directory `bin-int'
-cl  %~1  %Files% %~2  /link /LIBPATH:"..\lib\"
+cl  %~1  %Files% %~2 /link /LIBPATH:"..\lib\"
 REM This echo is important for emacs compilation mode
 echo Leaving  directory `bin-int'
 popd
