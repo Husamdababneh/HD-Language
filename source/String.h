@@ -11,21 +11,24 @@
 
 #include <cassert>
 
+
+// @Cleanup: do we need this ?
+#define SS(x) String { sizeof(x) - 1, (u8*)x }
+
 struct myString
 {
-	u64 count;
 	u8* data;
-	
+	u64 count;
+
 	u8& operator[]  (u64 i) {
 		assert(i <= count);
 		return data[i];
 	}
-
 };
 
 struct myStringView
 {
-	myString* string;
+	myString string;
 	u64 cursor;
 
 	operator u64() const
@@ -34,9 +37,24 @@ struct myStringView
 	}
 	
 	u8& operator[]  (u64 i) {
-		return (*string)[i];
-	}		
+		return string[i];
+	}
+	
+
 };
+
+myString operator "" _s(const char* a, size_t s);
+
+
+
+
+typedef myString String;
+typedef myStringView StringView;
+
+bool isEqual(String& first, String& second);
+myStringView make_view(const myString& str);
+
+
 
 // @Temp(Husam):.
 // @IMPORTANT(Husam): Memory ??.
@@ -50,6 +68,3 @@ struct Array
 	size_t count = 0;
 	T* data = nullptr;
 };
-
-typedef myString String;
-typedef myStringView StringView;

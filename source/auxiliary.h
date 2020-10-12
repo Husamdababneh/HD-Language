@@ -7,7 +7,13 @@
     ========================================================================*/
 #pragma once
 
-#include <fstream>
+#include <cassert>
+#include <stdio.h>
+
+
+#include "common.h"
+
+
 extern constexpr int MAX_ARG_COUNT = 5 + 1; // + 1 for executable call string
 #define BINARY "binary:"
 #define INPUT  "input:"
@@ -35,3 +41,9 @@ struct Defer
 #define CONCAT0(a, b) a##b
 #define CONCAT(a, b) CONCAT0(a, b)
 #define defer(body) Defer CONCAT(defer, __LINE__)([&]() { body; })
+
+
+
+struct Memory {
+	
+};

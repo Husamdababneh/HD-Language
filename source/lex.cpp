@@ -7,13 +7,6 @@
    ========================================================================*/ 
 
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <cassert>
-#include <cctype>
-#include <cstdlib>
 
 #include "lex.h"
 
@@ -22,11 +15,24 @@
 #include "auxiliary.h"
 
 const char* Keywords [] = {
-	"u32", "u8", "char","if", "else", "while", "for",
+	"u32", "u8", "char",  "if", "else", "while", "for",
 	"continue", "delete", "new", "InputFile", "OutputDir"
 };
 
-
+String reserved [] = {
+	"u32"_s,
+	"u8"_s,
+	"char"_s,
+	"if"_s,
+	"else"_s,
+	"while"_s,
+	"for"_s,
+	"continue"_s,
+	"delete"_s,
+	"new"_s,
+	"InputFile"_s,
+	"OutputDir"_s,
+};
 constexpr extern int KeywordsCount = sizeof(Keywords)/sizeof(const char *);
 
 static inline bool isWhitechar(u8 c){
@@ -37,17 +43,30 @@ static inline bool isWhitechar(u8 c){
 	return false;
 }
 
-static inline bool isAlphabet(u8 c){
-	if (c >= 97 && c <= 122) return true;
-	if (c >= 65 && c <= 90)	 return true;
+static inline bool isAlphabet(u8 ch){
+	if (ch >= 'a' && ch <= 'z') return true;
+	if (ch >= 'A' && ch <= 'Z') return true;
 	return false;
 }
 
-static inline bool isInLireralChar(u8 c){
-	if (c >= 97 && c <= 122) return true;
-	if (c >= 65 && c <= 90)	 return true;
-	if (c == '_')  return true;
-	if (c >= 48 && c <= 57) return true;
+static inline bool isDigit(u8 ch){
+	if (ch >= '0' && ch <= '9') return true;
+	return false;
+}
+static inline bool isInLireralChar(u8 ch){
+	if (isAlphabet(ch)) return true;
+	if (ch == '_')  return true;
+	if (isDigit(ch)) return true;
+	return false;
+}
+
+
+
+bool isKeyword(String& string)
+{
+	for(int a = 0; a < KeywordsCount; a++)
+		if(isEqual(string, reserved[a]))
+			return true;
 	return false;
 }
 
@@ -59,36 +78,13 @@ bool IsReserved(std::string& string)
 	return false;
 }
 
-ELITERALTYPE IsLiteral(std::string& string)
-{
-    // String Guaranteed .. need proccessing 
-	if(string[0] == '\"'  && string[string.size() - 1] == '\"')
-		return ELITERALTYPE::STRING;
-
-	// Number (Float Or Integer)
-	for(char& ch : string)
-	{
-		switch(ch)
-		{
-		  case '.':
-		  default:
-			  // Report Error
-			  break;
-		}
-		// @Todo(Husam) : Report Error
-		if(std::isdigit((unsigned char)ch) == 0)
-			return ELITERALTYPE::NONE;
-	}
-	
-	return ELITERALTYPE::NONE;
-}
-
 
 // @CleanUp Is this usefull ?? 
 inline Position LexerState::get_position_from_cursor(u64 cursor)
 {
 	return { current_line_number ,  current_char_index };	
 }
+
 
 u8& LexerState::peek_next_character()
 {
@@ -137,26 +133,27 @@ u8 LexerState::eat_character()
 	input_cursor++;
 	return input[input_cursor - 1];
 }
-
+char * filename = nullptr;
 LexerState::LexerState(const char * filepath)
 {
-	std::cout << "initing Lexer\n";
+	printf("initing Lexer\n");
 	FILE* file = fopen(filepath, "rb");
+	filename = (char *)filepath;
 	if(!file)
 	{
-		std::cout << "Couldn't find file [" << filepath  << "]\n" ;
+		printf("Couldn't find file [%s]\n", filepath);
 		exit(1);
 	}
 	
 	int length = read_entire_file(file, (void**)&input.data);
 	if (length < 0)
 	{
-		std::cout << "Couldn't read  file: [" << filepath  << "]\n" ;
+		printf("Couldn't read file [%s]\n", filepath);
 		exit(1);
 	}
 	input.count = length;
 	input_cursor = 0;
-	cursor.string = &input;
+	cursor.string = input;
 	cursor.cursor = 0;
 	current_line_number = 1;
 	current_char_index = 0;
@@ -166,7 +163,7 @@ LexerState::LexerState(const char * filepath)
 
 LexerState::~LexerState()
 {
-	std::cout << "Getting Out\n";
+	printf("Getting Out\n");
 	delete[] input.data;
 	input.data = nullptr;
 }
@@ -179,7 +176,6 @@ LexerState::~LexerState()
 // TODO: @Important !!!! : String Implementation ASAP
 // TODO: @Important !!!! : String Implementation ASAP
 // @(TEMP):
-#define SS(x) String { sizeof(x), (u8*)x }
 #define ERRSTRING(x) String { sizeof(x), (u8*)x }
 
 // Rename to eat_next_token
@@ -191,8 +187,8 @@ Token LexerState::peek_next_token()
 		return { ETOKEN::EOFA , 0 , 0 };
 	
 	Token token = {};
-	u8 ch = eat_character();
 	int temp = input_cursor;
+	u8 ch = eat_character();
 	token.start_position = get_current_position();
 	switch(ch)
 	{
@@ -204,7 +200,7 @@ Token LexerState::peek_next_token()
 		  if(next  == '/'){
 			  token.Type = ETOKEN::COMMENT;
 			  while(eat_character() != '\n');
-			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
+			  token.value = String {&input[temp], input_cursor  - temp};
 			  return token;
 		  } else if (next == '*'){
 			  token.Type = ETOKEN::MULTILINE_COMMENT;
@@ -223,24 +219,24 @@ Token LexerState::peek_next_token()
 				  }
 				  if (nested_level == 0) break;	  
 			  };
-			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
+			  token.value = String {&input[temp], input_cursor  - temp};
 			  break;	  
 		  } else {
 			  // division ?? 
-			  token.Type = ETOKEN::ERROR;
-			  eat_character();
-			  token.value = String { input_cursor  - temp + 1 , &input[temp - 1]};
-			  //token.value = ERRSTRING("Not an error !! :-) ");
+			  token.Type = (ETOKEN) ch;
+			  token.value = String{&input[input_cursor], 1,};
 			  break;	  
-			  // eat_characters();
 		  }
 	  }
 	  break;
 	  case '+': case '-': case '*': case '{': case '}':
 	  case '[': case ']': case '=': case ';': case '.':
-	  case '(': case ')': case ',':
+	  case '(': case ')': case ',': case '<': case '>':
+	  case '~': case '!': case '$': case '%': case '^':
+	  case '&': case '?': case '|': case '`': case '\\':
+	  case '\'': case '@':
 		  token.Type = (ETOKEN) ch;
-		  token.value = String{1, &input[input_cursor]};
+		  token.value = String{&input[input_cursor], 1};
 		  break;
 	  case '#':
 		  // Compile Time Execution operator
@@ -249,47 +245,92 @@ Token LexerState::peek_next_token()
 		  // This is not right .. the behaviour should be to stop on first whitespace
 		  // but since i'm getting used to the lexer i wanted to try some stuff - Husam 9/28/2020
 		  while(true){
-			  auto eaten = eat_character();
+			  auto eaten = peek_character();
 			  if(eaten == ' ' || eaten == '\t' || eaten == ';' || eaten == '\n')
 				  break;
+			  eat_character();
 		  };
-		  token.value = String { input_cursor  - temp , &input[temp - 1]};
+		  token.value = String { &input[temp], input_cursor  - temp};
 		  break;
 	  case '"':
 	  {
-		  while(eat_character() != '"');
+		  // @Cleanup: We could check the prev instead ?? wont it be easer ??
+		  u8 escape = 0;
+		  while(true){
+			  auto peeked = peek_character();
+			  auto ahead =  peek_character(1);
+			  if (peeked == '\\' && ahead == '"'){
+				  eat_characters(2);
+			  }
+			  eat_character();
+			  if(peeked == '"')
+				  break;
+		  }	  
 		  token.Type = ETOKEN::LITERAL;
-		  token.value = String{input_cursor - temp + 1, &input[temp - 1]};
+		  token.value = String{&input[temp], input_cursor - temp};
 		  break;	  
 	  }
 	  break;
 	  case ':':
 	  {
+		  
 		  auto next = eat_until_character();
-		  token.value = String{input_cursor - temp, &input[temp - 1]};
-		  if (next == ':')  token.Type = ETOKEN::DOUBLECOLON; // uninitailizaed 
-		  else if (next == '=')  token.Type = ETOKEN::COLONEQUAL; // initialized
+		  token.value = String {&input[temp], input_cursor - temp};
+		  if (next == ':')  {
+			  token.Type = ETOKEN::DOUBLECOLON; // uninitailizaed
+			  eat_character();
+		  }
+		  else if (next == '=')  {
+			  token.Type = ETOKEN::COLONEQUAL; // initialized
+			  eat_character();
+		  }
 		  else  {
+			  input_cursor--;
 			  token.Type = ETOKEN::COLON;
-			  token.value = String{1, &input[temp - 1]};
+			  token.value = String{&input[temp], 1};
 		  } 
-		  eat_character();
-		  
 		  break;	  
-		  
 	  }
 	  break;
 	  case ' ': case '\t': case '\n': case '\r': break;
 	  default:
-		  if (isAlphabet(ch)){
+		  if (isAlphabet(ch) || ch == '_'){
 			  while(true){
-				  auto next = eat_character();
+				  auto next = peek_character();
 				  if (!isInLireralChar(next))
 					  break;
-				  
+				  eat_character();
 			  };
+			  token.value = String{&input[temp], input_cursor - temp};
+			  if (isKeyword(token.value))
+				  token.Type = ETOKEN::KEYWORD;
+			  else
+				  token.Type = ETOKEN::IDENT;
+			  
+			  
+		  } else {
+			  // We assume that this will be only numbers
+			  // (0x -> hex) (0b -> binary) (0o  -> Octal)
+			  // auto& pos = get_current_position();
+			  // std::cout << "Location :(" << pos.x << ',' << pos.y << ") \n" ;
+			  assert(isDigit(ch));
 			  token.Type = ETOKEN::LITERAL;
-			  token.value = String{input_cursor - temp , &input[temp - 1]};
+			  auto peeked = peek_character();
+			  bool doEat  = true;
+			  if(peeked == 'x' ||  peeked == 'b' ||	 peeked == 'o')  eat_character();
+			  
+			  peeked = peek_character();
+
+			  if (isDigit(peeked)){			  
+				  while(true){
+					  auto next = peek_character();
+					  if (!isDigit(next)){
+						  break;
+					  }
+					  eat_character();
+				  }
+			  }
+			  token.value = String{&input[temp], input_cursor - temp };
 		  }
 		  break;
 	}
@@ -298,76 +339,10 @@ Token LexerState::peek_next_token()
 }
 
 
-std::ostream& operator<<(std::ostream& stream, Token& token)
-{
-
-	// auto name = "Unknown";
-	// if(token.Type == ETOKEN::ERROR)
-	// 	name = "Error";
-	
-	
-	switch(token.Type)
-	{
-	  case ETOKEN::IDENT:
-		  stream << "IDENT: " << token.name << "--\n";
-		  break;
-	  case ETOKEN::KEYWORD:
-		  stream << "KEYWORD: " << token.name << "--\n";
-		  break;
-	  case ETOKEN::COMMENT:
-		  break;
-	  case ETOKEN::MULTILINE_COMMENT:
-		  // stream << "Position: "  << "samples\\sample.hd("
-		  // 		 << token.start_position.line << ","
-		  // 		 << token.start_position.index << ")->("
-		  // 		 << token.end_position.line << ","
-		  // 		 << token.end_position.index << ")\n";
-		  //stream << "MULTILINE_COMMENT: \n" << token.value << "--\n";
-		  break;
-	  case ETOKEN::OPERATOR:
-		  break;
-	  case ETOKEN::LITERAL:
-		  stream << "LITERAL: " << token.value << "--\n";
-		  break;
-		  // case ETOKEN::DEFINE:
-		  // 	  break;
-		  // case ETOKEN::DEFINEANDASSIGN:
-		  // 	  break;
-	  case ETOKEN::COLON:
-		  stream << "COLON: " << token.value << "--\n";
-		  break;
-	  case ETOKEN::DOUBLECOLON:
-		  stream << "DOUBLECOLON: " << token.value << "--\n";
-		  break;
-	  case ETOKEN::COLONEQUAL:
-		  stream << "COLONEQUAL: " << token.value << "--\n";
-		  break;
-	  case ETOKEN::DIRECTIVE:
-		  stream << "DIRECTIVE: " << token.value << "--\n";
-		  break;
-	  case ETOKEN::ERROR:
-		  stream << "ERROR: " << token.value << "--\n";
-		  break;
-	  case ETOKEN::NONE:
-	  default:
-		  break;
-	}
-	
-	return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream,String& data)
-{
-	u64 temp = 0;
-	while(temp < data.count)
-	{
-		if (data[temp] == '\r')
-		{
-			temp++;
-			continue;
-		}
-		stream << data[temp++];
-	}
-	
-	return stream;
-}
+// @Temp::
+#define LOCATION 
+#ifdef LOCATION 
+#define POSI " Location :(" << token.start_position.x << ',' << token.start_position.y << ")"
+#else
+#define POSI "" 
+#endif

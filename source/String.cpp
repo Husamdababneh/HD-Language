@@ -9,3 +9,21 @@
 
 #include "String.h"
 
+bool isEqual(String& first, String& second)  {
+	if (first.count != second.count) return false;
+
+	for(u32 a = 0; a < first.count; a++){
+		if(first[a] != second[a])
+			return false;
+	}
+	return true;
+}
+
+myStringView make_view(const String& str)
+{
+	return { str, 0 };
+}
+
+ myString operator "" _s(const char* a, size_t s){
+    return { (u8*)a, s};
+}

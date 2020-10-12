@@ -6,8 +6,9 @@
    $Description: see auxiliary.h
    ========================================================================*/
 #include "auxiliary.h"
-#include <iostream>
-#include <cassert>
+
+#include <string.h>
+
 
 Arguments ParseArguments(int argc, char ** argv)
 {
@@ -24,7 +25,7 @@ Arguments ParseArguments(int argc, char ** argv)
 		if(argv[a][0] != '-')
 			return {};
 
-		if(char *sub = strstr(argv[a],INPUT);sub)
+		if(char *sub = (argv[a],INPUT); sub)
 		{
 			args.inputFile = &sub[strlen(INPUT)];
 			haha--;
@@ -46,19 +47,21 @@ Arguments ParseArguments(int argc, char ** argv)
 		args.isSet = true;
 	else
 	{
-		std::cout << "Usage : " << argv[0]
-				  << " -inputfile:<inputfilename> "
-				  << " -outputfile:<outputfilename> "
-				  << " -binary:<binarystructurefilename> \n";
+		
+		printf("Usage : %s  -inputfile:<inputfilename>  -outputfile:<outputfilename>  -binary:<binarystructurefilename> \n",argv[0]);
 	}
 	return args;
 }
+
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #define fileno _fileno
 #define fstat _fstat
 #define stat _stat
 #endif
+
 int read_entire_file(FILE* file, void** data_return)
 {
 	assert(file);
@@ -89,7 +92,7 @@ int read_entire_file(const char *filepath , void** data_return)
 	FILE* file = fopen(filepath, "rb");
 	if(!file)
 	{
-		std::cout << "Couldn't find file [" << file  << "]\n" ;
+		printf("Couldn't find file [%s]\n", filepath);
 		return false;
 	}
 	assert(file);
@@ -115,7 +118,7 @@ int read_entire_file(const char *filepath , void** data_return)
 }
 
 #ifdef WIN32
-#undefine fileno
-#undefine fstat 
-#undefine stat
+#undef fileno
+#undef fstat 
+#undef stat
 #endif

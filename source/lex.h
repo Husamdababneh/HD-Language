@@ -3,7 +3,7 @@
    $Date: 2020-04-04
    $Revision: : @Incomplete
    $Creator: Husam Dababneh
-   $Description: Here are some data structures represents the lexer
+   $Description: Here are the data structures represents the lexer
    ========================================================================*/
 
 #pragma once
@@ -15,14 +15,6 @@ extern const char* Keywords[];
 extern const char* TokenTypeName[];
 
 
-enum class ELITERALTYPE 
-{
-	NONE = 0,  // Error
-	STRING,
-	INTEGER,
-	FLOAT
-};
-
 enum class  ETOKEN : u64
 {
 	ZERO = 0,
@@ -32,8 +24,8 @@ enum class  ETOKEN : u64
 	COMMENT,
 	MULTILINE_COMMENT,
 	/*
-	DEFINE,
-	DEFINEANDASSIGN,
+	  DEFINE,
+	  DEFINEANDASSIGN,
 	*/
 	COLON,
 	DOUBLECOLON,
@@ -48,7 +40,11 @@ enum class  ETOKEN : u64
 
 struct Position
 {
-	u64 line, index;
+	union
+	{
+		struct {u64 line, index;};
+		struct {u64 x, y;};
+	};
 };
 
 struct Token
@@ -106,7 +102,4 @@ struct LexerState
 
 };
 
-// @Todo(Husam): I should create my own printing function....
-std::ostream& operator<<(std::ostream& stream, Token& token);
-std::ostream& operator<<(std::ostream& stream,String& data);
 

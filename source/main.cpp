@@ -1,24 +1,20 @@
-/*
-  main.cpp -- This project is aimed to create a languages which
-  is capable of defineing (binray encoded data) data structures and proccess on them
-*/
+/* ========================================================================
+   $File: main.cpp
+   $Date: 2020-10-02
+   $Revision: : @Incomplete
+   $Creator: Husam Dababneh
+   $Description: main function
+   ========================================================================*/
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <string>
-#include <ctime>
-#include <chrono>
-
+#include <stdio.h>
 
 #include "main.h"
 #include "lex.h"
 #include "auxiliary.h"
 #include "common.h"
-
+#include "logger.h"
 
 constexpr bool verbos = false;
-// @Robusstness(Husam):Very error prone
 
 
 int main(int argc, char ** argv)
@@ -28,32 +24,23 @@ int main(int argc, char ** argv)
 	if(!args.isSet)
 		return -1;
 
-
-	//std::clock_t c_start = std::clock();
-    
-	
+	int b = 101;
+	Logger logger("Husam");
+	String str = "\n\tThis %% is a beautiful string!!\n"_s;
+	logger.print("hey %u %s\n"_s,  b, str);
 	LexerState lexer(args.structureFile);
-	//std::fstream outfile("tokens.txt", std::ios::out| std::ios::binary);
-	auto t_start = std::chrono::high_resolution_clock::now();
+	int a = 0;
 	// This is just a test
 	for(auto token = lexer.peek_next_token();
 		token.Type != ETOKEN::EOFA;
 		token = lexer.peek_next_token())
 	{
 		//outfile << token << "\n";
-		std::cout  << token;
-
+		//std::cout  << token;
+		a++;
 	}
-	
-	//std::clock_t c_end = std::clock();
-    auto t_end = std::chrono::high_resolution_clock::now();
-	
-	// std::cout << std::fixed << std::setprecision(2) << "CPU time used: "
-    //           << 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC << " ms\n";
-	
-	std::cout << "Wall clock time passed: "
-              << std::chrono::duration<double, std::milli>(t_end-t_start).count()
-			  << " ms\n";
+	printf("# Tokens : %d\n",  a );
+
 	//outfile.close();
 	
 }
