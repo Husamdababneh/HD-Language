@@ -6,42 +6,42 @@
    $Description: main function
    ========================================================================*/
 
+
+/*
+  @Todo(): Parse comand line argument manualy using  GetCommandLineA() in Windows.h
+*/
+
+
 #include <stdio.h>
 
 #include "main.h"
 #include "lex.h"
+#include "parser.h"
 #include "auxiliary.h"
 #include "common.h"
 #include "logger.h"
 
-constexpr bool verbos = false;
 
+#include "array.h"
+
+constexpr bool verbos = false;
+int allocation_count = 0;
+
+void * operator new(u64 size){
+	allocation_count++;
+	return malloc(size);
+}
+
+
+//#define print(x, ...) print(CONCAT(x, _s), ...);
 
 int main(int argc, char ** argv)
 {
-	Arguments args = ParseArguments(argc, argv);
-	// NOTE(Husam):  ParseArguments should report the errors.
-	if(!args.isSet)
-		return -1;
-
-	int b = 101;
-	Logger logger("Husam");
-	String str = "\n\tThis %% is a beautiful string!!\n"_s;
-	logger.print("hey %u %s\n"_s,  b, str);
-	LexerState lexer(args.structureFile);
-	int a = 0;
-	// This is just a test
-	for(auto token = lexer.peek_next_token();
-		token.Type != ETOKEN::EOFA;
-		token = lexer.peek_next_token())
-	{
-		//outfile << token << "\n";
-		//std::cout  << token;
-		a++;
-	}
-	printf("# Tokens : %d\n",  a );
-
-	//outfile.close();
+	int a = strlen(argv[1]);
+	String filename = {(u8*)argv[1],  strlen(argv[1])};
+	parse_file(filename);
+	
+	printf("allocation = %d\n", allocation_count);
 	
 }
 

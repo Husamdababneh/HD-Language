@@ -6,8 +6,9 @@
    $Description: see auxiliary.h
    ========================================================================*/
 #include "auxiliary.h"
+#include <stdio.h>
 
-#include <string.h>
+
 
 
 Arguments ParseArguments(int argc, char ** argv)
@@ -117,8 +118,37 @@ int read_entire_file(const char *filepath , void** data_return)
     return length;
 }
 
+int read_entire_file(const String& filename  , void** data_return)
+{
+	assert(filename.count <= 255);
+	char name[256];
+
+	memcpy(name, filename.data, filename.count);
+	name[filename.count] = '\0';
+	return read_entire_file(name, data_return);
+	
+}
+
 #ifdef WIN32
 #undef fileno
 #undef fstat 
 #undef stat
 #endif
+
+
+
+Memory alloc_memory(u64 size){
+	return {};
+}
+
+void free_memory(Memory* memory){
+	
+}
+
+Memory alloc_memoryslot(Memory*  memory){
+	return {};
+}
+
+void  free_memoryslot(MemorySlot* slot){
+	
+}

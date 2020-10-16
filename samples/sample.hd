@@ -7,7 +7,7 @@
    $Description: Defines Lexer functionality & Data Structures
    ========================================================================*/ 
 #pragma
-/s
+///s
 #pragma once
 /* This is a comment */
 
@@ -23,7 +23,7 @@
 */
 
 Header :: struct {
-	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
+	Tag     : [455] #char = "PAK"; // first 3 characters are constants 
 	IDK     : u32;
 	Version : u32;
 	ResNum  : u32;
@@ -62,7 +62,7 @@ FilesDataC :: [Header.ResNum]
 	PackedBlockSize = Read sizeof(u32);
 	UnpackedBlockSize = Read sizeof(u32);
 	PackedData = Read PackedBlockSize;
-	UnpackedData : [UnpackedBlockSize]u8;
+	UnpackedData : [UnpackedBlockSize] u8;
 	decompress(data,PackedBlockSize, UnpackedData);
 };
 

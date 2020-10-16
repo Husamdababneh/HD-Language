@@ -4,9 +4,9 @@ IF NOT EXIST .\bin-int mkdir bin-int
 IF NOT EXIST .\bin mkdir bin
 
 REM Clean
-set CommonFlags=/Fe:..\bin\main.exe /std:c++17 /EHsc -DWIN32=1
+set CommonFlags=/Fe:..\bin\main.exe /std:c++17  -DWIN32=1
 set ReleaseFlags=%CommonFlags% /MTd /Ob3x
-set DebugFlags=%CommonFlags% /W2 /Z7  /Od /DEBUG:FULL /MDd
+set DebugFlags=%CommonFlags% /W2 /Z7 /Od /DEBUG:FULL /MDd /D_DEBUG
 
 REM   Wild card  not sure if we really want this ?? 
 set Files=../source/*.cpp		

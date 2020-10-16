@@ -10,12 +10,13 @@
 #include <string>
 
 #include "String.h"
-
+#include "logger.h"
+#include "array.h"
 extern const char* Keywords[];
 extern const char* TokenTypeName[];
 
 
-enum class  ETOKEN : u64
+enum class  ETOKEN : u32
 {
 	ZERO = 0,
 	IDENT = 256,
@@ -23,15 +24,12 @@ enum class  ETOKEN : u64
 	LITERAL,
 	COMMENT,
 	MULTILINE_COMMENT,
-	/*
-	  DEFINE,
-	  DEFINEANDASSIGN,
-	*/
 	COLON,
 	DOUBLECOLON,
 	COLONEQUAL,
 	OPERATOR,
 	DIRECTIVE,
+	DOUBLEDOT,
 	NONE,
 	// EOF Not working
 	EOFA,
@@ -42,8 +40,10 @@ struct Position
 {
 	union
 	{
-		struct {u64 line, index;};
-		struct {u64 x, y;};
+		// Do we need bigger size ??
+		// 
+		struct {u16 line, index;};
+		struct {u16 x, y;};
 	};
 };
 
@@ -67,24 +67,23 @@ struct Token
 
 struct LexerState
 {
-	LexerState(const char * filepath);
+	LexerState(const String& filepath);
 	~LexerState();
 
 	String input;				// Data
 	u64 input_cursor;			// to keep track were we are
-	StringView cursor;			// new cursor type 
+	//StringView cursor;			// new cursor type 
 
-	u64 current_line_number;
-	u64 current_char_index;
-	u64 previous_token_line_number;
+	u16 current_line_number;
+	u16 current_char_index;
+	u16 previous_token_line_number;
 	//int numberOfTokens;
 
-
-	Token peek_next_token();
-
-	Token peek_token(int lookAhead);
-	void eat_token(int count = 0);
+	Logger logger = Logger("Lexer");
+ 
 	
+	Token eat_token();
+	Token peek_token(int lookAhead = 0);	
 
 	inline u8& peek_next_character();
 	inline u8& peek_character(u64 lookAhead = 0);
@@ -95,11 +94,10 @@ struct LexerState
 	
 
 	Position get_current_position() { return {current_line_number, current_char_index}; }
-	Position get_position_from_cursor(u64 cursor);
 	
 	LexerState() = delete;					 // copy constructor
 	LexerState(const LexerState& ) = delete; // copy constructor
-
+	
 };
 
 

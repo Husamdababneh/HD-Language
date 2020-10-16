@@ -1,1 +1,1 @@
-call bin\main.exe -binary:samples\sample.hd -outputfile:a -inputfile:a
+call bin\main.exe samples\sample.hd

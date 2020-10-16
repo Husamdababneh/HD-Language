@@ -38,6 +38,7 @@ constexpr extern int KeywordsCount = sizeof(Keywords)/sizeof(const char *);
 static inline bool isWhitechar(u8 c){
 	if (c == '\t' ||
 		c ==  '\n' ||
+		c ==  '\r' ||
 		c ==  ' ')
 		return true;
 	return false;
@@ -78,14 +79,6 @@ bool IsReserved(std::string& string)
 	return false;
 }
 
-
-// @CleanUp Is this usefull ?? 
-inline Position LexerState::get_position_from_cursor(u64 cursor)
-{
-	return { current_line_number ,  current_char_index };	
-}
-
-
 u8& LexerState::peek_next_character()
 {
 	return input[input_cursor + 1];
@@ -104,11 +97,11 @@ void LexerState::eat_characters(u64 count)
 
 u8 LexerState::eat_until_character()
 {
-	// TODO: checks
-	while(true){
+	for(int a = input_cursor;  a < input.count; a++){
 		auto ch = eat_character();
-		if (isWhitechar(ch)) continue;
-		return ch;
+		if (!isWhitechar(ch)) {
+			return ch;
+		}
 	}
 	return 0;
 }
@@ -134,31 +127,22 @@ u8 LexerState::eat_character()
 	return input[input_cursor - 1];
 }
 char * filename = nullptr;
-LexerState::LexerState(const char * filepath)
+LexerState::LexerState(const String& filepath)
 {
 	printf("initing Lexer\n");
-	FILE* file = fopen(filepath, "rb");
-	filename = (char *)filepath;
-	if(!file)
-	{
-		printf("Couldn't find file [%s]\n", filepath);
-		exit(1);
-	}
-	
-	int length = read_entire_file(file, (void**)&input.data);
+	int length = read_entire_file(filepath, (void**)&input.data);
 	if (length < 0)
 	{
-		printf("Couldn't read file [%s]\n", filepath);
+		logger.print("Couldn't read file %s\n"_s, filepath);
 		exit(1);
 	}
 	input.count = length;
 	input_cursor = 0;
-	cursor.string = input;
-	cursor.cursor = 0;
+
 	current_line_number = 1;
 	current_char_index = 0;
 	previous_token_line_number = 0;
-	fclose(file);
+	
 }
 
 LexerState::~LexerState()
@@ -168,18 +152,8 @@ LexerState::~LexerState()
 	input.data = nullptr;
 }
 
-
-// TODO: @Important !!!! : String Implementation ASAP
-// TODO: @Important !!!! : String Implementation ASAP
-// TODO: @Important !!!! : String Implementation ASAP
-// TODO: @Important !!!! : String Implementation ASAP
-// TODO: @Important !!!! : String Implementation ASAP
-// TODO: @Important !!!! : String Implementation ASAP
-// @(TEMP):
-#define ERRSTRING(x) String { sizeof(x), (u8*)x }
-
-// Rename to eat_next_token
-Token LexerState::peek_next_token()
+Token last_token = {};
+Token LexerState::eat_token()
 {
 	// @TODO: init a token and return it.
 	
@@ -187,8 +161,9 @@ Token LexerState::peek_next_token()
 		return { ETOKEN::EOFA , 0 , 0 };
 	
 	Token token = {};
-	int temp = input_cursor;
-	u8 ch = eat_character();
+	
+	u8 ch = eat_until_character();
+	int temp = input_cursor - 1;
 	token.start_position = get_current_position();
 	switch(ch)
 	{
@@ -224,19 +199,19 @@ Token LexerState::peek_next_token()
 		  } else {
 			  // division ?? 
 			  token.Type = (ETOKEN) ch;
-			  token.value = String{&input[input_cursor], 1,};
+			  token.value = String{&input[temp], 1};
 			  break;	  
 		  }
 	  }
 	  break;
 	  case '+': case '-': case '*': case '{': case '}':
-	  case '[': case ']': case '=': case ';': case '.':
+	  case '=': case ';': case '[': case ']': case '`':
 	  case '(': case ')': case ',': case '<': case '>':
 	  case '~': case '!': case '$': case '%': case '^':
-	  case '&': case '?': case '|': case '`': case '\\':
-	  case '\'': case '@':
+	  case '&': case '?': case '|': case '@':
+	  case '\'': case '\\':
 		  token.Type = (ETOKEN) ch;
-		  token.value = String{&input[input_cursor], 1};
+		  token.value = String{&input[temp], 1};
 		  break;
 	  case '#':
 		  // Compile Time Execution operator
@@ -251,6 +226,17 @@ Token LexerState::peek_next_token()
 			  eat_character();
 		  };
 		  token.value = String { &input[temp], input_cursor  - temp};
+		  break;
+	  case '.':
+		  if (peek_character() == '.')
+		  {
+			  eat_character();
+			  token.Type = ETOKEN::DOUBLEDOT;
+			  token.value = String { &input[temp], input_cursor  - temp};
+			  break;
+		  }
+		  token.Type = (ETOKEN)ch;
+		  token.value = String { &input[temp], 1};
 		  break;
 	  case '"':
 	  {
@@ -273,8 +259,7 @@ Token LexerState::peek_next_token()
 	  break;
 	  case ':':
 	  {
-		  
-		  auto next = eat_until_character();
+		  auto next = peek_character();
 		  token.value = String {&input[temp], input_cursor - temp};
 		  if (next == ':')  {
 			  token.Type = ETOKEN::DOUBLECOLON; // uninitailizaed
@@ -284,15 +269,17 @@ Token LexerState::peek_next_token()
 			  token.Type = ETOKEN::COLONEQUAL; // initialized
 			  eat_character();
 		  }
-		  else  {
-			  input_cursor--;
+		  else{
 			  token.Type = ETOKEN::COLON;
 			  token.value = String{&input[temp], 1};
 		  } 
-		  break;	  
+		  break;
 	  }
 	  break;
-	  case ' ': case '\t': case '\n': case '\r': break;
+	  //case ' ': case '\t': case '\n': case '\r': break;
+	  case '\0':
+		  return { ETOKEN::EOFA , 0 , 0 };
+		  break;
 	  default:
 		  if (isAlphabet(ch) || ch == '_'){
 			  while(true){
@@ -312,7 +299,6 @@ Token LexerState::peek_next_token()
 			  // We assume that this will be only numbers
 			  // (0x -> hex) (0b -> binary) (0o  -> Octal)
 			  // auto& pos = get_current_position();
-			  // std::cout << "Location :(" << pos.x << ',' << pos.y << ") \n" ;
 			  assert(isDigit(ch));
 			  token.Type = ETOKEN::LITERAL;
 			  auto peeked = peek_character();
@@ -334,10 +320,30 @@ Token LexerState::peek_next_token()
 		  }
 		  break;
 	}
-	token.end_position = get_current_position();	
+	token.end_position = get_current_position();
+	assert(token.Type != ETOKEN::NONE);
+	last_token = token;
 	return token;
 }
 
+
+// TODO:@Optimization(Husam): This may be called to many times ?? use cache ??
+// 
+Token LexerState::peek_token(int lookAhead /* = 0*/ )
+{
+	u64 input_cursor = this->input_cursor;
+	u16 current_line_number = this->current_line_number;
+	u16 current_char_index = this->current_char_index;
+	u16 previous_token_line_number = this->previous_token_line_number;
+	auto result =  eat_token();
+	for(int counter = 0; counter < lookAhead; counter++)
+		result = eat_token();
+	this->input_cursor = input_cursor;
+	this->current_line_number = current_line_number;
+	this->current_char_index = current_char_index;
+	this->previous_token_line_number = previous_token_line_number;
+	return result;
+}
 
 // @Temp::
 #define LOCATION 

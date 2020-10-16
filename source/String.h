@@ -9,14 +9,23 @@
 
 #include "common.h"
 
-#include <cassert>
+#include <assert.h>
 
+#include <string.h>
 
 // @Cleanup: do we need this ?
-#define SS(x) String { sizeof(x) - 1, (u8*)x }
 
 struct myString
 {
+	static int counter;
+
+	// -1??
+	myString() :data(nullptr), count(0) {	
+    }
+
+    myString(u8* d, u64 size): data(d), count(size) {
+    }
+	
 	u8* data;
 	u64 count;
 
@@ -24,7 +33,12 @@ struct myString
 		assert(i <= count);
 		return data[i];
 	}
+
+
+	friend myString operator "" _s(const char* a, size_t s);
 };
+
+
 
 struct myStringView
 {
@@ -45,26 +59,8 @@ struct myStringView
 
 myString operator "" _s(const char* a, size_t s);
 
-
-
-
 typedef myString String;
 typedef myStringView StringView;
 
 bool isEqual(String& first, String& second);
 myStringView make_view(const myString& str);
-
-
-
-// @Temp(Husam):.
-// @IMPORTANT(Husam): Memory ??.
-template<typename T>
-struct Array
-{
-	Array(size_t _count): count(_count) {
-		if(count != 0)
-			data = new T[count];
-	}
-	size_t count = 0;
-	T* data = nullptr;
-};
