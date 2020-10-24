@@ -8,8 +8,8 @@
 #pragma once
 
 #include "String.h"
+#include "Array.h"
 
-/*
 enum NODE_TYPE {
 	AST_BLOCK,
 	AST_DEFINETION,
@@ -18,22 +18,24 @@ enum NODE_TYPE {
 	
 };
 
-struct Ast_Node {
-	Type type; // ?? 
+enum OpType {
+	OP_ADD,
+	OP_SUB,
+	OP_MUL,
+	OP_DIV
 };
 
-enum OpType {
-	ADD,
-	SUB,
-	MUL,
-	DIV
+struct Ast_Node {
+	NODE_TYPE type; // ?? 
 };
+
+
 
 struct BinaryOp : public Ast_Node {
 	//  <a> ? <b>
 	OpType op;
-	Ast_Node left;
-	Ast_Node right
+	Ast_Node* left;
+	Ast_Node* right;
 	
 };
 
@@ -44,34 +46,57 @@ struct Ast_Expresion : public Ast_Node {
 
 struct Ast_Body : public Ast_Node {
 	// { ... }
-	Ast_Node* expresions;
+	Array<Ast_Node*> expresions;
+};
+
+struct Ast_ParmeterList : public Ast_Node {
+	// ( name : type, name : type ... )
+	
+};
+
+enum {
+	AST_VALUE_FLOAT,
+	AST_VALUE_INT,
+	AST_VALUE_STRING,
+	
+};
+struct Ast_Value : public Ast_Node {
+	u8 ValueType;
+	union {
+		u64 unsinged_value;
+		u64 singed_value;
+		float64 float_value;
+	};
 };
 
 struct Ast_Declaration : public Ast_Node {
-	// name :: (arguments) -> (returns)
+	// name := value;
+	// name :: value;   // constant
+	// name :  type  = value;
+	// name :  type  : value; // constant
+	// name :: struct { ... }
+	// name :: struct (   ) { ... }  
 	
 	String name;
-	
-	Ast_Node* arguments; // the problem with c/c++ that there is really no arrays :) ?. 
-	Ast_Node* returns;   // These are arrays 
-	
-	Ast_Body* body;
+	String type;
+	union {
+		String value;
+		struct {
+			Ast_ParmeterList parmeterList;
+			Ast_Body body;
+		};
+	};
+
 };
 
 struct Ast_While : public Ast_Node {
 	Ast_Expresion* exp;
 	Ast_Body* body;
 };
-
-
-struct Ast {
-	Ast_Node* data;
-};
-
 	
 
 
 
 
 
-*/
+

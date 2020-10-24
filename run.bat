@@ -1,1 +1,1 @@
-call bin\main.exe samples\sample.hd
+call bin\main.exe samples\first.hd

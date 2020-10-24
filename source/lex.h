@@ -12,29 +12,7 @@
 #include "String.h"
 #include "logger.h"
 #include "array.h"
-extern const char* Keywords[];
-extern const char* TokenTypeName[];
-
-
-enum class  ETOKEN : u32
-{
-	ZERO = 0,
-	IDENT = 256,
-	KEYWORD,
-	LITERAL,
-	COMMENT,
-	MULTILINE_COMMENT,
-	COLON,
-	DOUBLECOLON,
-	COLONEQUAL,
-	OPERATOR,
-	DIRECTIVE,
-	DOUBLEDOT,
-	NONE,
-	// EOF Not working
-	EOFA,
-	ERROR
-};
+#include "constants.h"
 
 struct Position
 {

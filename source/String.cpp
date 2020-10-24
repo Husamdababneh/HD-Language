@@ -24,6 +24,6 @@ myStringView make_view(const String& str)
 	return { str, 0 };
 }
 
- myString operator "" _s(const char* a, size_t s){
+myString operator "" _s(const char* a, size_t s){
     return { (u8*)a, s};
 }

@@ -1,11 +1,19 @@
 @echo off
 
+pushd source
+python generator.py
+popd
+
+
 IF NOT EXIST .\bin-int mkdir bin-int
 IF NOT EXIST .\bin mkdir bin
 
 REM Clean
-set CommonFlags=/Fe:..\bin\main.exe /std:c++17  -DWIN32=1
-set ReleaseFlags=%CommonFlags% /MTd /Ob3x
+
+set IncludePaths=/I..\source\meow_hash
+set LibPaths=/LIBPATH:"..\lib\"
+set CommonFlags=/Fe:..\bin\main.exe /std:c++17   -D_WIN32=1
+set ReleaseFlags=%CommonFlags% /MTd /Ob3x 
 set DebugFlags=%CommonFlags% /W2 /Z7 /Od /DEBUG:FULL /MDd /D_DEBUG
 
 REM   Wild card  not sure if we really want this ?? 
@@ -13,12 +21,12 @@ set Files=../source/*.cpp
 set DLibs=
 set RLibs=
 
-REM the /I after the IF means to do case insensitive compare
+
 
 [ -z %1 ] && goto Usage
-
-if /I [%1] == [Debug] CALL :Compile "%DebugFlags%" "%DLibs%" & goto :eof
-if /I [%1] == [Release] CALL :Compile "%ReleaseFlags%" "%RLibs%" & goto :eof
+REM the /I after the IF means to do case insensitive compare
+if /I [%1] == [Debug] CALL :Compile "%DebugFlags%" "%IncludePaths%" "%LibPaths%"  "%DLibs%" & goto :eof
+if /I [%1] == [Release] CALL :Compile "%ReleaseFlags%" "%IncludePaths%" "%LibPaths%" "%RLibs%" & goto :eof
 if /I [%1] == [Clean] goto Clean
 if /I [%1] == [Usage] goto Usage
 
@@ -30,7 +38,7 @@ goto :eof
 pushd bin-int
 REM This echo is important for emacs compilation mode
 echo Entering directory `bin-int'
-cl  %~1  %Files% %~2 /link /LIBPATH:"..\lib\"
+cl  %~1  %~2 %Files% %~4 /link  %~3
 REM This echo is important for emacs compilation mode
 echo Leaving  directory `bin-int'
 popd

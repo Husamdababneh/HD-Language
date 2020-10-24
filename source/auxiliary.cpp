@@ -129,11 +129,7 @@ int read_entire_file(const String& filename  , void** data_return)
 	
 }
 
-#ifdef WIN32
-#undef fileno
-#undef fstat 
-#undef stat
-#endif
+
 
 
 

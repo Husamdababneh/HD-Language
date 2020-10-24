@@ -17,13 +17,13 @@ struct Stack_Array  {
 
 
 template<typename T>
-struct Heap_Array {
+struct Array {
     u64 size;
     T* data;
 };
 
 template<typename T>
-Heap_Array<T> make_heap_array(u64 size);
+Array<T> make_heap_array(u64 size);
 
 
 //Array make_array;

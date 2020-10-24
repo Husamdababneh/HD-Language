@@ -34,8 +34,6 @@ struct myString
 		return data[i];
 	}
 
-
-	friend myString operator "" _s(const char* a, size_t s);
 };
 
 

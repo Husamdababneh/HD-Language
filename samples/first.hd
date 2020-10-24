@@ -1,0 +1,17 @@
+#import "Basic"
+
+#load "file.hd"
+
+
+internal
+add :: (u64 a, u64 b) -> (u64) {
+	return a + b;
+}
+
+
+
+#scope internal  // this tells the compiler that everything under it is only accessed by the file
+
+main :: () {
+	return add(4,5);	
+}

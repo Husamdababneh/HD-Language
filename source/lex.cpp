@@ -14,26 +14,54 @@
 #include "String.h"
 #include "auxiliary.h"
 
-const char* Keywords [] = {
-	"u32", "u8", "char",  "if", "else", "while", "for",
-	"continue", "delete", "new", "InputFile", "OutputDir"
-};
-
 String reserved [] = {
-	"u32"_s,
-	"u8"_s,
-	"char"_s,
+	// Types
+	"int"_s, "float"_s,
+	"u8"_s , "s8"_s,
+	"u16"_s, "s16"_s,
+	"u32"_s, "s32"_s,
+	"u64"_s, "s64"_s,	
+	"float32"_s,
+	"float64"_s,
+	"string"_s,
+	"bool"_s,
+
+    // loop
+	"for"_s,
+	
+	// memory related
+	"new"_s,
+	"delete"_s,
+
+	// control 
+	"defer"_s,
 	"if"_s,
 	"else"_s,
-	"while"_s,
-	"for"_s,
+	"switch"_s,
 	"continue"_s,
-	"delete"_s,
-	"new"_s,
-	"InputFile"_s,
-	"OutputDir"_s,
+	"break"_s,
+	"return"_s,
+
+	// Builtins
+	"cast"_s,
+	"it"_s,
+	"type_info"_s,
+	"size_of"_s,
+	"inline"_s,
+	"internal"_s,
+	"external"_s,
+	"scope"_s,
+
+	// Constants
+	"null"_s,
+	"true"_s,
+	"false"_s,
+
+	// not used
+	"no_inline"_s
 };
-constexpr extern int KeywordsCount = sizeof(Keywords)/sizeof(const char *);
+
+constexpr int KeywordCount = sizeof(reserved)/sizeof(String);
 
 static inline bool isWhitechar(u8 c){
 	if (c == '\t' ||
@@ -65,16 +93,8 @@ static inline bool isInLireralChar(u8 ch){
 
 bool isKeyword(String& string)
 {
-	for(int a = 0; a < KeywordsCount; a++)
+	for(int a = 0; a < KeywordCount; a++)
 		if(isEqual(string, reserved[a]))
-			return true;
-	return false;
-}
-
-bool IsReserved(std::string& string)
-{
-	for(int a = 0; a < KeywordsCount; a++)
-		if(string.compare(Keywords[a]) == 0)
 			return true;
 	return false;
 }
@@ -205,8 +225,8 @@ Token LexerState::eat_token()
 	  }
 	  break;
 	  case '+': case '-': case '*': case '{': case '}':
-	  case '=': case ';': case '[': case ']': case '`':
-	  case '(': case ')': case ',': case '<': case '>':
+	  case ';': case '[': case ']': case '`':
+	  case '(': case ')': case ',': 
 	  case '~': case '!': case '$': case '%': case '^':
 	  case '&': case '?': case '|': case '@':
 	  case '\'': case '\\':
@@ -221,23 +241,78 @@ Token LexerState::eat_token()
 		  // but since i'm getting used to the lexer i wanted to try some stuff - Husam 9/28/2020
 		  while(true){
 			  auto eaten = peek_character();
-			  if(eaten == ' ' || eaten == '\t' || eaten == ';' || eaten == '\n')
+			  if(isWhitechar(eaten))
 				  break;
 			  eat_character();
 		  };
 		  token.value = String { &input[temp], input_cursor  - temp};
 		  break;
+	  case '=':
+	  {
+		  auto next = peek_character();
+		  if (next == '='){
+			  eat_character();
+			  token.Type = ETOKEN::EQL;
+			  token.value = String { &input[temp], input_cursor  - temp};
+		  }
+		  else {
+			  token.Type = ETOKEN::ASSIGN;
+			  token.value = String { &input[temp], 1};			  
+		  }
+		  break;
+	  }
+	  case '<':
+	  {
+		  auto next = peek_character();
+		  if (next == '='){
+			  eat_character();
+			  token.Type = ETOKEN::LT_OR_EQL;
+			  token.value = String { &input[temp], input_cursor  - temp};
+		  } else if (next == '<'){
+			  eat_character();
+			  token.Type = ETOKEN::SHIFT_LEFT;
+			  token.value = String { &input[temp], input_cursor  - temp};
+		  } else {
+			  token.Type = ETOKEN::LT;
+			  token.value = String { &input[temp], 1};
+		  }
+		  break;
+	  }
+	  case '>':
+	  {
+		  auto next = peek_character();
+		  if (next == '='){
+			  eat_character();
+			  token.Type = ETOKEN::GT_OR_EQL;
+			  token.value = String { &input[temp], input_cursor  - temp};
+		  } else if (next == '>'){
+			  eat_character();
+			  token.Type = ETOKEN::SHIFT_RIGHT;
+			  token.value = String { &input[temp], input_cursor  - temp};			  
+		  } else {
+			  token.Type = ETOKEN::GT;
+			  token.value = String { &input[temp], 1};
+		  }
+		  break;
+	  }
 	  case '.':
-		  if (peek_character() == '.')
-		  {
+	  {
+		  auto next = peek_character();
+		  if (next == '.') {
 			  eat_character();
 			  token.Type = ETOKEN::DOUBLEDOT;
 			  token.value = String { &input[temp], input_cursor  - temp};
-			  break;
 		  }
-		  token.Type = (ETOKEN)ch;
-		  token.value = String { &input[temp], 1};
+		  else if (next == '>'){
+			  eat_character();
+			  token.Type = ETOKEN::ARROW;
+			  token.value = String { &input[temp], input_cursor  - temp};
+		  } else {
+			  token.Type = (ETOKEN)ch;
+			  token.value = String { &input[temp], 1};
+		  }
 		  break;
+	  }
 	  case '"':
 	  {
 		  // @Cleanup: We could check the prev instead ?? wont it be easer ??
