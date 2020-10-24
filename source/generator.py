@@ -15,9 +15,9 @@ TokenTypes = {
 	"DIRECTIVE" : [False, 0] ,
 	"DOUBLEDOT": [False, 0] ,
 	
-	"STRING_LITIRAL": [False, 0] ,
-	"INT_LITIRAL": [False, 0] ,
-	"FLOAT_LITIRAL": [False, 0] ,
+	"STRING_LITERAL": [False, 0] ,
+	"INT_LITERAL": [False, 0] ,
+	"FLOAT_LITERAL": [False, 0] ,
 
 	
 	"ARROW": [False, 0] ,
@@ -31,9 +31,9 @@ TokenTypes = {
 
 	"SHIFT_LEFT": [False, 0] ,
 	"SHIFT_RIGHT": [False, 0] ,
-#	"FLOAT_LITIRAL": [False, 0] ,
-#	"FLOAT_LITIRAL": [False, 0] ,
-#	"FLOAT_LITIRAL": [False, 0] ,
+#	"FLOAT_LITERAL": [False, 0] ,
+#	"FLOAT_LITERAL": [False, 0] ,
+#	"FLOAT_LITERAL": [False, 0] ,
 	
 	
 	"NONE" : [False, 0],

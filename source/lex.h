@@ -57,7 +57,7 @@ struct LexerState
 	u16 previous_token_line_number;
 	//int numberOfTokens;
 
-	Logger logger = Logger("Lexer");
+	Logger logger = Logger("Lexer"_s);
  
 	
 	Token eat_token();

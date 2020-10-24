@@ -8,6 +8,7 @@
 
 #include "parser.h"
 #include "lex.h"
+#include "array.h"
 #include <meow_hash.h>
 
 
@@ -18,6 +19,56 @@ PrintHash(meow_u128 Hash)
 		   MeowU32From(Hash,1),
 		   MeowU32From(Hash,0));
 
+}
+
+
+Ast_Declaration parse_declaration(LexerState* lexer, Logger* logger) {
+	Ast_Declaration result;
+	auto token = lexer->eat_token();
+
+	if (token.Type == (ETOKEN)')')
+		return {};
+	
+	if (token.Type != ETOKEN::IDENT)
+		logger->print_line(&token, "Error: expected an identifer\n"_s);
+	
+	result.name = token.name;
+
+	token = lexer->eat_token();
+	if (token.Type != ETOKEN::COLON)
+		logger->print_line(&token, "Error: expected ':'\n"_s);
+
+	token = lexer->eat_token();
+	if (token.Type != ETOKEN::IDENT &&  token.Type != ETOKEN::KEYWORD)
+		logger->print_line(&token, "Error: expected an Type\n"_s);
+	result.type = token.name;
+	
+	return result;
+}
+
+Ast_ParmeterList parse_argument_list(LexerState* lexer, Logger* logger){
+
+	Ast_ParmeterList list;
+	list.declerations = init_array<Ast_Declaration>();
+	auto token = lexer->peek_token();
+	u8 argumentIndex = 0;
+	while(true)
+	{
+		Ast_Declaration dec = parse_declaration(lexer,logger);
+		if (dec.name.data == nullptr)
+			break;
+		array_add<Ast_Declaration>(&list.declerations, dec);
+		token = lexer->eat_token();
+		if (token.Type == (ETOKEN)',')
+			continue;
+		else if (token.Type == (ETOKEN)')') {
+			break;
+		}else{
+			exit(-1);
+		}
+				
+	}
+	return list;
 }
 
 void parse_file(const String& filename){
@@ -55,9 +106,13 @@ void parse_file(const String& filename){
 					  logger.print("Struct [%s]\n"_s , token.value);
 				  }else if (next.Type == (ETOKEN)'(') {
 					  lexer.eat_token();
-					  //while(
-					  //parse_arguemnt_list();
-				  }				  
+					  Ast_ParmeterList arguments = parse_argument_list(&lexer, &logger);
+					  for (int a = 0; a < arguments.declerations.occupied; a++){
+						  logger.print("IDENT: %s is %s\n"_s,
+									   arguments.declerations[a]->name,
+									   arguments.declerations[a]->type);
+					  }
+				  }
 			  }
 			  else if (next.Type == ETOKEN::COLONEQUAL){
 				  lexer.eat_token();

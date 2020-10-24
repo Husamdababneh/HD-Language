@@ -12,8 +12,9 @@
 #include "String.h"
 #include "common.h"
 
+//#include "lex.h"
 
-
+struct Token;
 
 // TODO: Change putchar to putc ?? to make the user able to output to files 
 struct Logger {
@@ -28,56 +29,10 @@ struct Logger {
 		prefix = name;
 		out = stream;
 	}
-	void print(String str, ...) {
-		// print header
-		putchar('[');
-		for(size_t i = 0; i < prefix.count; i++) putchar(prefix[i]);
-		putchar(']');
-		putchar(':');
-		putchar(' ');
-		
-		// print body
-		va_list	args;
-		va_start(args, str);
-		for(size_t i = 0; i < str.count; i++) {
-			if (str[i] == '%'){
-				i++;
-				switch (str[i]){
-				  case 'u':
-				  {
-					  unsigned long number = va_arg(args, unsigned long);
-					  printf("%ld", number);
-					  break;
-				  }
-				  case 'd':
-				  {
-					  long number = va_arg(args, long);
-					  printf("%ld", number);
-					  break;
-				  }
-				  case 's':
-				  {
-					  String string = va_arg(args, String);
-					  for(int a = 0; a < string.count; a++)
-						  putc(string[a], out);
-					  break;
-				  }
-				  default:
-					  if (str[i] == '%'){
-						  if (i + 1 < str.count && str[i+1] != '%')
-							  continue;
-					  }
-					  putchar(str[i]);
-					  break;
-				}
-			}
-			else{
-				putchar(str[i]);
-			}
-			
-		}
-		va_end(args);
-		
-		return;
-	}	
+
+
+	inline void print_prefix();
+	void print(String str, ...);
+	void print_token_pos(Token * token );
+	void print_line(Token * token , String str, ...);	
 };

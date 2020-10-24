@@ -49,9 +49,17 @@ struct Ast_Body : public Ast_Node {
 	Array<Ast_Node*> expresions;
 };
 
+
+struct Ast_Declaration;
+
 struct Ast_ParmeterList : public Ast_Node {
 	// ( name : type, name : type ... )
-	
+	Array<Ast_Declaration> declerations;
+};
+
+struct Ast_ArgumentList : public Ast_Node {
+	// ( name : type, name : type ... )
+//	Array<Ast_Literal> declerations;
 };
 
 enum {
@@ -91,7 +99,7 @@ struct Ast_Declaration : public Ast_Node {
 
 struct Ast_While : public Ast_Node {
 	Ast_Expresion* exp;
-	Ast_Body* body;
+	Ast_Body body;
 };
 	
 

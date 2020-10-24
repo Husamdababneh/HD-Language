@@ -195,8 +195,6 @@ Token LexerState::eat_token()
 		  if(next  == '/'){
 			  token.Type = ETOKEN::COMMENT;
 			  while(eat_character() != '\n');
-			  token.value = String {&input[temp], input_cursor  - temp};
-			  return token;
 		  } else if (next == '*'){
 			  token.Type = ETOKEN::MULTILINE_COMMENT;
 			  int nested_level = 1;			  
@@ -214,14 +212,13 @@ Token LexerState::eat_token()
 				  }
 				  if (nested_level == 0) break;	  
 			  };
-			  token.value = String {&input[temp], input_cursor  - temp};
 			  break;	  
 		  } else {
 			  // division ?? 
 			  token.Type = (ETOKEN) ch;
-			  token.value = String{&input[temp], 1};
 			  break;	  
 		  }
+		  break;
 	  }
 	  break;
 	  case '+': case '-': case '*': case '{': case '}':
@@ -231,7 +228,6 @@ Token LexerState::eat_token()
 	  case '&': case '?': case '|': case '@':
 	  case '\'': case '\\':
 		  token.Type = (ETOKEN) ch;
-		  token.value = String{&input[temp], 1};
 		  break;
 	  case '#':
 		  // Compile Time Execution operator
@@ -245,7 +241,6 @@ Token LexerState::eat_token()
 				  break;
 			  eat_character();
 		  };
-		  token.value = String { &input[temp], input_cursor  - temp};
 		  break;
 	  case '=':
 	  {
@@ -253,11 +248,9 @@ Token LexerState::eat_token()
 		  if (next == '='){
 			  eat_character();
 			  token.Type = ETOKEN::EQL;
-			  token.value = String { &input[temp], input_cursor  - temp};
 		  }
 		  else {
 			  token.Type = ETOKEN::ASSIGN;
-			  token.value = String { &input[temp], 1};			  
 		  }
 		  break;
 	  }
@@ -267,14 +260,11 @@ Token LexerState::eat_token()
 		  if (next == '='){
 			  eat_character();
 			  token.Type = ETOKEN::LT_OR_EQL;
-			  token.value = String { &input[temp], input_cursor  - temp};
 		  } else if (next == '<'){
 			  eat_character();
 			  token.Type = ETOKEN::SHIFT_LEFT;
-			  token.value = String { &input[temp], input_cursor  - temp};
 		  } else {
 			  token.Type = ETOKEN::LT;
-			  token.value = String { &input[temp], 1};
 		  }
 		  break;
 	  }
@@ -284,14 +274,11 @@ Token LexerState::eat_token()
 		  if (next == '='){
 			  eat_character();
 			  token.Type = ETOKEN::GT_OR_EQL;
-			  token.value = String { &input[temp], input_cursor  - temp};
 		  } else if (next == '>'){
 			  eat_character();
 			  token.Type = ETOKEN::SHIFT_RIGHT;
-			  token.value = String { &input[temp], input_cursor  - temp};			  
 		  } else {
 			  token.Type = ETOKEN::GT;
-			  token.value = String { &input[temp], 1};
 		  }
 		  break;
 	  }
@@ -301,15 +288,12 @@ Token LexerState::eat_token()
 		  if (next == '.') {
 			  eat_character();
 			  token.Type = ETOKEN::DOUBLEDOT;
-			  token.value = String { &input[temp], input_cursor  - temp};
 		  }
 		  else if (next == '>'){
 			  eat_character();
 			  token.Type = ETOKEN::ARROW;
-			  token.value = String { &input[temp], input_cursor  - temp};
 		  } else {
 			  token.Type = (ETOKEN)ch;
-			  token.value = String { &input[temp], 1};
 		  }
 		  break;
 	  }
@@ -328,7 +312,6 @@ Token LexerState::eat_token()
 				  break;
 		  }	  
 		  token.Type = ETOKEN::LITERAL;
-		  token.value = String{&input[temp], input_cursor - temp};
 		  break;	  
 	  }
 	  break;
@@ -346,7 +329,6 @@ Token LexerState::eat_token()
 		  }
 		  else{
 			  token.Type = ETOKEN::COLON;
-			  token.value = String{&input[temp], 1};
 		  } 
 		  break;
 	  }
@@ -363,7 +345,6 @@ Token LexerState::eat_token()
 					  break;
 				  eat_character();
 			  };
-			  token.value = String{&input[temp], input_cursor - temp};
 			  if (isKeyword(token.value))
 				  token.Type = ETOKEN::KEYWORD;
 			  else
@@ -391,13 +372,13 @@ Token LexerState::eat_token()
 					  eat_character();
 				  }
 			  }
-			  token.value = String{&input[temp], input_cursor - temp };
 		  }
 		  break;
 	}
 	token.end_position = get_current_position();
 	assert(token.Type != ETOKEN::NONE);
-	last_token = token;
+	//last_token = token;
+	token.value = String { &input[temp], input_cursor  - temp};
 	return token;
 }
 

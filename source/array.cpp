@@ -8,8 +8,4 @@
 
 #include "array.h"
 
-// template<typename T>
-// Dynamic_Array<T> make_heap_array(u64 size){
-// 	return {size, new T[size]};
-// }
 
