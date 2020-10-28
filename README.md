@@ -4,4 +4,4 @@ HD Programming language is a project for learning
 
 
 ## TODO: 
-[] -  Build On linux 
+[X] -  Build On linux 
