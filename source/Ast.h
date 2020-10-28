@@ -25,6 +25,10 @@ enum OpType {
 	OP_DIV
 };
 
+
+struct Ast_Declaration;
+
+
 struct Ast_Node {
 	NODE_TYPE type; // ?? 
 };
@@ -50,7 +54,7 @@ struct Ast_Body : public Ast_Node {
 };
 
 
-struct Ast_Declaration;
+
 
 struct Ast_ParmeterList : public Ast_Node {
 	// ( name : type, name : type ... )
@@ -68,6 +72,7 @@ enum {
 	AST_VALUE_STRING,
 	
 };
+
 struct Ast_Value : public Ast_Node {
 	u8 ValueType;
 	union {
@@ -77,13 +82,17 @@ struct Ast_Value : public Ast_Node {
 	};
 };
 
+
 struct Ast_Declaration : public Ast_Node {
 	// name := value;
 	// name :: value;   // constant
 	// name :  type  = value;
 	// name :  type  : value; // constant
 	// name :: struct { ... }
-	// name :: struct (   ) { ... }  
+	// name :: struct (   ) { ... }
+
+	
+	// name = "value" ---> in this case the type refers to the type's value not the name 
 	
 	String name;
 	String type;

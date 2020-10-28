@@ -4,7 +4,7 @@
 
 
 internal
-add :: (a : u64, b : u64) -> (u64) {
+add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64 ) {
 	return a + b;
 }
 
@@ -13,5 +13,5 @@ add :: (a : u64, b : u64) -> (u64) {
 #scope internal  // this tells the compiler that everything under it is only accessed by the file
 
 main :: () {
-	return add(4,5);	
+	return add();	
 }

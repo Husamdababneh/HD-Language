@@ -39,18 +39,86 @@ Ast_Declaration parse_declaration(LexerState* lexer, Logger* logger) {
 		logger->print_line(&token, "Error: expected ':'\n"_s);
 
 	token = lexer->eat_token();
+	// this is wrong we need split the keywords to "type keyword" and  "language keyword"
 	if (token.Type != ETOKEN::IDENT &&  token.Type != ETOKEN::KEYWORD)
-		logger->print_line(&token, "Error: expected an Type\n"_s);
+		logger->print_line(&token, "Error: expected a Type\n"_s);
 	result.type = token.name;
-	
+
+
+	token = lexer->peek_token();
+	if (token.Type == ETOKEN::ASSIGN){
+		lexer->eat_token();
+		token = lexer->eat_token(); // this token should be known before assebmleing 
+		result.value = token.name;
+	}
+
 	return result;
 }
 
-Ast_ParmeterList parse_argument_list(LexerState* lexer, Logger* logger){
+Ast_Declaration parse_caller_argument(LexerState* lexer, Logger* logger) {
+	Ast_Declaration result;
+	auto token = lexer->eat_token();
+	
+	if (token.Type == ETOKEN::IDENT){
+		result.name = token.name;
+		if (lexer->peek_token().Type == ETOKEN::ASSIGN){
+			lexer->eat_token();
+			token = lexer->peek_token();
+			if (token.Type == ETOKEN::IDENT ||
+				token.Type == ETOKEN::KEYWORD ||
+				token.Type == ETOKEN::LITERAL)
+			{
+				lexer->eat_token();
+				result.type = token.name;
+				return result;
+			}
+		}
+	}
+	
+	return {};
+}
 
-	Ast_ParmeterList list;
-	list.declerations = init_array<Ast_Declaration>();
+Ast_ParmeterList parse_caller_arguemnts_list(LexerState* lexer, Logger* logger){
+
+	Ast_ParmeterList list = {};
 	auto token = lexer->peek_token();
+	if (token.Type == (ETOKEN)')')
+		return list;
+	
+	list.declerations = init_array<Ast_Declaration>();	
+	u8 argumentIndex = 0;
+	while(true)
+	{
+		Ast_Declaration dec = parse_caller_argument(lexer,logger);
+		if (dec.name.data == nullptr)
+			break;
+		array_add<Ast_Declaration>(&list.declerations, dec);
+		
+		token = lexer->eat_token();
+		if (token.Type == (ETOKEN)','){	
+			continue;
+		}
+		else if (token.Type == (ETOKEN)')') {
+			break;
+		}
+		else {
+			logger->print_line(&token, "Error: unexpected token %s\n"_s ,token.name);
+			exit(-1);
+		}
+				
+	}
+	return list;
+}
+
+Ast_ParmeterList parse_declaration_list(LexerState* lexer, Logger* logger){
+
+	Ast_ParmeterList list = {};
+	auto token = lexer->peek_token();
+	if (token.Type == (ETOKEN)')')
+		return list;
+	
+	list.declerations = init_array<Ast_Declaration>();
+
 	u8 argumentIndex = 0;
 	while(true)
 	{
@@ -58,12 +126,16 @@ Ast_ParmeterList parse_argument_list(LexerState* lexer, Logger* logger){
 		if (dec.name.data == nullptr)
 			break;
 		array_add<Ast_Declaration>(&list.declerations, dec);
+		
 		token = lexer->eat_token();
-		if (token.Type == (ETOKEN)',')
+		if (token.Type == (ETOKEN)','){	
 			continue;
+		}
 		else if (token.Type == (ETOKEN)')') {
 			break;
-		}else{
+		}
+		else {
+			logger->print_line(&token, "Error: unexpected token %s\n"_s ,token.name);
 			exit(-1);
 		}
 				
@@ -105,13 +177,15 @@ void parse_file(const String& filename){
 				  if (isEqual(next.value, "struct"_s)){
 					  logger.print("Struct [%s]\n"_s , token.value);
 				  }else if (next.Type == (ETOKEN)'(') {
+					  logger.print("Function [%s]\n"_s , token.value);
 					  lexer.eat_token();
-					  Ast_ParmeterList arguments = parse_argument_list(&lexer, &logger);
+					  Ast_ParmeterList arguments = parse_declaration_list(&lexer, &logger);
 					  for (int a = 0; a < arguments.declerations.occupied; a++){
 						  logger.print("IDENT: %s is %s\n"_s,
 									   arguments.declerations[a]->name,
 									   arguments.declerations[a]->type);
 					  }
+
 				  }
 			  }
 			  else if (next.Type == ETOKEN::COLONEQUAL){
@@ -128,11 +202,24 @@ void parse_file(const String& filename){
 					  next = lexer.eat_token();
 					  logger.print("\t\t type[  [%s]  ]\n"_s , next.value);
 					  next = lexer.eat_token();
-				  }else{
+				  }
+				  else{
 					  next = lexer.eat_token();
 					  logger.print("\t\t type[%s]\n"_s , next.value);
 				  }
-			  }else{
+			  }
+			  else if (next.Type == (ETOKEN)'('){
+				  lexer.eat_token();
+				  logger.print("Function Call [%s]\n"_s , token.value);
+				  
+				  Ast_ParmeterList arguments = parse_caller_arguemnts_list(&lexer, &logger);
+				  for (int a = 0; a < arguments.declerations.occupied; a++){
+					  logger.print("IDENT: %s is %s\n"_s,
+								   arguments.declerations[a]->name,
+								   arguments.declerations[a]->type);
+				  }
+			  }
+			  else{
 				  // TODO: report errors
 			  }
 		  }

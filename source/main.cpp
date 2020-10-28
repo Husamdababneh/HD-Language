@@ -35,6 +35,10 @@ void * operator new(u64 size){
 	return malloc(size);
 }
 
+void * operator new[](u64 size){
+	allocation_count++;
+	return malloc(size);
+}
 
 // static void
 // PrintHash(meow_u128 Hash)
