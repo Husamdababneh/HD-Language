@@ -4,4 +4,12 @@ HD Programming language is a project for learning
 
 
 ## TODO: 
-[X] -  Build On linux 
+- [ ] Lexer
+  - [ ] Tokens
+  - [ ] Pre-Lexer
+  
+- [ ] Parser
+  - [ ] AST
+  
+- [ ] Profiling
+- [ ] Build On linux 
