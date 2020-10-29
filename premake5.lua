@@ -18,11 +18,27 @@ project "HDLang"
 	{
 		"source/meow_hash"
 	}
-   
-   filter "configurations:Debug"
+
+	
+
+	filter "configurations:Debug"
       defines { "DEBUG" }
       symbols "On"
 
-   filter "configurations:Release"
+	filter "configurations:Release"
       defines { "NDEBUG" }
-      optimize "On"
+      optimize "on"
+	  
+
+-- Clean Function --
+newaction {
+   trigger     = "clean",
+   description = "Removing project files",
+   execute     = function ()
+      print("clean the build...")
+      os.rmdir("./bin")
+	  os.rmdir("./bin-int")
+	  os.rmdir("./.vs")
+      print("done.")
+   end
+}
