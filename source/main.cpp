@@ -85,7 +85,6 @@ int main(int argc, char ** argv)
 {
 
 	//HashTestBuffer();
-	
 	u64 a = strlen(argv[1]);
 	String filename = {(u8*)argv[1],  strlen(argv[1])};
 	parse_file(filename);
