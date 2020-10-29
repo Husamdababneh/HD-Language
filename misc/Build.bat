@@ -1,4 +1,4 @@
 @echo off
 
 
-MSBuild.exe HDLang.vcxproj -p:Configuration=%1
+MSBuild.exe Generated/HDLang.vcxproj -p:Configuration=%1

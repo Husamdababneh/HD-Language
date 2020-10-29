@@ -81,14 +81,22 @@ void * operator new[](u64 size){
 //#define print(x, ...) print(CONCAT(x, _s), ...);
 
 
+void Usage() {
+	Logger log("USAGE"_s);
+	log.print("Usage: hd.exe <filename>\n"_s);
+}
+
 int main(int argc, char ** argv)
 {
 
 	//HashTestBuffer();
-	u64 a = strlen(argv[1]);
+	if (argc < 2){
+		Usage();
+		return 0;
+	}
+	
 	String filename = {(u8*)argv[1],  strlen(argv[1])};
 	parse_file(filename);
-	
 	printf("allocation = %d\n", allocation_count);
 	
 }
