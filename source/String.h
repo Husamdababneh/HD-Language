@@ -17,15 +17,6 @@
 
 struct myString
 {
-	static int counter;
-
-	// -1??
-	// myString() : data(nullptr), count(0) {	
-    // }
-
-    // myString(u8* d, u64 size): data(d), count(size) {
-    // }
-	
 	u8* data;
 	u64 count;
 

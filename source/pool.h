@@ -7,23 +7,12 @@
     ========================================================================*/
 #pragma once
 
+#include "common.h"
 
-
-constexpr static MAX_POOL_SIZE = 100;
+constexpr static u64 MAX_POOL_SIZE = 100;
 
 template<typename T>
 struct Pool {
 	T data[MAX_POOL_SIZE];
-	
-	
-	
 };
 
-
-
-
-int func () {
-	Pool<int> myPool;
-
-	myPool.allocate
-}

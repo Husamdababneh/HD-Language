@@ -117,7 +117,7 @@ void LexerState::eat_characters(u64 count)
 
 u8 LexerState::eat_until_character()
 {
-	for(int a = input_cursor;  a < input.count; a++){
+	for(u64 a = input_cursor;  a < input.count; a++){
 		auto ch = eat_character();
 		if (!isWhitechar(ch)) {
 			return ch;
@@ -132,7 +132,6 @@ u8 LexerState::eat_character()
 	switch(input[input_cursor])
 	{
 	  case '\n':
-		  previous_token_line_number = current_line_number;
 		  current_line_number++;
 		  current_char_index = 0;
 		  break;
@@ -150,7 +149,7 @@ char * filename = nullptr;
 LexerState::LexerState(const String& filepath)
 {
 	printf("initing Lexer\n");
-	int length = read_entire_file(filepath, (void**)&input.data);
+	u64 length = read_entire_file(filepath, (void**)&input.data);
 	if (length < 0)
 	{
 		logger.print("Couldn't read file %s\n"_s, filepath);
@@ -160,9 +159,7 @@ LexerState::LexerState(const String& filepath)
 	input_cursor = 0;
 
 	current_line_number = 1;
-	current_char_index = 0;
-	previous_token_line_number = 0;
-	
+	current_char_index = 0;	
 }
 
 LexerState::~LexerState()
@@ -183,7 +180,7 @@ Token LexerState::eat_token()
 	Token token = {};
 	
 	u8 ch = eat_until_character();
-	int temp = input_cursor - 1;
+	u64 temp = input_cursor - 1;
 	token.start_position = get_current_position();
 	switch(ch)
 	{
@@ -390,14 +387,12 @@ Token LexerState::peek_token(int lookAhead /* = 0*/ )
 	u64 input_cursor = this->input_cursor;
 	u16 current_line_number = this->current_line_number;
 	u16 current_char_index = this->current_char_index;
-	u16 previous_token_line_number = this->previous_token_line_number;
 	auto result =  eat_token();
 	for(int counter = 0; counter < lookAhead; counter++)
 		result = eat_token();
 	this->input_cursor = input_cursor;
 	this->current_line_number = current_line_number;
 	this->current_char_index = current_char_index;
-	this->previous_token_line_number = previous_token_line_number;
 	return result;
 }
 

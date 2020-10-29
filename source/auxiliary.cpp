@@ -11,45 +11,45 @@
 
 
 
-Arguments ParseArguments(int argc, char ** argv)
+Arguments ParseArguments(int argc, char** argv)
 {
 	Arguments args;
-	if(argc > MAX_ARG_COUNT)
+	if (argc > MAX_ARG_COUNT)
 		return args;
-	
-    // TODO@TODO(Husam): Report error
+
+	// TODO@TODO(Husam): Report error
 	int haha = 3;
-	for(int a = 1; a < argc; a++)
+	for (int a = 1; a < argc; a++)
 	{
 
 		//std::cout << "Proccessing " << argv[a] << "\n";
-		if(argv[a][0] != '-')
+		if (argv[a][0] != '-')
 			return {};
 
-		if(char *sub = (argv[a],INPUT); sub)
+		if (char* sub = (argv[a], INPUT); sub)
 		{
 			args.inputFile = &sub[strlen(INPUT)];
 			haha--;
 		}
 
-		if(char *sub = strstr(argv[a],OUTPUT);sub)
+		if (char* sub = strstr(argv[a], OUTPUT); sub)
 		{
 			args.outputFile = &sub[strlen(OUTPUT)];
 			haha--;
 		}
 		// we are looking to parse this file
-		if(char *sub = strstr(argv[a],BINARY);sub)
+		if (char* sub = strstr(argv[a], BINARY); sub)
 		{
 			args.structureFile = &sub[strlen(BINARY)];
 			haha--;
 		}
 	}
-	if(haha < 3)
+	if (haha < 3)
 		args.isSet = true;
 	else
 	{
-		
-		printf("Usage : %s  -inputfile:<inputfilename>  -outputfile:<outputfilename>  -binary:<binarystructurefilename> \n",argv[0]);
+
+		printf("Usage : %s  -inputfile:<inputfilename>  -outputfile:<outputfilename>  -binary:<binarystructurefilename> \n", argv[0]);
 	}
 	return args;
 }
@@ -63,62 +63,63 @@ Arguments ParseArguments(int argc, char ** argv)
 #define stat _stat
 #endif
 
-int read_entire_file(FILE* file, void** data_return)
+u64 read_entire_file(FILE* file, void** data_return)
 {
 	assert(file);
-    int descriptor = fileno(file);
+	int descriptor = _fileno(file);
 
-    struct stat file_stats;
-    int result = fstat(descriptor, &file_stats);
-    if (result == -1) return -1;
+	struct stat file_stats;
+	int result = fstat(descriptor, &file_stats);
+	if (result == -1) return -1;
 
-    int length = file_stats.st_size;
+	u64 length = file_stats.st_size;
 
-    unsigned char *data = new unsigned char[length];
+	unsigned char* data = new unsigned char[length];
 
-    fseek(file, 0, SEEK_SET);
-    int success = fread((void *)data, length, 1, file);
-    if (success < 1) {
-        delete [] data;
-        return -1;
-    }
+	fseek(file, 0, SEEK_SET);
+	u64 success = fread((void*)data, length, 1, file);
+	if (success < 1) {
+		delete[] data;
+		return -1;
+	}
 
-    *data_return = data;
-    return length;
+	*data_return = data;
+	return length;
 }
 
-int read_entire_file(const char *filepath , void** data_return)
+u64 read_entire_file(const char* filepath, void** data_return)
 {
-	
-	FILE* file = fopen(filepath, "rb");
-	if(!file)
+
+	FILE* file;
+	fopen_s(&file, filepath, "rb");
+	if (!file)
 	{
 		printf("Couldn't find file [%s]\n", filepath);
 		return false;
 	}
 	assert(file);
-    int descriptor = fileno(file);
+	int descriptor = _fileno(file);
 
-    struct stat file_stats;
-    int result = fstat(descriptor, &file_stats);
-    if (result == -1) return -1;
+	struct stat file_stats;
+	int result = fstat(descriptor, &file_stats);
+	if (result == -1) return -1;
 
-    int length = file_stats.st_size;
+	u64  length = file_stats.st_size;
 
-    unsigned char *data = new unsigned char[length];
+	unsigned char* data = new unsigned char[length];
 
-    fseek(file, 0, SEEK_SET);
-    int success = fread((void *)data, length, 1, file);
-    if (success < 1) {
-        delete [] data;
-        return -1;
-    }
+	fseek(file, 0, SEEK_SET);
+	u64  success = fread((void*)data, length, 1, file);
+	if (success < 1) {
+		delete[] data;
+		return -1;
+	}
 
-    *data_return = data;
-    return length;
+	*data_return = data;
+	return length;
 }
 
-int read_entire_file(const String& filename  , void** data_return)
+u64 read_entire_file(const String& filename, void** data_return)
 {
 	assert(filename.count <= 255);
 	char name[256];
@@ -126,25 +127,5 @@ int read_entire_file(const String& filename  , void** data_return)
 	memcpy(name, filename.data, filename.count);
 	name[filename.count] = '\0';
 	return read_entire_file(name, data_return);
-	
-}
 
-
-
-
-
-Memory alloc_memory(u64 size){
-	return {};
-}
-
-void free_memory(Memory* memory){
-	
-}
-
-Memory alloc_memoryslot(Memory*  memory){
-	return {};
-}
-
-void  free_memoryslot(MemorySlot* slot){
-	
 }

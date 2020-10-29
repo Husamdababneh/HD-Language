@@ -88,6 +88,7 @@ struct Ast_Declaration : public Ast_Node {
 	// name :: value;   // constant
 	// name :  type  = value;
 	// name :  type  : value; // constant
+	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
 	// name :: struct { ... }
 	// name :: struct (   ) { ... }
 
