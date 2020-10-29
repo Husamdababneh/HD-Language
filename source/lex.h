@@ -20,8 +20,8 @@ struct Position
 	{
 		// Do we need bigger size ??
 		// 
-		struct {u16 line, index;};
-		struct {u16 x, y;};
+		struct {u32 line, index;};
+		struct {u32 x, y;};
 	};
 };
 
@@ -49,16 +49,12 @@ struct LexerState
 	~LexerState();
 
 	String input;				// Data
+	Logger logger = Logger("Lexer"_s);
 	u64 input_cursor;			// to keep track were we are
 	//StringView cursor;			// new cursor type 
 
-	u16 current_line_number;
-	u16 current_char_index;
-	u16 previous_token_line_number;
-	//int numberOfTokens;
-
-	Logger logger = Logger("Lexer"_s);
- 
+	u32 current_line_number;
+	u32 current_char_index; 
 	
 	Token eat_token();
 	Token peek_token(int lookAhead = 0);	

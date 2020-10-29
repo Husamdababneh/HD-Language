@@ -35,5 +35,5 @@ enum class ETOKEN : u64 {
     ERROR,
 };
 
-String ETOKENStrings[];
-String ETOKENToString(ETOKEN var);
+extern String ETOKENStrings[];
+extern String ETOKENToString(ETOKEN var);
