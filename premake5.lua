@@ -2,7 +2,7 @@
 workspace "HD-Project"
    location "Generated"
    architecture "x64"
-   configurations { "Debug", "Release" }
+   configurations { "Debug", "Release", "Tracy" }
    startproject "HDLang"
 
 project "HDLang"
@@ -14,9 +14,14 @@ project "HDLang"
    staticruntime "On"
       
    targetdir "bin/"
-   objdir "bin-int/"
+   objdir "bin-int/%{cfg.buildcfg}/"
 
-   files { "**.h", "**.c", "**.cpp" }
+   files {
+	  "source/**.h",
+	  "source/**.c",
+	  "source/**.cpp",
+	  "submodules/tracy/TracyClient.cpp"
+   }
 
 
    	includedirs
@@ -33,6 +38,11 @@ project "HDLang"
 	  runtime "Debug"
       symbols "On"
 
+	filter "configurations:Tracy"
+	  defines { "DEBUG", "TRACY_ENABLE" }
+	  runtime "Debug"
+      symbols "On"
+	  
 	filter "configurations:Release"
       defines { "NDEBUG" }
 	  runtime "Release"
