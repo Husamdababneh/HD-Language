@@ -46,6 +46,7 @@ project "HDLang"
 
 	filter "configurations:Tracy"
 	  files {"submodules/tracy/TracyClient.cpp"}
+	  links { "pthread", "dl" }
 	  defines { "DEBUG", "TRACY_ENABLE" }
 	  runtime "Debug"
       symbols "On"
