@@ -18,18 +18,18 @@ struct Stack_Array  {
 
 template<typename T>
 struct Array {
-    u64 size;
+	u64 size;
 	u64 occupied;
-    T* data;
+	T* data;
 
 	T* operator[]  (u64 i) {
-		assert(i <= occupied);
+		//assert(i <= occupied);
 		return &data[i];
 	}
 };
 
 
-extern constexpr int ARRAY_INIT_SIZE = 10;
+extern int ARRAY_INIT_SIZE;
 
 // template<typename T>
 // Array<T> init_array();

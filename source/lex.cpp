@@ -94,7 +94,7 @@ static inline bool isInLireralChar(u8 ch){
 bool isKeyword(String& string)
 {
 	for(int a = 0; a < KeywordCount; a++)
-		if(isEqual(string, reserved[a]))
+		if(isEqual(&string, &reserved[a]))
 			return true;
 	return false;
 }

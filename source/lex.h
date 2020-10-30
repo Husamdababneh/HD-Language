@@ -37,8 +37,8 @@ struct Token
 		String name;
 		bool boolean;
 		int integer;
-		float32 float32;
-		float64 float64;
+		float32 _float32;
+		float64 _float64;
 		String value;
 	};
 };

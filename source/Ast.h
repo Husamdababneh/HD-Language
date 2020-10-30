@@ -8,7 +8,7 @@
 #pragma once
 
 #include "String.h"
-#include "Array.h"
+#include "array.h"
 
 enum NODE_TYPE {
 	AST_BLOCK,

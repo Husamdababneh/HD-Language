@@ -8,8 +8,6 @@
 #pragma once
 #include <stdint.h>
 
-
-
 typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -26,4 +24,4 @@ typedef double float64;
 
 
 
-size_t c_str_size(const char* str);
+u64 c_str_size(const char* str);

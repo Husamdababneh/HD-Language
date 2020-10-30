@@ -174,7 +174,9 @@ void parse_file(const String& filename){
 				  //logger.print("Function or Constant Or Struct [%s]\n"_s , token.value);
 				  next = lexer.peek_token();
 
-				  if (isEqual(next.value, "struct"_s)){
+				  // TODO:@Clean: cleanup String class
+				  String sturctStr = "struct"_s;
+				  if (isEqual(&next.value, &sturctStr)){
 					  logger.print("Struct [%s]\n"_s , token.value);
 				  }else if (next.Type == (ETOKEN)'(') {
 					  logger.print("Function [%s]\n"_s , token.value);
