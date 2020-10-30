@@ -15,7 +15,7 @@
 #include "String.h"
 
 
-extern constexpr int MAX_ARG_COUNT = 5 + 1; // + 1 for executable call string
+//extern constexpr int MAX_ARG_COUNT = 5 + 1; // + 1 for executable call string
 #define BINARY "binary:"
 #define INPUT  "input:"
 #define OUTPUT "output:"

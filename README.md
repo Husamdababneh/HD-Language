@@ -12,4 +12,4 @@ HD Programming language is a project for learning
   - [ ] AST
   
 - [x] Profiling -> We are using Tracy Profiler as a submodule (Recomended)
-- [ ] Build On linux 
+- [x] Build On linux (Early Stage)

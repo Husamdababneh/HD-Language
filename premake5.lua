@@ -19,8 +19,7 @@ project "HDLang"
    files {
 	  "source/**.h",
 	  "source/**.c",
-	  "source/**.cpp",
-	  "submodules/tracy/TracyClient.cpp"
+	  "source/**.cpp"
    }
 
 
@@ -31,7 +30,14 @@ project "HDLang"
 
 	filter  "system:windows" 
 	  editandcontinue "Off"
-     	
+
+	filter "system:linux"
+	  buildoptions {
+	  	"-msse2",
+		"-msse",
+		"-march=native",
+		"-maes"
+	}
 	
 	filter "configurations:Debug"
 	  defines { "DEBUG" }
@@ -39,6 +45,7 @@ project "HDLang"
       symbols "On"
 
 	filter "configurations:Tracy"
+	  files {"submodules/tracy/TracyClient.cpp"}
 	  defines { "DEBUG", "TRACY_ENABLE" }
 	  runtime "Debug"
       symbols "On"

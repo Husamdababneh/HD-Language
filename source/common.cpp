@@ -6,10 +6,11 @@
    $Description: common.cpp
    ========================================================================*/
 
+#include "common.h"
 
-size_t c_str_size(const char* str){
+u64 c_str_size(const char* str){
 
-	size_t a = 0;
+	u64 a = 0;
 	while(*str != '\0') {
 		str++;
 		a++;

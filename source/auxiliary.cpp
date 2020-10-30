@@ -7,53 +7,6 @@
    ========================================================================*/
 #include "auxiliary.h"
 #include <stdio.h>
-
-
-
-
-Arguments ParseArguments(int argc, char** argv)
-{
-	Arguments args;
-	if (argc > MAX_ARG_COUNT)
-		return args;
-
-	// TODO@TODO(Husam): Report error
-	int haha = 3;
-	for (int a = 1; a < argc; a++)
-	{
-
-		//std::cout << "Proccessing " << argv[a] << "\n";
-		if (argv[a][0] != '-')
-			return {};
-
-		if (char* sub = (argv[a], INPUT); sub)
-		{
-			args.inputFile = &sub[strlen(INPUT)];
-			haha--;
-		}
-
-		if (char* sub = strstr(argv[a], OUTPUT); sub)
-		{
-			args.outputFile = &sub[strlen(OUTPUT)];
-			haha--;
-		}
-		// we are looking to parse this file
-		if (char* sub = strstr(argv[a], BINARY); sub)
-		{
-			args.structureFile = &sub[strlen(BINARY)];
-			haha--;
-		}
-	}
-	if (haha < 3)
-		args.isSet = true;
-	else
-	{
-
-		printf("Usage : %s  -inputfile:<inputfilename>  -outputfile:<outputfilename>  -binary:<binarystructurefilename> \n", argv[0]);
-	}
-	return args;
-}
-
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -66,7 +19,7 @@ Arguments ParseArguments(int argc, char** argv)
 u64 read_entire_file(FILE* file, void** data_return)
 {
 	assert(file);
-	int descriptor = _fileno(file);
+	int descriptor = fileno(file);
 
 	struct stat file_stats;
 	int result = fstat(descriptor, &file_stats);
@@ -89,16 +42,19 @@ u64 read_entire_file(FILE* file, void** data_return)
 
 u64 read_entire_file(const char* filepath, void** data_return)
 {
-
 	FILE* file;
+#ifdef WIN32
 	fopen_s(&file, filepath, "rb");
+#else
+	file = fopen(filepath, "rb");
+#endif
 	if (!file)
 	{
 		printf("Couldn't find file [%s]\n", filepath);
 		return false;
 	}
 	assert(file);
-	int descriptor = _fileno(file);
+	int descriptor = fileno(file);
 
 	struct stat file_stats;
 	int result = fstat(descriptor, &file_stats);

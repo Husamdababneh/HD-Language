@@ -9,3 +9,4 @@
 #include "array.h"
 
 
+int  ARRAY_INIT_SIZE = 10;

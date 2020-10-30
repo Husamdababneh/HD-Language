@@ -51,5 +51,5 @@ myString operator "" _s(const char* a, size_t s);
 typedef myString String;
 typedef myStringView StringView;
 
-bool isEqual(String& first, String& second);
+bool isEqual(String* first, String* second);
 myStringView make_view(const myString& str);
