@@ -32,6 +32,7 @@ project "HDLang"
 	  editandcontinue "Off"
 
 	filter "system:linux"
+	  links { "pthread", "dl" }
 	  buildoptions {
 	  	"-msse2",
 		"-msse",
@@ -46,15 +47,15 @@ project "HDLang"
 
 	filter "configurations:Tracy"
 	  files {"submodules/tracy/TracyClient.cpp"}
-	  links { "pthread", "dl" }
-	  defines { "DEBUG", "TRACY_ENABLE" }
-	  runtime "Debug"
+	  
+	  defines { "DEBUG", "TRACY_ENABLE", "TRACY_NO_EXIT" }
+	  runtime "Release"
       symbols "On"
 	  
 	filter "configurations:Release"
       defines { "NDEBUG" }
 	  runtime "Release"
-      optimize "on"
+      optimize "off"
 	  
 
 -- Clean Function --
