@@ -4,7 +4,9 @@
 *
 */
 
+#include "pch.h"
 #include "constants.h"
+
 String ETOKENStrings[] =   {
     "IDENT"_s,
     "KEYWORD"_s,
@@ -34,9 +36,9 @@ String ETOKENStrings[] =   {
     "ERROR"_s,
 };
 
-String ETOKENToString(ETOKEN var) {
-    if (var < ETOKEN::IDENT)
+String ETOKENToString(u64 var) {
+    if (var < ETOKEN_IDENT)
         return {(u8*) var , 1};
-    return ETOKENStrings[(u64)var - (u64)ETOKEN::IDENT  + 1];
+    return ETOKENStrings[(u64)var - (u64)ETOKEN_IDENT  + 1];
 };
 

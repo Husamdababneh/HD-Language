@@ -6,7 +6,7 @@
    $Description: Logger.cpp
    ========================================================================*/
 
-
+#include "pch.h"
 #include "logger.h"
 #include "lex.h"
 
@@ -35,41 +35,41 @@ void Logger::print_line(Token * token , String str, ...) {
 		if (str[i] == '%'){
 			i++;
 			switch (str[i]){
-			  case 'u':
-			  {
-				  unsigned long number = va_arg(args, unsigned long);
-				  printf("%ld", number);
-				  break;
-			  }
-			  case 'd':
-			  {
-				  long number = va_arg(args, long);
-				  printf("%ld", number);
-				  break;
-			  }
-			  case 's':
-			  {
-				  String string = va_arg(args, String);
-				  for(int a = 0; a < string.count; a++)
-					  putc(string[a], out);
-				  break;
-			  }
-			  default:
-				  if (str[i] == '%'){
-					  if (i + 1 < str.count && str[i+1] != '%')
-						  continue;
-				  }
-				  putchar(str[i]);
-				  break;
+				case 'u':
+				{
+					unsigned long number = va_arg(args, unsigned long);
+					printf("%ld", number);
+					break;
+				}
+				case 'd':
+				{
+					long number = va_arg(args, long);
+					printf("%ld", number);
+					break;
+				}
+				case 's':
+				{
+					String string = va_arg(args, String);
+					for(int a = 0; a < string.count; a++)
+						putc(string[a], out);
+					break;
+				}
+				default:
+				if (str[i] == '%'){
+					if (i + 1 < str.count && str[i+1] != '%')
+						continue;
+				}
+				putchar(str[i]);
+				break;
 			}
 		}
 		else{
 			putchar(str[i]);
 		}
-			
+		
 	}
 	va_end(args);
-		
+	
 	return;
 }
 
@@ -83,41 +83,41 @@ void Logger::print(String str, ...) {
 		if (str[i] == '%'){
 			i++;
 			switch (str[i]){
-			  case 'u':
-			  {
-				  unsigned long number = va_arg(args, unsigned long);
-				  printf("%ld", number);
-				  break;
-			  }
-			  case 'd':
-			  {
-				  long number = va_arg(args, long);
-				  printf("%ld", number);
-				  break;
-			  }
-			  case 's':
-			  {
-				  String string = va_arg(args, String);
-				  for(int a = 0; a < string.count; a++)
-					  putc(string[a], out);
-				  break;
-			  }
-			  default:
-				  if (str[i] == '%'){
-					  if (i + 1 < str.count && str[i+1] != '%')
-						  continue;
-				  }
-				  putchar(str[i]);
-				  break;
+				case 'u':
+				{
+					unsigned long number = va_arg(args, unsigned long);
+					printf("%ld", number);
+					break;
+				}
+				case 'd':
+				{
+					long number = va_arg(args, long);
+					printf("%ld", number);
+					break;
+				}
+				case 's':
+				{
+					String string = va_arg(args, String);
+					for(int a = 0; a < string.count; a++)
+						putc(string[a], out);
+					break;
+				}
+				default:
+				if (str[i] == '%'){
+					if (i + 1 < str.count && str[i+1] != '%')
+						continue;
+				}
+				putchar(str[i]);
+				break;
 			}
 		}
 		else{
 			putchar(str[i]);
 		}
-			
+		
 	}
 	va_end(args);
-		
+	
 	return;
 }
 

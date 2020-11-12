@@ -18,10 +18,6 @@ TYPE  -> u8      | u16 |
 		 float32 | float64 |
 		 string  | char
 
-NAME : TYPE = VALUE;
-NAME : TYPE  = VALUE;
-NAME := VALUE ; // Type inffered
-
 IDENT -> [ a-z A-z _ ]+ [ a-z A-z _ 0-9]*
 ///
  primitive types
@@ -52,7 +48,7 @@ Definitions
 		   			  	 this should work inside other functions
 						 
 5 - Data Structers
-  	structs			  -> <name> :: struct <block>
+  	strcuture			  -> <name> :: struct <block>
 
 
 

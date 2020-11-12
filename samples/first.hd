@@ -4,7 +4,7 @@
 
 
 internal
-add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64 ) {
+add :: proc (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
 	return a + b;
 }
 
@@ -12,6 +12,9 @@ add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64 ) {
 
 #scope internal  // this tells the compiler that everything under it is only accessed by the file
 
-main :: () {
+main :: proc () {
+
+	a :: b;
 	return add();	
 }
+

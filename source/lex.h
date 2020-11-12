@@ -7,7 +7,6 @@
    ========================================================================*/
 
 #pragma once
-#include <string>
 
 #include "String.h"
 #include "logger.h"
@@ -27,7 +26,7 @@ struct Position
 
 struct Token
 {
-	ETOKEN Type = ETOKEN::NONE;
+	u16 Type = ETOKEN_NONE;
 
 	Position start_position;
 	Position end_position;

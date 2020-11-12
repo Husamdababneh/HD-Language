@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "String.h"
+#include "mystring.h"
 
 
 //extern constexpr int MAX_ARG_COUNT = 5 + 1; // + 1 for executable call string

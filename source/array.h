@@ -7,7 +7,9 @@
    ========================================================================*/
 #pragma once
 
+
 #include "common.h"
+
 
 template<typename T, u64 a>
 struct Stack_Array  {
@@ -21,7 +23,7 @@ struct Array {
 	u64 size;
 	u64 occupied;
 	T* data;
-
+	
 	T* operator[]  (u64 i) {
 		//assert(i <= occupied);
 		return &data[i];
@@ -29,17 +31,7 @@ struct Array {
 };
 
 
-extern int ARRAY_INIT_SIZE;
-
-// template<typename T>
-// Array<T> init_array();
-
-
-// template<typename T>
-// void array_resize(const Array<T>* array, const T item );
-
-// template<typename T>
-// void array_add(const Array<T>* array, const T item );
+extern u8 ARRAY_INIT_SIZE;
 
 template<typename T>
 Array<T> init_array() {
@@ -54,7 +46,7 @@ Array<T> init_array() {
 template<typename T>
 void array_resize(Array<T>* array ) {
 	T* newData = new T[array->size * 2];
-	memcpy((u8*)newData, (u8*)array->data, array->occupied);
+	memcpy((void*)newData, (void*)array->data, array->occupied);
 	delete array->data;
 	array->data = newData;
 }
@@ -65,4 +57,9 @@ void array_add(Array<T>* array, T item ) {
 		array_resize(array);
 	array->data[array->occupied] = item;
 	array->occupied++;
+}
+
+template<typename T>
+void array_free(Array<T>* array ) {
+	delete array->data;
 }

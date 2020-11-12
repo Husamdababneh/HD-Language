@@ -5,35 +5,36 @@
 */
 
 #include "common.h"
-#include "String.h"
-enum class ETOKEN : u64 {
-    IDENT = 256,
-    KEYWORD,
-    LITERAL,
-    COMMENT,
-    MULTILINE_COMMENT,
-    COLON,
-    DOUBLECOLON,
-    COLONEQUAL,
-    OPERATOR,
-    DIRECTIVE,
-    DOUBLEDOT,
-    STRING_LITERAL,
-    INT_LITERAL,
-    FLOAT_LITERAL,
-    ARROW,
-    ASSIGN,
-    EQL,
-    GT,
-    LT,
-    GT_OR_EQL,
-    LT_OR_EQL,
-    SHIFT_LEFT,
-    SHIFT_RIGHT,
-    NONE,
-    EOFA,
-    ERROR,
+#include "mystring.h"
+
+enum  {
+    ETOKEN_IDENT = 256,
+    ETOKEN_KEYWORD,
+    ETOKEN_LITERAL,
+    ETOKEN_COMMENT,
+    ETOKEN_MULTILINE_COMMENT,
+    ETOKEN_COLON,
+    ETOKEN_DOUBLECOLON,
+    ETOKEN_COLONEQUAL,
+    ETOKEN_OPERATOR,
+    ETOKEN_DIRECTIVE,
+    ETOKEN_DOUBLEDOT,
+    ETOKEN_STRING_LITERAL,
+    ETOKEN_INT_LITERAL,
+    ETOKEN_FLOAT_LITERAL,
+    ETOKEN_ARROW,
+    ETOKEN_ASSIGN,
+    ETOKEN_EQL,
+    ETOKEN_GT,
+    ETOKEN_LT,
+    ETOKEN_GT_OR_EQL,
+    ETOKEN_LT_OR_EQL,
+    ETOKEN_SHIFT_LEFT,
+    ETOKEN_SHIFT_RIGHT,
+    ETOKEN_NONE,
+    ETOKEN_EOFA,
+    ETOKEN_ERROR,
 };
 
-extern String ETOKENStrings[];
-extern String ETOKENToString(ETOKEN var);
+String ETOKENStrings[];
+String ETOKENToString(u64 var);

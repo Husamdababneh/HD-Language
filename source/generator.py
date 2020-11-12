@@ -41,17 +41,17 @@ TokenTypes = {
 	"ERROR" : [False, 0]
 }
 
-def generateEnum(headerfile, cppfile, enumName, enumtype, enumValues):
-	headerfile.write('enum class ' +  enumName + " : " + enumtype + ' {\n')
+def generateEnum(headerfile, cppfile, enumName, enumValues):
+	headerfile.write('\nenum  {\n')
 	for token, value in enumValues.items():
 		headerfile.write("    ")
-		headerfile.write(token)
+		headerfile.write(enumName + "_" +token)
 		if value[0] != False:
 			headerfile.write(" = " + str(value[1]))
 		headerfile.write(",\n")
 	headerfile.write('};\n\n')
 
-def generateStringArray(headerfile, cppfile, enumName, enumtype, enumValues):
+def generateStringArray(headerfile, cppfile, enumName, enumValues):
 	headerfile.write('String ' +  enumName + "Strings[]" + ';\n')
 	cppfile.write('String ' +  enumName + "Strings[] =  " + ' {\n')
 	for token, value in enumValues.items():
@@ -60,16 +60,16 @@ def generateStringArray(headerfile, cppfile, enumName, enumtype, enumValues):
 		cppfile.write(",\n")
 	cppfile.write('};\n\n')
 
-def generateFunction(headerfile, cppfile, enumName, enumtype, enumValues):
-	headerfile.write('String ' +  enumName + "ToString(" + enumName  + " var)" + ';\n')
-	cppfile.write('String ' +  enumName + "ToString(" + enumName  + " var)" + ' {\n')
+def generateFunction(headerfile, cppfile, enumName, enumValues):
+	headerfile.write('String ' +  enumName + "ToString(u64 var)" + ';\n')
+	cppfile.write('String ' +  enumName + "ToString(u64 var)" + ' {\n')
 	cppfile.write("    ")
-	cppfile.write("if (var < ETOKEN::IDENT)\n")
+	cppfile.write("if (var < " + enumName + "_" + "IDENT)" +"\n")
 	cppfile.write("    ")
 	cppfile.write("    ")
 	cppfile.write("return {(u8*) var , 1};\n")
 	cppfile.write("    ")
-	cppfile.write("return " + enumName + "Strings[(u64)var - (u64)ETOKEN::IDENT  + 1];\n")
+	cppfile.write("return " + enumName + "Strings[(u64)var - (u64)ETOKEN_IDENT  + 1];\n")
 	cppfile.write('};\n\n')
 	
 def generateFile() :
@@ -78,12 +78,13 @@ def generateFile() :
 	cppfile.write(a)
 	headerfile.write(a)
 	headerfile.write("#include \"common.h\"\n")
-	headerfile.write("#include \"String.h\"\n")
-	cppfile.write("#include \"constants.h\"\n")
+	headerfile.write("#include \"mystring.h\"\n")
+	cppfile.write("#include \"pch.h\"\n")
+	cppfile.write("#include \"constants.h\"\n\n")
 	
-	generateEnum(headerfile, cppfile, "ETOKEN" , "u64", TokenTypes)
-	generateStringArray(headerfile, cppfile, "ETOKEN" , "u64", TokenTypes)
-	generateFunction(headerfile, cppfile, "ETOKEN" , "u64", TokenTypes)
+	generateEnum(headerfile, cppfile, "ETOKEN" , TokenTypes)
+	generateStringArray(headerfile, cppfile, "ETOKEN" , TokenTypes)
+	generateFunction(headerfile, cppfile, "ETOKEN" , TokenTypes)
 	cppfile.close()
 	headerfile.close()
 	

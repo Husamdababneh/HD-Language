@@ -6,12 +6,15 @@
    $Description: Custom String Type
    ========================================================================*/
 
+#include "pch.h"
+#include "string.h"
 
-#include "String.h"
+typedef myString String;
+typedef myStringView StringView;
 
 bool isEqual(String* first, String* second)  {
 	if (first->count != second->count) return false;
-
+	
 	for(u32 a = 0; a < first->count; a++){
 		if((*first)[a] != (*second)[a])
 			return false;
@@ -20,9 +23,9 @@ bool isEqual(String* first, String* second)  {
 }
 
 
-myStringView make_view(const String& str)
+myStringView make_view(String& str)
 {
-	return { str, 0 };
+	return { &str, 0 };
 }
 
 myString operator "" _s(const char* a, size_t s){

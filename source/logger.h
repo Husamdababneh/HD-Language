@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "String.h"
+#include "string.h"
 #include "common.h"
 
 //#include "lex.h"

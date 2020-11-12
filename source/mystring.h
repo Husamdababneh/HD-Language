@@ -8,11 +8,7 @@
 #pragma once
 
 #include "common.h"
-
 #include <assert.h>
-
-#include <string.h>
-
 // @Cleanup: do we need this ?
 
 struct myString
@@ -24,14 +20,41 @@ struct myString
 		assert(i <= count);
 		return data[i];
 	}
+	
+	u8& operator[] (u64 i) const  {
+		assert(i <= count);
+		return data[i];
+	}
 
+	// @Incomplete:
+	bool compare(const myString& str){
+		if (this->count != str.count) return false;
+
+		for(u32 a = 0; a < this->count; a++){
+			if(str[a] != data[a])
+				return false;
+		}
+		
+		return true;
+	}
+
+	bool isEqual(const myString& str){
+		if (this->count != str.count) return false;
+
+		for(u32 a = 0; a < this->count; a++){
+			if(str[a] != data[a])
+				return false;
+		}
+		
+		return true;
+	}
 };
 
 
 
 struct myStringView
 {
-	myString string;
+	myString* string;
 	u64 cursor;
 
 	operator u64() const
@@ -39,8 +62,8 @@ struct myStringView
 		return cursor;
 	}
 	
-	u8& operator[]  (u64 i) {
-		return string[i];
+	u8 operator[]  (u64 i) {
+		return (*string)[i];
 	}
 	
 

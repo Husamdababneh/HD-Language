@@ -7,7 +7,7 @@
    ========================================================================*/ 
 
 
-
+#include "pch.h"
 #include "lex.h"
 
 #include "common.h"
@@ -25,14 +25,14 @@ String reserved [] = {
 	"float64"_s,
 	"string"_s,
 	"bool"_s,
-
+	
     // loop
 	"for"_s,
 	
 	// memory related
 	"new"_s,
 	"delete"_s,
-
+	
 	// control 
 	"defer"_s,
 	"if"_s,
@@ -41,7 +41,7 @@ String reserved [] = {
 	"continue"_s,
 	"break"_s,
 	"return"_s,
-
+	
 	// Builtins
 	"cast"_s,
 	"it"_s,
@@ -51,17 +51,17 @@ String reserved [] = {
 	"internal"_s,
 	"external"_s,
 	"scope"_s,
-
+	
 	// Constants
 	"null"_s,
 	"true"_s,
 	"false"_s,
-
+	
 	// not used
 	"no_inline"_s
 };
 
-constexpr int KeywordCount = sizeof(reserved)/sizeof(String);
+constexpr int KeywordCount = sizeof(reserved) / sizeof(String);
 
 static inline bool isWhitechar(u8 c){
 	if (c == '\t' ||
@@ -95,7 +95,7 @@ bool isKeyword(String& string)
 {
 	for(int a = 0; a < KeywordCount; a++)
 		if(isEqual(&string, &reserved[a]))
-			return true;
+		return true;
 	return false;
 }
 
@@ -131,16 +131,16 @@ u8 LexerState::eat_character()
 	
 	switch(input[input_cursor])
 	{
-	  case '\n':
-		  current_line_number++;
-		  current_char_index = 0;
-		  break;
-	  case '\t':
-		  current_char_index+=4;
-		  break;
-	  default:
-		  current_char_index++;
-		  break;
+		case '\n':
+		current_line_number++;
+		current_char_index = 0;
+		break;
+		case '\t':
+		current_char_index+=4;
+		break;
+		default:
+		current_char_index++;
+		break;
 	}
 	input_cursor++;
 	return input[input_cursor - 1];
@@ -157,7 +157,7 @@ LexerState::LexerState(const String& filepath)
 	}
 	input.count = length;
 	input_cursor = 0;
-
+	
 	current_line_number = 1;
 	current_char_index = 0;	
 }
@@ -175,7 +175,7 @@ Token LexerState::eat_token()
 	// @TODO: init a token and return it.
 	
 	if(input_cursor >= input.count)
-		return { ETOKEN::EOFA , 0 , 0 };
+		return { ETOKEN_EOFA , 0 , 0 };
 	
 	Token token = {};
 	
@@ -185,195 +185,196 @@ Token LexerState::eat_token()
 	switch(ch)
 	{
 		// @Todo(Husam):Handle nested multiline comments.
-	  case '/':
-	  {
-		  u8 next = peek_character();
-		  
-		  if(next  == '/'){
-			  token.Type = ETOKEN::COMMENT;
-			  while(eat_character() != '\n');
-		  } else if (next == '*'){
-			  token.Type = ETOKEN::MULTILINE_COMMENT;
-			  int nested_level = 1;			  
-			  while(input_cursor < input.count ){
-				  u8 eaten = eat_character();
-				  u8 next_to_be_eaten = peek_character();
-				  if (eaten == '/' && next_to_be_eaten == '*'){
-					  eat_character();
-					  nested_level++;
-				  }
-				  if(eaten == '*' && next_to_be_eaten == '/'){
-					  eat_character();
-					  nested_level--;
-					  continue;
-				  }
-				  if (nested_level == 0) break;	  
-			  };
-			  break;	  
-		  } else {
-			  // division ?? 
-			  token.Type = (ETOKEN) ch;
-			  break;	  
-		  }
-		  break;
-	  }
-	  break;
-	  case '+': case '-': case '*': case '{': case '}':
-	  case ';': case '[': case ']': case '`':
-	  case '(': case ')': case ',': 
-	  case '~': case '!': case '$': case '%': case '^':
-	  case '&': case '?': case '|': case '@':
-	  case '\'': case '\\':
-		  token.Type = (ETOKEN) ch;
-		  break;
-	  case '#':
-		  // Compile Time Execution operator
-		  // What follows # should be executed at compile time (Just Like Jai)
-		  token.Type = ETOKEN::DIRECTIVE;
-		  // This is not right .. the behaviour should be to stop on first whitespace
-		  // but since i'm getting used to the lexer i wanted to try some stuff - Husam 9/28/2020
-		  while(true){
-			  auto eaten = peek_character();
-			  if(isWhitechar(eaten))
-				  break;
-			  eat_character();
-		  };
-		  break;
-	  case '=':
-	  {
-		  auto next = peek_character();
-		  if (next == '='){
-			  eat_character();
-			  token.Type = ETOKEN::EQL;
-		  }
-		  else {
-			  token.Type = ETOKEN::ASSIGN;
-		  }
-		  break;
-	  }
-	  case '<':
-	  {
-		  auto next = peek_character();
-		  if (next == '='){
-			  eat_character();
-			  token.Type = ETOKEN::LT_OR_EQL;
-		  } else if (next == '<'){
-			  eat_character();
-			  token.Type = ETOKEN::SHIFT_LEFT;
-		  } else {
-			  token.Type = ETOKEN::LT;
-		  }
-		  break;
-	  }
-	  case '>':
-	  {
-		  auto next = peek_character();
-		  if (next == '='){
-			  eat_character();
-			  token.Type = ETOKEN::GT_OR_EQL;
-		  } else if (next == '>'){
-			  eat_character();
-			  token.Type = ETOKEN::SHIFT_RIGHT;
-		  } else {
-			  token.Type = ETOKEN::GT;
-		  }
-		  break;
-	  }
-	  case '.':
-	  {
-		  auto next = peek_character();
-		  if (next == '.') {
-			  eat_character();
-			  token.Type = ETOKEN::DOUBLEDOT;
-		  }
-		  else if (next == '>'){
-			  eat_character();
-			  token.Type = ETOKEN::ARROW;
-		  } else {
-			  token.Type = (ETOKEN)ch;
-		  }
-		  break;
-	  }
-	  case '"':
-	  {
-		  // @Cleanup: We could check the prev instead ?? wont it be easer ??
-		  u8 escape = 0;
-		  while(true){
-			  auto peeked = peek_character();
-			  auto ahead =  peek_character(1);
-			  if (peeked == '\\' && ahead == '"'){
-				  eat_characters(2);
-			  }
-			  eat_character();
-			  if(peeked == '"')
-				  break;
-		  }	  
-		  token.Type = ETOKEN::LITERAL;
-		  break;	  
-	  }
-	  break;
-	  case ':':
-	  {
-		  auto next = peek_character();
-		  token.value = String {&input[temp], input_cursor - temp};
-		  if (next == ':')  {
-			  token.Type = ETOKEN::DOUBLECOLON; // uninitailizaed
-			  eat_character();
-		  }
-		  else if (next == '=')  {
-			  token.Type = ETOKEN::COLONEQUAL; // initialized
-			  eat_character();
-		  }
-		  else{
-			  token.Type = ETOKEN::COLON;
-		  } 
-		  break;
-	  }
-	  break;
-	  //case ' ': case '\t': case '\n': case '\r': break;
-	  case '\0':
-		  return { ETOKEN::EOFA , 0 , 0 };
-		  break;
-	  default:
-		  if (isAlphabet(ch) || ch == '_'){
-			  while(true){
-				  auto next = peek_character();
-				  if (!isInLireralChar(next))
-					  break;
-				  eat_character();
-			  };
-			  if (isKeyword(token.value))
-				  token.Type = ETOKEN::KEYWORD;
-			  else
-				  token.Type = ETOKEN::IDENT;
-			  
-			  
-		  } else {
-			  // We assume that this will be only numbers
-			  // (0x -> hex) (0b -> binary) (0o  -> Octal)
-			  // auto& pos = get_current_position();
-			  assert(isDigit(ch));
-			  token.Type = ETOKEN::LITERAL;
-			  auto peeked = peek_character();
-			  bool doEat  = true;
-			  if(peeked == 'x' ||  peeked == 'b' ||	 peeked == 'o')  eat_character();
-			  
-			  peeked = peek_character();
-
-			  if (isDigit(peeked)){			  
-				  while(true){
-					  auto next = peek_character();
-					  if (!isDigit(next)){
-						  break;
-					  }
-					  eat_character();
-				  }
-			  }
-		  }
-		  break;
+		case '/':
+		{
+			u8 next = peek_character();
+			
+			if(next  == '/'){
+				token.Type = ETOKEN_COMMENT;
+				while(eat_character() != '\n');
+			} else if (next == '*'){
+				token.Type = ETOKEN_MULTILINE_COMMENT;
+				int nested_level = 1;			  
+				while(input_cursor < input.count ){
+					u8 eaten = eat_character();
+					u8 next_to_be_eaten = peek_character();
+					if (eaten == '/' && next_to_be_eaten == '*'){
+						eat_character();
+						nested_level++;
+					}
+					if(eaten == '*' && next_to_be_eaten == '/'){
+						eat_character();
+						nested_level--;
+						continue;
+					}
+					if (nested_level == 0) break;	  
+				};
+				break;	  
+			} else {
+				// division ?? 
+				token.Type = ch;
+				break;	  
+			}
+			break;
+		}
+		break;
+		case '+': case '-': case '*': case '{': case '}':
+		case ';': case '[': case ']': case '`':
+		case '(': case ')': case ',': 
+		case '~': case '!': case '$': case '%': case '^':
+		case '&': case '?': case '|': case '@':
+		case '\'': case '\\':
+		token.Type = ch;
+		break;
+		case '#':
+		// Compile Time Execution operator
+		// What follows # should be executed at compile time (Just Like Jai)
+		token.Type = ETOKEN_DIRECTIVE;
+		// This is not right .. the behaviour should be to stop on first whitespace
+		// but since i'm getting used to the lexer i wanted to try some stuff - Husam 9/28/2020
+		while(true){
+			auto eaten = peek_character();
+			if(isWhitechar(eaten))
+				break;
+			eat_character();
+		};
+		break;
+		case '=':
+		{
+			auto next = peek_character();
+			if (next == '='){
+				eat_character();
+				token.Type = ETOKEN_EQL;
+			}
+			else {
+				token.Type = ETOKEN_ASSIGN;
+			}
+			break;
+		}
+		case '<':
+		{
+			auto next = peek_character();
+			if (next == '='){
+				eat_character();
+				token.Type = ETOKEN_LT_OR_EQL;
+			} else if (next == '<'){
+				eat_character();
+				token.Type = ETOKEN_SHIFT_LEFT;
+			} else {
+				token.Type = ETOKEN_LT;
+			}
+			break;
+		}
+		case '>':
+		{
+			auto next = peek_character();
+			if (next == '='){
+				eat_character();
+				token.Type = ETOKEN_GT_OR_EQL;
+			} else if (next == '>'){
+				eat_character();
+				token.Type = ETOKEN_SHIFT_RIGHT;
+			} else {
+				token.Type = ETOKEN_GT;
+			}
+			break;
+		}
+		case '.':
+		{
+			auto next = peek_character();
+			if (next == '.') {
+				eat_character();
+				token.Type = ETOKEN_DOUBLEDOT;
+			}
+			else if (next == '>'){
+				eat_character();
+				token.Type = ETOKEN_ARROW;
+			} else {
+				token.Type = ch;
+			}
+			break;
+		}
+		case '"':
+		{
+			// @Cleanup: We could check the prev instead ?? wont it be easer ??
+			u8 escape = 0;
+			while(true){
+				auto peeked = peek_character();
+				auto ahead =  peek_character(1);
+				if (peeked == '\\' && ahead == '"'){
+					eat_characters(2);
+				}
+				eat_character();
+				if(peeked == '"')
+					break;
+			}	  
+			token.Type = ETOKEN_LITERAL;
+			break;	  
+		}
+		break;
+		case ':':
+		{
+			auto next = peek_character();
+			token.value = String {&input[temp], input_cursor - temp};
+			if (next == ':')  {
+				token.Type = ETOKEN_DOUBLECOLON; // uninitailizaed
+				eat_character();
+			}
+			else if (next == '=')  {
+				token.Type = ETOKEN_COLONEQUAL; // initialized
+				eat_character();
+			}
+			else{
+				token.Type = ETOKEN_COLON;
+			} 
+			break;
+		}
+		break;
+		{
+			case '\0':
+			return { ETOKEN_EOFA , 0 , 0 };
+			break;
+		}
+		default:
+		if (isAlphabet(ch) || ch == '_'){
+			while(true){
+				auto next = peek_character();
+				if (!isInLireralChar(next))
+					break;
+				eat_character();
+			};
+			if (isKeyword(token.value))
+				token.Type = ETOKEN_KEYWORD;
+			else
+				token.Type = ETOKEN_IDENT;
+			
+			
+		} else {
+			// We assume that this will be only numbers
+			// (0x -> hex) (0b -> binary) (0o  -> Octal)
+			// auto& pos = get_current_position();
+			assert(isDigit(ch));
+			token.Type = ETOKEN_LITERAL;
+			auto peeked = peek_character();
+			bool doEat  = true;
+			if(peeked == 'x' ||  peeked == 'b' ||	 peeked == 'o')  eat_character();
+			
+			peeked = peek_character();
+			
+			if (isDigit(peeked)){			  
+				while(true){
+					auto next = peek_character();
+					if (!isDigit(next)){
+						break;
+					}
+					eat_character();
+				}
+			}
+		}
+		break;
 	}
 	token.end_position = get_current_position();
-	assert(token.Type != ETOKEN::NONE);
+	assert(token.Type != ETOKEN_NONE);
 	//last_token = token;
 	token.value = String { &input[temp], input_cursor  - temp};
 	return token;
@@ -396,10 +397,3 @@ Token LexerState::peek_token(int lookAhead /* = 0*/ )
 	return result;
 }
 
-// @Temp::
-#define LOCATION 
-#ifdef LOCATION 
-#define POSI " Location :(" << token.start_position.x << ',' << token.start_position.y << ")"
-#else
-#define POSI "" 
-#endif

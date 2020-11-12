@@ -1,73 +1,74 @@
 -- premake5.lua
 workspace "HD-Project"
-   location "Generated"
-   architecture "x64"
-   configurations { "Debug", "Release", "Tracy" }
-   startproject "HDLang"
+	location "generated"
+	architecture "x64"
+	configurations { "Debug", "Release", "Tracy" }
+	startproject "HDLang"
 
 project "HDLang"
-   kind "ConsoleApp"
+	kind "ConsoleApp"
 
-   targetname "hd"
-   language "C++"
-   cppdialect "C++17"
-   staticruntime "On"
-      
-   targetdir "bin/"
-   objdir "bin-int/%{cfg.buildcfg}/"
+	targetname "hd"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "On"
 
-   files {
-	  "source/**.h",
-	  "source/**.c",
-	  "source/**.cpp"
-   }
+	targetdir "bin/"
+	objdir "bin-int/%{cfg.buildcfg}/"
 
+	files {
+		"source/**.h",
+		"source/**.c",
+		"source/**.cpp"
+	}
 
-   	includedirs
-	{
-		"source/meow_hash"
+	pchheader "pch.h"
+	pchsource "source/pch.cpp"
+
+	includedirs {
+		"source/meow_hash",
+		"source"
 	}
 
 	filter  "system:windows" 
-	  editandcontinue "Off"
+		editandcontinue "Off"
 
 	filter "system:linux"
-	  links { "pthread", "dl" }
-	  buildoptions {
-	  	"-msse2",
+		links { "pthread", "dl" }
+		buildoptions {
+		"-msse2",
 		"-msse",
 		"-march=native",
 		"-maes"
 	}
-	
+
 	filter "configurations:Debug"
-	  defines { "DEBUG" }
-	  runtime "Debug"
-      symbols "On"
+		defines { "DEBUG" }
+		runtime "Debug"
+		symbols "On"
 
 	filter "configurations:Tracy"
-	  files {"submodules/tracy/TracyClient.cpp"}
-	  
-	  defines { "DEBUG", "TRACY_ENABLE", "TRACY_NO_EXIT" }
-	  runtime "Release"
-      symbols "On"
-	  
+		files {"source/include_tracy.cpp"}
+		defines { "TRACY_ENABLE", "TRACY_NO_EXIT" }
+		runtime "Release"
+		symbols "off"
+
 	filter "configurations:Release"
-      defines { "NDEBUG" }
-	  runtime "Release"
-      optimize "off"
-	  
+		defines { "NDEBUG" }
+		runtime "Release"
+		optimize "off"
+	
 
 -- Clean Function --
 newaction {
-   trigger     = "clean",
-   description = "Removing project files",
-   execute     = function ()
-      print("clean the build...")
-      os.rmdir("./bin")
-	  os.rmdir("./bin-int")
-	  os.rmdir("./.vs")
-	  os.rmdir("./generated")
-      print("done.")
-   end
+	trigger     = "clean",
+	description = "Removing project files",
+	execute     = function ()
+		print("clean the build...")
+		os.rmdir("./bin")
+		os.rmdir("./bin-int")
+		os.rmdir("./.vs")
+		os.rmdir("./generated")
+		print("done.")
+	end
 }

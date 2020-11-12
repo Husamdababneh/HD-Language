@@ -6,7 +6,8 @@
    $Description: array.cpp
    ========================================================================*/
 
-#include "array.h"
+#include "pch.h"
 
 
-int  ARRAY_INIT_SIZE = 10;
+
+u8 ARRAY_INIT_SIZE = 10;
