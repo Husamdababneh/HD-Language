@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: lex.cpp
    $Date: 2020-04-04
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Defines Lexer functionality & Data Structures
    ========================================================================*/ 

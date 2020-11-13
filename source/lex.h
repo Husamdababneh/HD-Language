@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: lex.h
    $Date: 2020-04-04
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Here are the data structures represents the lexer
    ========================================================================*/
@@ -27,7 +26,7 @@ struct Position
 struct Token
 {
 	u16 Type = ETOKEN_NONE;
-
+	
 	Position start_position;
 	Position end_position;
 	
@@ -46,18 +45,18 @@ struct LexerState
 {
 	LexerState(const String& filepath);
 	~LexerState();
-
+	
 	String input;				// Data
 	Logger logger = Logger("Lexer"_s);
 	u64 input_cursor;			// to keep track were we are
 	//StringView cursor;			// new cursor type 
-
+	
 	u32 current_line_number;
 	u32 current_char_index; 
 	
 	Token eat_token();
 	Token peek_token(int lookAhead = 0);	
-
+	
 	inline u8& peek_next_character();
 	inline u8& peek_character(u64 lookAhead = 0);
 	
@@ -65,7 +64,7 @@ struct LexerState
 	inline u8 eat_until_character();
 	inline void eat_characters(u64 count = 1);
 	
-
+	
 	Position get_current_position() { return {current_line_number, current_char_index}; }
 	
 	LexerState() = delete;					 // copy constructor

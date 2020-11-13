@@ -13,10 +13,11 @@ patterns = {
 "*.txt",
 };
 blacklist_patterns = {
+"submodules\\**.*",
 ".*",
 };
 load_paths_custom = {
- {"."},
+ {".\\source"},
 };
 load_paths = {
  { load_paths_custom, .os = "win"  },

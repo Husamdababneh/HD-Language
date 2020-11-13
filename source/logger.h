@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: logger.h
    $Date: 2020-10-10
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Logger
    ========================================================================*/
@@ -30,8 +29,8 @@ struct Logger {
 		prefix = name;
 		out = stream;
 	}
-
-
+	
+	
 	inline void print_prefix();
 	void print(String str, ...);
 	void print_token_pos(Token * token );

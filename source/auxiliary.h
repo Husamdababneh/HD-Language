@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: auxiliary.h
    $Date: 2020-04-05
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Contains common procedures that doesn't have specific place
    ========================================================================*/

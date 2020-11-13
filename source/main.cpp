@@ -1,15 +1,10 @@
 /* ========================================================================
    $File: main.cpp
    $Date: 2020-10-02
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: main function
    ========================================================================*/
 
-
-/*
-  @Todo(): Parse comand line argument manualy using  GetCommandLineA() in Windows.h
-*/
 #include "pch.h"
 
 #include "main.h"
@@ -21,7 +16,7 @@ int allocation_count = 0;
 
 void * operator new(u64 size){
 	allocation_count++;
-
+	
 	return malloc(size);
 }
 
@@ -42,6 +37,7 @@ int main(int argc, char ** argv)
 		Usage();
 		return 0;
 	}
+	
 	String filename = {(u8*)argv[1],  strlen(argv[1])};
 	parse_file(filename);
 	printf("allocation = %d\n", allocation_count);

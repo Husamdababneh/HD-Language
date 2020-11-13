@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: String.h
    $Date: 2020-04-23
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Custom String Type
    ========================================================================*/
@@ -15,7 +14,7 @@ struct myString
 {
 	u8* data;
 	u64 count;
-
+	
 	u8& operator[]  (u64 i) {
 		assert(i <= count);
 		return data[i];
@@ -25,11 +24,11 @@ struct myString
 		assert(i <= count);
 		return data[i];
 	}
-
+	
 	// @Incomplete:
 	bool compare(const myString& str){
 		if (this->count != str.count) return false;
-
+		
 		for(u32 a = 0; a < this->count; a++){
 			if(str[a] != data[a])
 				return false;
@@ -37,10 +36,10 @@ struct myString
 		
 		return true;
 	}
-
+	
 	bool isEqual(const myString& str){
 		if (this->count != str.count) return false;
-
+		
 		for(u32 a = 0; a < this->count; a++){
 			if(str[a] != data[a])
 				return false;
@@ -56,7 +55,7 @@ struct myStringView
 {
 	myString* string;
 	u64 cursor;
-
+	
 	operator u64() const
 	{
 		return cursor;
@@ -66,7 +65,7 @@ struct myStringView
 		return (*string)[i];
 	}
 	
-
+	
 };
 
 myString operator "" _s(const char* a, size_t s);
@@ -76,3 +75,4 @@ typedef myStringView StringView;
 
 bool isEqual(String* first, String* second);
 myStringView make_view(const myString& str);
+u64 c_str_size(const char* str);

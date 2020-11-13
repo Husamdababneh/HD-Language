@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: Ast.h
    $Date: 2020-10-03
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Ast.h
    ========================================================================*/
@@ -63,7 +62,7 @@ struct Ast_ParmeterList : public Ast_Node {
 
 struct Ast_ArgumentList : public Ast_Node {
 	// ( name : type, name : type ... )
-//	Array<Ast_Literal> declerations;
+	//	Array<Ast_Literal> declerations;
 };
 
 enum {
@@ -91,7 +90,7 @@ struct Ast_Declaration : public Ast_Node {
 	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
 	// name :: struct { ... }
 	// name :: struct (   ) { ... }
-
+	
 	
 	// name = "value" ---> in this case the type refers to the type's value not the name 
 	
@@ -104,14 +103,14 @@ struct Ast_Declaration : public Ast_Node {
 			Ast_Body body;
 		};
 	};
-
+	
 };
 
 struct Ast_While : public Ast_Node {
 	Ast_Expresion* exp;
 	Ast_Body body;
 };
-	
+
 
 
 

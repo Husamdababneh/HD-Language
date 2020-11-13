@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: array.h
    $Date: 2020-10-14
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: array
    ========================================================================*/
@@ -9,7 +8,7 @@
 
 
 #include "common.h"
-
+#include <stdio.h>
 
 template<typename T, u64 a>
 struct Stack_Array  {
@@ -46,7 +45,7 @@ Array<T> init_array() {
 template<typename T>
 void array_resize(Array<T>* array ) {
 	T* newData = new T[array->size * 2];
-	memcpy((void*)newData, (void*)array->data, array->occupied);
+	memcpy((u8*)newData, (u8*)array->data, array->occupied);
 	delete array->data;
 	array->data = newData;
 }

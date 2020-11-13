@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: String.cpp
    $Date: 2020-04-23
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: Custom String Type
    ========================================================================*/
@@ -30,4 +29,14 @@ myStringView make_view(String& str)
 
 myString operator "" _s(const char* a, size_t s){
     return { (u8*)a, s};
+}
+
+u64 c_str_size(const char* str){
+	
+	u64 a = 0;
+	while(*str != '\0') {
+		str++;
+		a++;
+	}
+	return a;	
 }

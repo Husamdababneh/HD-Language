@@ -1,7 +1,6 @@
 /* ========================================================================
    $File: auxiliary.cpp
    $Date: 2020-04-05
-   $Revision: : @Incomplete
    $Creator: Husam Dababneh
    $Description: see auxiliary.h
    ========================================================================*/
@@ -9,11 +8,7 @@
 #include "pch.h"
 
 // TODO(Husam Dababneh): Clean Up and move to platfrom specific files
-#ifdef _WIN32
-#define fileno _fileno
-#define fstat _fstat
-#define stat _stat
-#endif
+
 
 u64 read_entire_file(FILE* file, void** data_return)
 {
