@@ -3,8 +3,8 @@
 #load "file.hd"
 
 
-internal
-add :: proc (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
+
+add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
 	return a + b;
 }
 
@@ -13,7 +13,7 @@ add :: proc (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
 #scope internal  // this tells the compiler that everything under it is only accessed by the file
 
 main :: proc () {
-
+	A ::= 1;
 	a :: b;
 	return add();	
 }

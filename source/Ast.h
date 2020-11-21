@@ -9,12 +9,19 @@
 #include "String.h"
 #include "array.h"
 
-enum NODE_TYPE {
+enum {
 	AST_BLOCK,
 	AST_DEFINETION,
 	AST_IF,
 	AST_WHILE,
-	
+	AST_UKNOWN,
+};
+
+
+struct Symbol {
+	String name;
+	u32 type;
+	s32 Scope; // This is Hash 
 };
 
 enum OpType {
@@ -29,7 +36,7 @@ struct Ast_Declaration;
 
 
 struct Ast_Node {
-	NODE_TYPE type; // ?? 
+	u32 type = AST_UKNOWN; // ?? 
 };
 
 
@@ -83,13 +90,14 @@ struct Ast_Value : public Ast_Node {
 
 
 struct Ast_Declaration : public Ast_Node {
+	// name : value
 	// name := value;
 	// name :: value;   // constant
 	// name :  type  = value;
 	// name :  type  : value; // constant
 	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
 	// name :: struct { ... }
-	// name :: struct (   ) { ... }
+	// name :: strucct (   ) { ... }
 	
 	
 	// name = "value" ---> in this case the type refers to the type's value not the name 
@@ -99,8 +107,8 @@ struct Ast_Declaration : public Ast_Node {
 	union {
 		String value;
 		struct {
-			Ast_ParmeterList parmeterList;
-			Ast_Body body;
+			Ast_ParmeterList* parmeterList;
+			Ast_Body* body;
 		};
 	};
 	

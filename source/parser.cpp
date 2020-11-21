@@ -22,7 +22,7 @@ PrintHash(meow_u128 Hash)
 
 
 Ast_Declaration parse_declaration(LexerState* lexer, Logger* logger) {
-	Ast_Declaration result;
+	Ast_Declaration result = {};
 	auto token = lexer->eat_token();
 	
 	if (token.Type == ')')
@@ -55,7 +55,7 @@ Ast_Declaration parse_declaration(LexerState* lexer, Logger* logger) {
 }
 
 Ast_Declaration parse_caller_argument(LexerState* lexer, Logger* logger) {
-	Ast_Declaration result;
+	Ast_Declaration result = {} ;
 	auto token = lexer->eat_token();
 	
 	if (token.Type == ETOKEN_IDENT){
@@ -147,6 +147,46 @@ Ast_ParmeterList parse_declaration_list(LexerState* lexer, Logger* logger){
 	return list;
 }
 
+static 
+Ast_Node* parse_expression(LexerState* lexer, Logger* logger){
+	Ast_Node* node = nullptr;
+	
+	switch(lexer->peek_token().Type)
+	{
+		case '(':
+		{
+			//node.hasBracets = true;
+			lexer->eat_token();
+			//return parse_expression(lexer,logger);
+			break;
+		}
+		case ETOKEN_IDENT:
+		{
+			auto ident = lexer->eat_token();
+			auto next = lexer->eat_token();
+			if (next.Type == ETOKEN_DOUBLECOLON){
+				
+			}
+			else  if (next.Type == ETOKEN_COLON){
+				node = parse_expression(lexer,logger);
+				//if (node.Type != 1A)
+			}
+			else  if (next.Type == ETOKEN_COLONEQUAL){
+			}
+			else{
+			}
+			
+			
+			//return parse_expression(lexer,logger);
+			break;
+		}
+	}
+	
+	return node;
+	
+}
+
+
 void parse_file(const String& filename){
 	Logger logger = Logger(filename);
 	LexerState lexer(filename);
@@ -170,6 +210,7 @@ void parse_file(const String& filename){
 			}
 			case ETOKEN_IDENT:
 			{
+				logger.print("Token Name = [%s]\n"_s, token.name);
 				// meow_u128 Hash = MeowHash(MeowDefaultSeed, token.value.count, token.value.data);
 				// logger.print("%s hash is :"_s , token.value);
 				// PrintHash(Hash);

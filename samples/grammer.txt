@@ -30,36 +30,27 @@ IDENT -> [ a-z A-z _ ]+ [ a-z A-z _ 0-9]*
 Definitions
 
 1 - primitive types
-  	constants		  -> <name> :: <value>  -> functions are considered constants 
-  	unsigned integers -> u8, u16, u32, u64
+	constants	     -> <name> ::= <value> ->functions and structs are considered constants 
+	unsigned integers -> u8, u16, u32, u64
 	signed   integers -> s8, s16, s32, s64
 	floating points   -> float32 ,float64
-	strings	 		  -> string (this is actually a string view ) contains a count and a pointer to the string
-	static array 	  -> []
-	dynamic array 	  -> [..]
-	ranges 			  -> int .. int
+	strings	 	  -> string 
+	static array 	 -> [<size>/ <constexpr int> ] 
+	dynamic array     -> [..]
+	ranges 		   -> int .. int
 
-2 - statment		  -> 
+2 - expresion		  ->  
 
-3 - Blocks			  -> { <statments> }
+3 - Blocks		    -> { <statments> }
 
 4 - Functions (Procedures)
-  	normal definition -> <name> :: (<argument list>) -> (<return list>) <block>
+	anonymous 		->  () -> () { } 
+	normal definition -> <name> :: (<argument list>) -> (<return list>) <block>
 		   			  	 this should work inside other functions
 						 
 5 - Data Structers
-  	strcuture			  -> <name> :: struct <block>
+  	strcuture 	  -> <name> :: struct <block>
 
 
 
 
-Message:
-When A Goddes Kisses A God
-Our First Kiss
-❤
-
-Details:
-Night Sky
-August 9th, 2020 - 8:00 PM
-Al-Salt, Jordan
-32.0346° N, 35.7269° E
