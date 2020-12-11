@@ -8,12 +8,15 @@
 
 #include "String.h"
 #include "array.h"
+#include "lex.h"
 
 enum {
 	AST_BLOCK,
 	AST_DEFINETION,
 	AST_IF,
 	AST_WHILE,
+	AST_BINARY_EXP,
+	AST_LITERAL,
 	AST_UKNOWN,
 };
 
@@ -37,12 +40,28 @@ struct Ast_Declaration;
 
 struct Ast_Node {
 	u32 type = AST_UKNOWN; // ?? 
+	Token token;
 };
 
+struct Ast {
+	Ast_Node* rootNode;
+	// I made this a struct becuase maybe sometime in the future we wanted to add some information about the ast
+};
 
+struct Ast_Literal : Ast_Node
+{
+	Ast_Literal(){
+		type = AST_LITERAL;
+	}
+	//Token* token;
+};
 
-struct BinaryOp : public Ast_Node {
+struct Ast_Binary : public Ast_Node {
 	//  <a> ? <b>
+	Ast_Binary() {
+		type = AST_BINARY_EXP;
+	}
+	
 	OpType op;
 	Ast_Node* left;
 	Ast_Node* right;
@@ -50,6 +69,7 @@ struct BinaryOp : public Ast_Node {
 };
 
 struct Ast_Expresion : public Ast_Node {
+	Ast_Node* subExp;
 	// { ... }
 	// 
 };

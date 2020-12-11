@@ -1,4 +1,4 @@
-#import "Basic"
+/* #import "Basic"
 
 #load "file.hd"
 
@@ -12,9 +12,26 @@ add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
 
 #scope internal  // this tells the compiler that everything under it is only accessed by the file
 
-main :: proc () {
+main :: () {
 	A ::= 1;
 	a :: b;
 	return add();	
 }
+*/
 
+
+a + b + 5 + 17 + 5 + 17 + 5 + 17 + 5 + a + b + 5 + 17 + 5 + 17 + 5 + 17 + 5 ;
+
+
+
+/*
+	    +
+	  /  \ 
+	 +
+	/ \ 
+   a   b
+
+
+
+
+*/

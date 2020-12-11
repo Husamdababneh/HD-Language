@@ -13,6 +13,7 @@
 #include "String.h"
 #include "auxiliary.h"
 
+
 String reserved [] = {
 	// Types
 	"int"_s, "float"_s,
@@ -125,6 +126,13 @@ u8 LexerState::eat_until_character()
 	return 0;
 }
 
+void LexerState::eat_until_whitespace()
+{
+	for(u64 a = input_cursor;  a < input.count; a++)
+		if (isWhitechar(eat_character())) break;
+}
+
+
 u8 LexerState::eat_character()
 {
 	
@@ -144,6 +152,7 @@ u8 LexerState::eat_character()
 	input_cursor++;
 	return input[input_cursor - 1];
 }
+
 char * filename = nullptr;
 LexerState::LexerState(const String& filepath)
 {
@@ -159,6 +168,10 @@ LexerState::LexerState(const String& filepath)
 	
 	current_line_number = 1;
 	current_char_index = 0;	
+	
+	
+	//// Cache
+	token_cache = make_queue<Token>(100);
 }
 
 LexerState::~LexerState()
@@ -168,16 +181,23 @@ LexerState::~LexerState()
 	input.data = nullptr;
 }
 
-Token last_token = {};
+
 Token LexerState::eat_token()
 {
 	// @TODO: init a token and return it.
-	
+	static int COUTNER = 1;
 	if(input_cursor >= input.count)
-		return { ETOKEN_EOFA , 0 , 0 };
+		return { TOKEN_EOFA , 0, 0 , 0 };
 	
 	Token token = {};
 	
+	
+	if (token_cache.count > 0){
+		token = *pop<Token>(&token_cache);
+		return token;
+	}
+	token.id = COUTNER;
+	COUTNER++;
 	u8 ch = eat_until_character();
 	u64 temp = input_cursor - 1;
 	token.start_position = get_current_position();
@@ -189,10 +209,10 @@ Token LexerState::eat_token()
 			u8 next = peek_character();
 			
 			if(next  == '/'){
-				token.Type = ETOKEN_COMMENT;
+				token.Type = TOKEN_COMMENT;
 				while(eat_character() != '\n');
 			} else if (next == '*'){
-				token.Type = ETOKEN_MULTILINE_COMMENT;
+				token.Type = TOKEN_MULTILINE_COMMENT;
 				int nested_level = 1;			  
 				while(input_cursor < input.count ){
 					u8 eaten = eat_character();
@@ -221,32 +241,33 @@ Token LexerState::eat_token()
 		case ';': case '[': case ']': case '`':
 		case '(': case ')': case ',': 
 		case '~': case '!': case '$': case '%': case '^':
-		case '&': case '?': case '|': case '@':
+		case '&': case '?': case '|': 
 		case '\'': case '\\':
 		token.Type = ch;
 		break;
+		// Notes 
+		case '@': 
+		{
+			token.Type = TOKEN_DIRECTIVE;
+			eat_until_whitespace();
+			break;
+		}
+		// Compiler Directives
 		case '#':
-		// Compile Time Execution operator
-		// What follows # should be executed at compile time (Just Like Jai)
-		token.Type = ETOKEN_DIRECTIVE;
-		// This is not right .. the behaviour should be to stop on first whitespace
-		// but since i'm getting used to the lexer i wanted to try some stuff - Husam 9/28/2020
-		while(true){
-			auto eaten = peek_character();
-			if(isWhitechar(eaten))
-				break;
-			eat_character();
-		};
-		break;
+		{
+			token.Type = TOKEN_DIRECTIVE;
+			eat_until_whitespace();
+			break;
+		}
 		case '=':
 		{
 			auto next = peek_character();
 			if (next == '='){
 				eat_character();
-				token.Type = ETOKEN_EQL;
+				token.Type = TOKEN_EQL;
 			}
 			else {
-				token.Type = ETOKEN_ASSIGN;
+				token.Type = TOKEN_ASSIGN;
 			}
 			break;
 		}
@@ -255,12 +276,12 @@ Token LexerState::eat_token()
 			auto next = peek_character();
 			if (next == '='){
 				eat_character();
-				token.Type = ETOKEN_LT_OR_EQL;
+				token.Type = TOKEN_LT_OR_EQL;
 			} else if (next == '<'){
 				eat_character();
-				token.Type = ETOKEN_SHIFT_LEFT;
+				token.Type = TOKEN_SHIFT_LEFT;
 			} else {
-				token.Type = ETOKEN_LT;
+				token.Type = TOKEN_LT;
 			}
 			break;
 		}
@@ -269,12 +290,12 @@ Token LexerState::eat_token()
 			auto next = peek_character();
 			if (next == '='){
 				eat_character();
-				token.Type = ETOKEN_GT_OR_EQL;
+				token.Type = TOKEN_GT_OR_EQL;
 			} else if (next == '>'){
 				eat_character();
-				token.Type = ETOKEN_SHIFT_RIGHT;
+				token.Type = TOKEN_SHIFT_RIGHT;
 			} else {
-				token.Type = ETOKEN_GT;
+				token.Type = TOKEN_GT;
 			}
 			break;
 		}
@@ -283,11 +304,11 @@ Token LexerState::eat_token()
 			auto next = peek_character();
 			if (next == '.') {
 				eat_character();
-				token.Type = ETOKEN_DOUBLEDOT;
+				token.Type = TOKEN_DOUBLEDOT;
 			}
 			else if (next == '>'){
 				eat_character();
-				token.Type = ETOKEN_ARROW;
+				token.Type = TOKEN_ARROW;
 			} else {
 				token.Type = ch;
 			}
@@ -307,7 +328,7 @@ Token LexerState::eat_token()
 				if(peeked == '"')
 					break;
 			}	  
-			token.Type = ETOKEN_LITERAL;
+			token.Type = TOKEN_LITERAL;
 			break;	  
 		}
 		break;
@@ -316,22 +337,22 @@ Token LexerState::eat_token()
 			auto next = peek_character();
 			token.value = String {&input[temp], input_cursor - temp};
 			if (next == ':')  {
-				token.Type = ETOKEN_DOUBLECOLON; // uninitailizaed
+				token.Type = TOKEN_DOUBLECOLON; // uninitailizaed
 				eat_character();
 			}
 			else if (next == '=')  {
-				token.Type = ETOKEN_COLONEQUAL; // initialized
+				token.Type = TOKEN_COLONEQUAL; // initialized
 				eat_character();
 			}
 			else{
-				token.Type = ETOKEN_COLON;
+				token.Type = TOKEN_COLON;
 			} 
 			break;
 		}
 		break;
 		{
 			case '\0':
-			return { ETOKEN_EOFA , 0 , 0 };
+			return { TOKEN_EOFA , 0 , 0 };
 			break;
 		}
 		default:
@@ -343,9 +364,9 @@ Token LexerState::eat_token()
 				eat_character();
 			};
 			if (isKeyword(token.value))
-				token.Type = ETOKEN_KEYWORD;
+				token.Type = TOKEN_KEYWORD;
 			else
-				token.Type = ETOKEN_IDENT;
+				token.Type = TOKEN_IDENT;
 			
 			
 		} else {
@@ -353,7 +374,7 @@ Token LexerState::eat_token()
 			// (0x -> hex) (0b -> binary) (0o  -> Octal)
 			// auto& pos = get_current_position();
 			assert(isDigit(ch));
-			token.Type = ETOKEN_LITERAL;
+			token.Type = TOKEN_LITERAL;
 			auto peeked = peek_character();
 			bool doEat  = true;
 			if(peeked == 'x' ||  peeked == 'b' ||	 peeked == 'o')  eat_character();
@@ -373,7 +394,7 @@ Token LexerState::eat_token()
 		break;
 	}
 	token.end_position = get_current_position();
-	assert(token.Type != ETOKEN_NONE);
+	assert(token.Type != TOKEN_NONE);
 	//last_token = token;
 	token.value = String { &input[temp], input_cursor  - temp};
 	return token;
@@ -382,17 +403,24 @@ Token LexerState::eat_token()
 
 // TODO:@Optimization(Husam): This may be called to many times ?? use cache ??
 // 
-Token LexerState::peek_token(int lookAhead /* = 0*/ )
+
+
+// When lookAhead == 0 it's exactlly as peek_next_token
+
+Token LexerState::peek_token(u64 lookAhead /* = 0*/ )
 {
-	u64 input_cursor = this->input_cursor;
-	u16 current_line_number = this->current_line_number;
-	u16 current_char_index = this->current_char_index;
-	auto result =  eat_token();
-	for(int counter = 0; counter < lookAhead; counter++)
-		result = eat_token();
-	this->input_cursor = input_cursor;
-	this->current_line_number = current_line_number;
-	this->current_char_index = current_char_index;
+	
+	Token result = peek_next_token();
+	for(u64 counter = 0; counter < lookAhead; counter++)
+		result = peek_next_token();
 	return result;
+}
+
+
+
+Token LexerState::peek_next_token()
+{
+	push<Token>(&token_cache, eat_token());
+	return *top<Token>(&token_cache);
 }
 

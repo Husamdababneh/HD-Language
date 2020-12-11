@@ -24,7 +24,7 @@ void Logger::print_token_pos(Token * token ) {
 }
 
 
-void Logger::print_line(Token * token , String str, ...) {
+void Logger::print_with_location(Token * token , String str, ...) {
 	//print_prefix();
 	print_token_pos(token);
 	// print body
@@ -40,12 +40,20 @@ void Logger::print_line(Token * token , String str, ...) {
 					printf("%ld", number);
 					break;
 				}
+				case 'x':
+				{
+					u32 number = va_arg(args, int);
+					printf("%08X", number);
+					break;
+				}
+				
 				case 'd':
 				{
 					long number = va_arg(args, long);
 					printf("%ld", number);
 					break;
 				}
+				
 				case 's':
 				{
 					String string = va_arg(args, String);
@@ -74,7 +82,7 @@ void Logger::print_line(Token * token , String str, ...) {
 
 
 void Logger::print(String str, ...) {
-	print_prefix();
+	//print_prefix();
 	// print body
 	va_list	args;
 	va_start(args, str);
@@ -88,6 +96,13 @@ void Logger::print(String str, ...) {
 					printf("%ld", number);
 					break;
 				}
+				case 'x':
+				{
+					u32 number = va_arg(args, int);
+					printf("%08X", number);
+					break;
+				}
+				
 				case 'd':
 				{
 					long number = va_arg(args, long);
@@ -102,18 +117,19 @@ void Logger::print(String str, ...) {
 					break;
 				}
 				default:
-				if (str[i] == '%'){
-					if (i + 1 < str.count && str[i+1] != '%')
-						continue;
+				{
+					if (str[i] == '%'){
+						if (i + 1 < str.count && str[i+1] != '%')
+							continue;
+					}
+					putchar(str[i]);
+					break;
 				}
-				putchar(str[i]);
-				break;
 			}
 		}
 		else{
 			putchar(str[i]);
 		}
-		
 	}
 	va_end(args);
 	

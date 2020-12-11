@@ -37,8 +37,8 @@ String ETOKENStrings[] =   {
 };
 
 String ETOKENToString(u64 var) {
-    if (var < ETOKEN_IDENT)
+    if (var < TOKEN_IDENT)
         return {(u8*) var , 1};
-    return ETOKENStrings[(u64)var - (u64)ETOKEN_IDENT  + 1];
+    return ETOKENStrings[(u64)var - (u64)TOKEN_IDENT  + 1];
 };
 

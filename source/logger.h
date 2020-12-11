@@ -34,5 +34,5 @@ struct Logger {
 	inline void print_prefix();
 	void print(String str, ...);
 	void print_token_pos(Token * token );
-	void print_line(Token * token , String str, ...);
+	void print_with_location(Token * token , String str, ...);
 };
