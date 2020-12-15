@@ -12,8 +12,10 @@ Arena
 make_arena(u64 size)
 {
 	Arena result;
-	result.data = new u8[size];
+	result.data = (char*) malloc(size);
+	result.cursor = result.data;
 	result.cap = size;
+	memset((void*)result.data, 0, result.cap);
 	return result;
 }
 

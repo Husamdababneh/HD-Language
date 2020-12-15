@@ -27,6 +27,7 @@ PrintHash(meow_u128 Hash)
 }
 
 
+#if 0
 static Ast_Declaration
 PARSE_COMMAND(parse_declaration)
 {
@@ -159,97 +160,74 @@ PARSE_COMMAND(parse_declaration_list)
 	return list;
 }
 
+#endif
 
 
-static Ast_Node*
-PARSE_COMMAND(parse_expression)
-{	
-	Ast_Node* node = nullptr;
+
+inline Ast_Binary*
+PARSE_COMMAND(parse_operator)
+{
+	Token token = lexer->eat_token();
+	if (token.Type != '+' &&
+		token.Type != '*')
+		return nullptr;
 	
-	switch(lexer->peek_token().Type)
-	{
-		case '(':
-		{
-			//node.hasBracets = true;
-			lexer->eat_token();
-			//return parse_expression(lexer,logger);
-			break;
-		}
-		case TOKEN_LITERAL: 
-		case TOKEN_STRING_LITERAL:
-		case TOKEN_FLOAT_LITERAL:
-		case TOKEN_IDENT:
-		{
-			auto ident = lexer->eat_token();
-			auto next = lexer->eat_token();
-			if (next.Type == TOKEN_DOUBLECOLON){
-				
-			}
-			else  if (next.Type == TOKEN_COLON){
-				node = parse_expression(lexer,logger);
-				//if (node.Type != 1A)
-			}
-			else  if (next.Type == TOKEN_COLONEQUAL){
-			}
-			else{
-			}
-			
-			
-			//return parse_expression(lexer,logger);
-			break;
-		}
-	}
+	Ast_Binary* exp = allocate<Ast_Binary>(&ast_arena);
+	exp->token = token;
 	
-	return node;
+	if(exp->token.Type == '+')
+		exp->op = 0;// OP_ADD;
+	else if(exp->token.Type == '*')
+		exp->op = 1;//OP_MUL;
+	
+	return exp;
 	
 }
 
-
-#if 0
-&&
-token.Type != TOKEN_STRING_LITERAL &&
-token.Type != TOKEN_INT_LITERAL &&
-token.Type != TOKEN_FLOAT_LITERAL
-#endif
-//#define new_node()
 static Ast_Node*
 PARSE_COMMAND(parse_subexpression)
 {
 	
-	Token token = lexer->peek_next_token();
-	
-	if (token.Type == ';'){
-		lexer->eat_token();
-		return nullptr;
+	Token token = lexer->eat_token();
+	if (token.Type == TOKEN_LITERAL || 
+		token.Type == TOKEN_IDENT){
+		Ast_Literal* literal = allocate<Ast_Literal>(&ast_arena);
+		literal->token = token;
+		return literal;
 	}
+	return nullptr;
+}
+
+static Ast_Node*
+PARSE_COMMAND(parse_expression)
+{
+	Ast_Node* left = parse_subexpression(lexer, logger);
+	if (!left) return nullptr;
 	
-	// TODO(Husam): Make it better ... duh!! -_-'
-	if (token.Type != TOKEN_LITERAL){
-		assert(true);
-	}
+	Ast_Binary* exp = parse_operator(lexer, logger);
+	if (!exp) return left;
 	
-	
-	Ast_Literal* left = allocate<Ast_Literal>(&ast_arena);
-	left->token = lexer->eat_token();
-	
-	
-	token = lexer->peek_next_token();
-	
-	if (token.Type == ';'){
-		lexer->eat_token();
-		return left;
-	}
-	
-	// token.Type == ?? 
-	Ast_Binary* exp = allocate<Ast_Binary>(&ast_arena);
-	exp->token = lexer->eat_token();
-	
-	Ast_Node* right = parse_subexpression(lexer, logger);
+	Ast_Node* right = parse_expression(lexer, logger);
+	if (!right) return nullptr;;
 	
 	exp->left = left;
+	if (right->type == AST_BINARY_EXP)
+	{
+		//Ast_Binary* rightSide = (Ast_Binary*)right;
+		Ast_Binary* rightSide = (Ast_Binary*)right;
+		logger->print("r: %d  exp: %d\n"_s, rightSide->op, exp->op);
+		if(rightSide->op < exp->op)
+		{
+			logger->print("!!!!!!!!!!!!!!!\n"_s);
+			exp->right = rightSide->left;
+			rightSide->left = exp;
+			return rightSide;
+		}
+	}
 	exp->right = right;
 	return exp;
 }
+
 
 static Ast_Node*
 PARSE_COMMAND(parse_directive)
@@ -272,27 +250,46 @@ static void output_graph(Ast_Node* node, Logger* logger)
 		
 		meow_u128 hash = MeowHash(MeowDefaultSeed, sizeof(Ast_Binary), bin);
 		
-		meow_u128 hash_left = MeowHash(MeowDefaultSeed, sizeof(*bin->left), bin->left);
-		logger->print("T_%x -> _%s_%x\n"_s,
-					  MeowU32From(hash, 3),
-					  bin->left->token.name,
-					  MeowU32From(hash_left, 3));
 		
-		logger->print("T_%x -> "_s, 
-					  MeowU32From(hash, 3));
+		if (bin->left != nullptr){
+			//if (bin->left->type == AST_LITERAL)
+			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+			output_graph(bin->left, logger);
+		}
 		
-		output_graph(bin->right, logger);
+		logger->print("T_%x [shape=Mdiamond, label=\"%s\"];\n"_s,
+					  MeowU32From(hash, 3), bin->token.name);
 		
-		logger->print("T_%x [shape=Mdiamond, label=\"+\"];\n"_s,
-					  MeowU32From(hash, 3));
+		if (bin->right != nullptr){
+			//if (bin->right->type == AST_LITERAL)
+			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+			output_graph(bin->right, logger);
+		}
+		
+		
+		
+		
 		
 	}else if (node->type == AST_LITERAL) {
 		Ast_Literal * literal = (Ast_Literal*) node;
 		meow_u128 hash_left = MeowHash(MeowDefaultSeed, sizeof(*literal), literal);
-		logger->print("_%s_%x\n"_s, literal->token.name , MeowU32From(hash_left, 3));
+		logger->print("_%x\n"_s, MeowU32From(hash_left, 3));
+		
+		logger->print("_%x [label=\"%s\"];\n"_s,
+					  MeowU32From(hash_left, 3),
+					  literal->token.name);
 	}
 }
-
+static void 
+dump_arena()
+{
+	FILE * file;
+	fopen_s(&file, "dump.bin", "wb");
+	
+	fwrite(ast_arena.data, 1, ast_arena.cap ,file);
+	
+	fclose(file);
+}
 static Ast 
 PARSE_COMMAND(parse)
 {
@@ -304,7 +301,8 @@ PARSE_COMMAND(parse)
 			case TOKEN_IDENT:
 			{
 				logger->print("Token Name = [%s]\n"_s, token.name);
-				Ast_Node* node  = parse_subexpression(lexer, logger);
+				Ast_Node* node  = parse_expression(lexer, logger);
+				dump_arena();
 				output_graph(node, logger);
 				break;
 				

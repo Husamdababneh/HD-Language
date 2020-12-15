@@ -10,6 +10,8 @@
 #include "array.h"
 #include "lex.h"
 
+
+
 enum {
 	AST_BLOCK,
 	AST_DEFINETION,
@@ -27,20 +29,28 @@ struct Symbol {
 	s32 Scope; // This is Hash 
 };
 
-enum OpType {
-	OP_ADD,
-	OP_SUB,
-	OP_MUL,
-	OP_DIV
+enum {
+	OP_UNKOWN = -1,
+	OP_ADD = 0,
+	OP_SUB = 0,
+	OP_MUL = 1,
+	OP_DIV = 1
 };
 
 
+
+
+#if 0
 struct Ast_Declaration;
 
 
 struct Ast_Node {
-	u32 type = AST_UKNOWN; // ?? 
+	u32 type;
 	Token token;
+	
+	virtual Ast_Node () : type(AST_UKNOWN) {
+		
+	}
 };
 
 struct Ast {
@@ -60,9 +70,12 @@ struct Ast_Binary : public Ast_Node {
 	//  <a> ? <b>
 	Ast_Binary() {
 		type = AST_BINARY_EXP;
+		op = OP_UNKOWN;
+		left = nullptr;
+		right= nullptr;
 	}
 	
-	OpType op;
+	u64       op;
 	Ast_Node* left;
 	Ast_Node* right;
 	
@@ -139,9 +152,39 @@ struct Ast_While : public Ast_Node {
 	Ast_Body body;
 };
 
+#endif
+
+struct Ast_Node;
+struct Ast {
+	Ast_Node* rootNode;
+};
 
 
+struct Ast_Node {
+	u32 type = AST_UKNOWN; // ?? 
+	Token token;
+	
+};
 
+struct Ast_Literal : Ast_Node
+{
+	Ast_Literal(){
+		type = AST_LITERAL;
+	}
+	//Token* token;
+};
 
-
-
+struct Ast_Binary : public Ast_Node {
+	//  <a> ? <b>
+	Ast_Binary() {
+		type = AST_BINARY_EXP;
+		op = OP_UNKOWN;
+		left = nullptr;
+		right= nullptr;
+	}
+	
+	u32       op;
+	Ast_Node* left;
+	Ast_Node* right;
+	
+};

@@ -243,8 +243,10 @@ Token LexerState::eat_token()
 		case '~': case '!': case '$': case '%': case '^':
 		case '&': case '?': case '|': 
 		case '\'': case '\\':
-		token.Type = ch;
-		break;
+		{
+			token.Type = ch;
+			break;
+		}
 		// Notes 
 		case '@': 
 		{
