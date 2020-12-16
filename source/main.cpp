@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
 	
 	String filename = {(u8*)argv[1],  strlen(argv[1])};
 	parse_file(filename);
-	printf("allocation = %d\n", allocation_count);
+	printf("#Allocations Using New KeyWord = %d\n", allocation_count);
 	
 }
 

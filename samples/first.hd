@@ -1,4 +1,9 @@
-/* #import "Basic"
+
+husam = b + 2 / 3;
+
+husam2 = b2 + 22 / 32;
+
+/*#import "Basic"
 
 #load "file.hd"
 
@@ -13,32 +18,13 @@ add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
 #scope internal  // this tells the compiler that everything under it is only accessed by the file
 
 main :: () {
+	
 	A ::= 1;
 	a :: b;
 	return add();	
 }
 */
-
-
-a + b * 5 + 17 + 5 * 17 + 5 + 17 + 5 * a + b + 5 + 17 * 5 + 17 + 5 + 17 + 5 ;
-
-
-
 /*
-	  
-
-    * 
-   / \
-  a   
-	  +
-     / \
-    b   5
-
-
-      +
-     / \ 	
-    *   5
-   / \
-  a   b
-
+--!1 + -0x1 - h + b + a * b + 5 - 8 / 10 + 17 + 5 * 17 + 5 + 17 + 5 * a + b + 5 + 17 * 5 + 17 + 5 + 17 + 5 ;
 */
+

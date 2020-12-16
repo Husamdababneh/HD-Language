@@ -1,0 +1,25 @@
+/* ========================================================================
+$File: TODO.txt
+$Date: December 15th 2020 6:12 am 
+$Creator: Husam 
+$Desc:  
+=========================================================================*/
+
+
+
+
+1 - See if this is important 
+static void 
+dump_memory_to_file(String filename, void* data, size)
+{
+	FILE * file;
+	fopen_s(&file, "dump.bin", "wb");
+	
+	fwrite(ast_arena.data, 1, ast_arena.cap ,file);
+	
+	fclose(file);
+}
+
+
+2 - 
+3 - Work on the Logger

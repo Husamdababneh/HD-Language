@@ -13,11 +13,16 @@
 
 
 enum {
+	AST_IDENT,
+	AST_ASSIGN,
+	AST_DECLARATION,
+	AST_TYPE,
 	AST_BLOCK,
 	AST_DEFINETION,
 	AST_IF,
 	AST_WHILE,
 	AST_BINARY_EXP,
+	AST_UNARY_EXP,
 	AST_LITERAL,
 	AST_UKNOWN,
 };
@@ -97,12 +102,12 @@ struct Ast_Body : public Ast_Node {
 
 struct Ast_ParmeterList : public Ast_Node {
 	// ( name : type, name : type ... )
-	Array<Ast_Declaration> declerations;
+	Array<Ast_Declaration*> declerations;
 };
 
 struct Ast_ArgumentList : public Ast_Node {
 	// ( name : type, name : type ... )
-	//	Array<Ast_Literal> declerations;
+	Array<Ast_Literal*> declerations;
 };
 
 enum {
@@ -122,30 +127,6 @@ struct Ast_Value : public Ast_Node {
 };
 
 
-struct Ast_Declaration : public Ast_Node {
-	// name : value
-	// name := value;
-	// name :: value;   // constant
-	// name :  type  = value;
-	// name :  type  : value; // constant
-	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
-	// name :: struct { ... }
-	// name :: strucct (   ) { ... }
-	
-	
-	// name = "value" ---> in this case the type refers to the type's value not the name 
-	
-	String name;
-	String type;
-	union {
-		String value;
-		struct {
-			Ast_ParmeterList* parmeterList;
-			Ast_Body* body;
-		};
-	};
-	
-};
 
 struct Ast_While : public Ast_Node {
 	Ast_Expresion* exp;
@@ -155,6 +136,7 @@ struct Ast_While : public Ast_Node {
 #endif
 
 struct Ast_Node;
+
 struct Ast {
 	Ast_Node* rootNode;
 };
@@ -174,6 +156,21 @@ struct Ast_Literal : Ast_Node
 	//Token* token;
 };
 
+
+
+struct Ast_Unary : public Ast_Node {
+	//  <a> ? <b>
+	Ast_Unary() {
+		type = AST_UNARY_EXP;
+		op = OP_UNKOWN;
+		child= nullptr;
+	}
+	
+	u32       op;
+	Ast_Node* child;
+	
+};
+
 struct Ast_Binary : public Ast_Node {
 	//  <a> ? <b>
 	Ast_Binary() {
@@ -188,3 +185,74 @@ struct Ast_Binary : public Ast_Node {
 	Ast_Node* right;
 	
 };
+
+struct Ast_Type : public Ast_Node {
+	Ast_Type() {
+		type = AST_TYPE;
+	}
+	
+	
+	
+};
+
+struct Ast_Declaration ;
+struct Ast_ParmeterList : public Ast_Node {
+	// ( name : type, name : type ... )
+	Array<Ast_Declaration*> declerations;
+};
+
+
+
+
+
+struct Ast_Declaration : public Ast_Node {
+	// name : value
+	// name := value;
+	// name :: value;   // constant
+	// name :  type  = value;
+	// name :  type  : value; // constant
+	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
+	// name :: struct { ... }
+	// name :: strucct (   ) { ... }
+	
+	Ast_Declaration(){
+		type = AST_DECLARATION;
+	}
+	// name = "value" ---> in this case the type refers to the type's value not the name 
+	
+	String decl_type;
+	String name;
+	union {
+		String value;
+		struct {
+			Ast_ParmeterList* parmeterList;
+			//Ast_Body* body;
+		};
+	};
+	
+};
+
+struct Ast_Ident : public Ast_Node{
+	Ast_Ident() {
+		type = AST_IDENT;
+	}
+	
+};
+struct Ast_Assign : public Ast_Node {
+	// name : value
+	// name := value;
+	// name :: value;   // constant
+	// name :  type  = value;
+	// name :  type  : value; // constant
+	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
+	// name :: struct { ... }
+	// name :: strucct (   ) { ... }
+	
+	Ast_Assign(){
+		type = AST_ASSIGN;
+	}
+	// name = "value" ---> in this case the type refers to the type's value not the name 
+	Ast_Ident* ident; 
+	Ast_Node* exp;
+};
+

@@ -13,10 +13,18 @@ TV    -> TYPE |
 VALUE -> LETIRAL |
 	  	 REFERENCED
 
-TYPE  -> u8      | u16 |
-		 u32     | u64 |
-		 float32 | float64 |
-		 string  | char
+TYPE  -> u8  | u16 | u32  | u64 |
+		 s8  | s16 | s32  | s64 |
+		 f32 | f64 |
+		 string  | char | range 
+
+
+string -> size , data (pointer to the data)
+range -> start , end, increment 
+
+min & max for all other types
+
+
 
 IDENT -> [ a-z A-z _ ]+ [ a-z A-z _ 0-9]*
 ///

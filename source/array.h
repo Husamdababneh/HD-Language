@@ -41,6 +41,15 @@ Array<T> init_array() {
 	return array;
 }
 
+template<typename T>
+Array<T> init_array(u64 size) {
+	Array<T> array;
+	array.size = size;
+	array.occupied = 0;
+	array.data = new T[size];
+	return array;
+}
+
 
 template<typename T>
 void array_resize(Array<T>* array ) {
@@ -57,6 +66,7 @@ void array_add(Array<T>* array, T item ) {
 	array->data[array->occupied] = item;
 	array->occupied++;
 }
+
 
 template<typename T>
 void array_free(Array<T>* array ) {
