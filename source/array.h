@@ -12,14 +12,14 @@
 
 template<typename T, u64 a>
 struct Stack_Array  {
-    u64 size = a;
+    u64 count = a;
     T data[a];
 };
 
 
 template<typename T>
 struct Array {
-	u64 size;
+	u64 count;
 	u64 occupied;
 	T* data;
 	
@@ -35,33 +35,36 @@ extern u8 ARRAY_INIT_SIZE;
 template<typename T>
 Array<T> init_array() {
 	Array<T> array;
-	array.size = ARRAY_INIT_SIZE;
+	array.count = ARRAY_INIT_SIZE;
 	array.occupied = 0;
 	array.data = new T[ARRAY_INIT_SIZE];
 	return array;
 }
 
 template<typename T>
-Array<T> init_array(u64 size) {
+Array<T> init_array(u64 count) {
 	Array<T> array;
-	array.size = size;
+	array.count = count;
 	array.occupied = 0;
-	array.data = new T[size];
+	array.data = new T[count];
 	return array;
 }
 
 
 template<typename T>
 void array_resize(Array<T>* array ) {
-	T* newData = new T[array->size * 2];
-	memcpy((u8*)newData, (u8*)array->data, array->occupied);
+	T* newData = new T[array->count * 2];
+	array->count = array->count *2;
+	memset((void*)newData, 0, array->count * 2);
+	memcpy((void *)newData, (const void*)array->data, array->occupied * sizeof(T));
 	delete array->data;
 	array->data = newData;
+	
 }
 
 template<typename T>
 void array_add(Array<T>* array, T item ) {
-	if (array->occupied == array->size)
+	if (array->occupied == array->count)
 		array_resize(array);
 	array->data[array->occupied] = item;
 	array->occupied++;
