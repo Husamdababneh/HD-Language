@@ -8,15 +8,47 @@ $Desc:
 #pragma once
 
 
-enum Shape_Type {
-	NORMAL = 0,
+enum class  Shape_Type {
+	BOX = 0,
+	POLYGON,
+	ELLIPSE,
+	OVAL,
+	CIRCLE,
+	EGG,
+	TRIANGLE,
 	DIAMOND,
-	MDIAMOND
+	TRAPEZIUM,
+	PARALLELOGRAM,
+	HOUSE,
+	PENTAGON,
+	HEXAGON,
+	SEPTAGON,
+	OCTAGON,
+	DOUBLECIRCLE,
+	DOUBLEOCTAGON,
+	TRIPLEOCTAGON,
+	INVTRIANGLE,
+	INVTRAPEZIUM,
+	INVHOUSE,
+	MDIAMOND,
+	MSQUARE,
+	MCIRCLE,
+	RECT,
+	RECTANGLE,
+	SQUARE,
+	STAR,
+	CYLINDER,
+	NOTE,
+	TAB,
+	FOLDER,
+	BOX3D,
+	COMPONENT,
+	MAX,
 };
 
 
 struct Graph_Label {
 	s32 hash = 0;
-	Shape_Type type = NORMAL;
+	Shape_Type type = Shape_Type::BOX;
 	String str;
 };

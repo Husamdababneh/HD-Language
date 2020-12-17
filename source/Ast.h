@@ -24,6 +24,9 @@ enum {
 	AST_BINARY_EXP,
 	AST_UNARY_EXP,
 	AST_LITERAL,
+	AST_FUNCALL,
+	AST_ARGUMENT,
+	AST_PARMETER,
 	AST_UKNOWN,
 };
 
@@ -232,12 +235,47 @@ struct Ast_Declaration : public Ast_Node {
 	
 };
 
-struct Ast_Ident : public Ast_Node{
+struct Ast_Ident : public Ast_Node {
 	Ast_Ident() {
 		type = AST_IDENT;
 	}
 	
 };
+
+
+
+// @TODO: Maybe we want this for names arguments ??
+#if 0
+struct Ast_Argument : public Ast_Node {
+	Ast_Argument() {
+		type = AST_ARGUMENT;
+	}
+	
+	
+	Ast_Ident* type;
+	Ast_Ident* name;
+	//  TODO
+	
+};
+#endif
+
+struct Ast_Parmeter : public Ast_Node {
+	Ast_Parmeter() {
+		type= AST_PARMETER;
+	}
+	
+};
+
+
+struct Ast_FunctionCall : public Ast_Node {
+	Ast_FunctionCall() {
+		type = AST_FUNCALL;
+		arguments = init_array<Ast_Ident*>(5);
+	}
+	
+	Array<Ast_Ident*> arguments;
+};
+
 struct Ast_Assign : public Ast_Node {
 	// name : value
 	// name := value;

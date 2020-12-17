@@ -1,5 +1,6 @@
 helper.hd
-
+text.txt
+test.txt
 /bin-int/
 /bin/
 /**/*.obj

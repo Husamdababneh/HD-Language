@@ -1,7 +1,11 @@
 
-husam = b + 2 / 3;
+/*var = 	*/ 
 
-husam2 = b2 + 22 / 32;
+func(a, b)  // we are parsing this now 
+
+;//+ -0x1 - h + b + a * b + 5 - 8 / 10 + 17 + 5 * 17 + 5 + 17 + 5 * a + b + 5 + 17 * 5 + 17 + 5 + 17 + 5 ;
+
+//var2 = -b2 + 22 / 32;
 
 /*#import "Basic"
 

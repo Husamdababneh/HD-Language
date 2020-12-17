@@ -9,17 +9,18 @@
 #include "parser.h"
 #include "lex.h"
 
-// @TEMP
-#include <extra/graph.h>
+// @TEMP @CLEANUP This may break the premake generated files
+#define ENABLE_GRAPH_PRINTING 1
+#include <extra/graph.cpp>
 //
 
-#ifdef PARSE_COMMAND
-#error "PARSE_COMMAND Is Already Defined"
-#else
 #define PARSE_COMMAND(name) name(LexerState* lexer, Logger* logger)
-#endif
+#define CallParseCommand(command) command(lexer, logger);
 
-Arena ast_arena = make_arena(1024 * 1024); // 1MB ?? 
+#define AllocateNode(type, name) type* name =  allocate<type>(&ast_arena);
+
+
+static Arena ast_arena = make_arena(1024 * 1024); // 1MB ?? 
 
 
 
@@ -63,6 +64,44 @@ PARSE_COMMAND(parse_operator)
 	
 }
 
+static inline  Ast_Node*
+PARSE_COMMAND(parse_one_function_call_argument)
+{
+	Token token = lexer->peek_next_token();
+	if( token.Type == ')')
+		return nullptr;
+	
+	AllocateNode(Ast_Ident, argument);
+	
+	argument->token = lexer->eat_token();
+	
+	return argument;
+}
+
+static Ast_Node*
+PARSE_COMMAND(parse_function_call)
+{
+	AllocateNode(Ast_FunctionCall, function_call);
+	
+	Token token = lexer->eat_token(); // function name 
+	function_call->token = token;
+	
+	while(true){
+		Ast_Node* node = CallParseCommand(parse_one_function_call_argument);
+		if (node == nullptr)
+			break;
+		
+		if (node->type != AST_IDENT)
+			abort();
+		
+		Ast_Ident* arg = (Ast_Ident*)node; 
+		array_add(&function_call->arguments, arg);
+	}
+	
+	
+	return function_call; 
+}
+
 static Ast_Node*
 PARSE_COMMAND(parse_subexpression)
 {
@@ -70,9 +109,15 @@ PARSE_COMMAND(parse_subexpression)
 	Token token = lexer->eat_token();
 	switch(token.Type){
 		case TOKEN_IDENT:
+		{
+			if(lexer->peek_next_token().Type == '(')
+				AllocateNode(Ast_Ident, ident);
+			
+			break;
+		}
 		case TOKEN_LITERAL:
 		{
-			Ast_Literal* literal = allocate<Ast_Literal>(&ast_arena);
+			AllocateNode(Ast_Literal, literal);
 			literal->token = token;
 			return literal;
 			break;
@@ -80,7 +125,7 @@ PARSE_COMMAND(parse_subexpression)
 		case '!':
 		case '-':
 		{
-			Ast_Unary* unary = allocate<Ast_Unary>(&ast_arena);
+			AllocateNode(Ast_Unary, unary);
 			//unary->op = token.Type;
 			unary->token = token;
 			unary->child = parse_subexpression(lexer,logger);
@@ -93,6 +138,8 @@ PARSE_COMMAND(parse_subexpression)
 			break;
 		}
 	}
+	assert(true);
+	return nullptr;
 }
 
 static Ast_Node*
@@ -128,101 +175,6 @@ PARSE_COMMAND(parse_directive)
 {
 	return nullptr;
 }
-
-static String 
-get_operator_name(const Token& token) {
-	return "PLUS"_s;
-}
-
-// @Temp
-static Array<Graph_Label> labels = init_array<Graph_Label>(50);
-//static u64 graph_labels_counter = 0;
-//
-
-static void 
-output_labels(Logger* logger)
-{
-	for(u64 i = 0; i < labels.occupied; i++)
-	{
-		auto& label = *labels[i];
-		logger->print("T_%x [shape=Mdiamond, label=\"%s\"];\n"_s, label.hash, label.str);
-		//logger->print();
-	}
-}
-
-// Make this more sophisticated 
-static void
-output_graph(Ast_Node* node, Logger* logger)
-{
-	
-	if (node == nullptr)
-		return;
-	
-	if (node->type == AST_BINARY_EXP){
-		Ast_Binary* bin = (Ast_Binary*)node;
-		
-		meow_u128 hash = MeowHash(MeowDefaultSeed, sizeof(Ast_Binary), bin);
-		
-		
-		if (bin->left != nullptr){
-			//if (bin->left->type == AST_LITERAL)
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(bin->left, logger);
-		}
-		
-		array_add<Graph_Label>(&labels, { MeowU32From(hash, 3), Shape_Type::NORMAL,
-								   bin->token.name });
-		if (bin->right != nullptr){
-			//if (bin->right->type == AST_LITERAL)
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(bin->right, logger);
-		}
-		
-		
-		
-	} else if (node->type == AST_LITERAL) {
-		Ast_Literal * literal = (Ast_Literal*) node;
-		meow_u128 hash_left = MeowHash(MeowDefaultSeed, sizeof(*literal), literal);
-		logger->print("T_%x\n"_s, MeowU32From(hash_left, 3));
-		array_add<Graph_Label>(&labels, { MeowU32From(hash_left, 3), Shape_Type::NORMAL, literal->token.name});
-		
-	} else if (node->type == AST_UNARY_EXP) {
-		Ast_Unary * unary = (Ast_Unary*) node;
-		meow_u128 hash_left = MeowHash(MeowDefaultSeed, sizeof(*unary), unary);
-		
-		
-		if (unary->child != nullptr){
-			//if (bin->left->type == AST_LITERAL)
-			logger->print("T_%x -> "_s, MeowU32From(hash_left, 3));
-			output_graph(unary->child, logger);
-		}
-		
-		array_add<Graph_Label>(&labels, { MeowU32From(hash_left, 3), Shape_Type::NORMAL, unary->token.name});
-		
-	} else if (node->type == AST_ASSIGN) {
-		Ast_Assign* assign =  (Ast_Assign*) node;
-		meow_u128 hash = MeowHash(MeowDefaultSeed, sizeof(*assign), assign);
-		
-		output_graph(assign->ident, logger);
-		logger->print("-> T_%x\n"_s, MeowU32From(hash, 3));
-		
-		logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-		output_graph(assign->exp, logger);
-		
-		array_add<Graph_Label>(&labels, { MeowU32From(hash, 3), Shape_Type::NORMAL, assign->token.name});
-		
-	}else if (node->type == AST_IDENT) {
-		Ast_Ident* ident = (Ast_Ident*) node;
-		meow_u128 hash = MeowHash(MeowDefaultSeed, sizeof(*ident), ident);
-		
-		logger->print("T_%x "_s, MeowU32From(hash, 3));
-		array_add<Graph_Label>(&labels, { MeowU32From(hash, 3), Shape_Type::NORMAL, ident->token.name});
-		
-	}
-	
-}
-
-#define AllocateNode(type, name) type* name =  allocate<type>(&ast_arena);
 
 static Ast_Node*
 PARSE_COMMAND(parse_statement)
@@ -269,6 +221,7 @@ PARSE_COMMAND(parse_statement)
 }
 
 
+
 static Ast 
 PARSE_COMMAND(parse)
 {
@@ -288,12 +241,13 @@ PARSE_COMMAND(parse)
 				logger->print("Token Name = [%s]\n"_s, token.name);
 				
 				
-				Ast_Node* node = parse_statement(lexer, logger);
+				Ast_Node* node = CallParseCommand(parse_function_call);
+				//Ast_Node* node = parse_statement(lexer, logger);
 				
 				// @CleanUp(Husam): reset the array ... Do we need a "method for this";
-				labels.occupied = 0;
-				output_graph(node, logger);
-				output_labels(logger);
+				
+				PRINT_GRAPH(node, logger);
+				
 				//Ast_Node* node = parse_declaration(lexer, logger);
 				/*Ast_Node* node  = parse_expression(lexer, logger
 );
