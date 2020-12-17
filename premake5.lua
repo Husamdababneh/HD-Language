@@ -22,6 +22,11 @@ project "HDLang"
 		"source/**.cpp"
 	}
 
+	excludes {
+		"source/extra/graph.cpp",
+		"source/extra/graph.h",
+	}
+
 	pchheader "pch.h"
 	pchsource "source/pch.cpp"
 
