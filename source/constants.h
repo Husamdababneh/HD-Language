@@ -36,5 +36,5 @@ enum  {
     TOKEN_ERROR,
 };
 
-String ETOKENStrings[];
-String ETOKENToString(u64 var);
+extern String ETOKENStrings[];
+extern String ETOKENToString(u64 var);

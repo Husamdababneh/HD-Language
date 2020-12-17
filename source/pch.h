@@ -6,11 +6,10 @@
 
 
 
+
 #ifdef TRACY_ENABLE
 #include "../submodules/tracy/TracyClient.cpp"
 #endif
-
-
 
 #include "platform/platform.h"
 

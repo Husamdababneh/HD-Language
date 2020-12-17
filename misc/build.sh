@@ -1,7 +1,7 @@
 cwd=$(pwd)
 
 echo $cwd
-cd Generated/
+cd generated/
 echo Entering directory \'$(pwd)\'
 make config=$1
 echo Leaving  directory \'$(pwd)\'

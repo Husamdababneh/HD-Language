@@ -10,7 +10,6 @@
 #include "lex.h"
 
 #include "common.h"
-#include "String.h"
 #include "auxiliary.h"
 
 

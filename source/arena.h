@@ -23,7 +23,7 @@ template<typename T>
 T* allocate(Arena* arena){
 	assert(arena->cap > ((arena->cursor - arena->data) +  sizeof(T)));
 	arena->cursor += sizeof(T);
-	return new(arena->cursor - sizeof(T)) T();
+	return ::new(arena->cursor - sizeof(T)) T();
 }
 
 

@@ -10,5 +10,5 @@
 #ifdef _WIN32
 #include "os_windows.h"
 #else
-#error "Not Supported OS yet ... !!"
+#include "os_linux.h"
 #endif

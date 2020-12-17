@@ -6,14 +6,13 @@
    ========================================================================*/
 #pragma once
 
-#include "String.h"
 #include "Ast.h"
 #include "logger.h"
 #include "arena.h"
 
 // 1 KB of memory for ast nodes 
 // NOTE(Husam): Enough?
-extern Arena  ast_arena;
+//extern Arena ast_arena;
 
 struct Parser {
 	Logger logger = Logger("Parser"_s);
