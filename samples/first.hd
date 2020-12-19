@@ -1,10 +1,17 @@
 
+a = ((( (a(s / 5 * (f +4)) + b) ) / (g)) ;
+
+
+//a = ((a + b) * (5 + 4));
+
 /*var = 	*/ 
 
-func(a, b)  // we are parsing this now 
+//a = func(a, b / s * funv(a+b)) + 4;  // we are parsing this now 
 
-;//+ -0x1 - h + b + a * b + 5 - 8 / 10 + 17 + 5 * 17 + 5 + 17 + 5 * a + b + 5 + 17 * 5 + 17 + 5 + 17 + 5 ;
+//a = a / b * s;
 
+//a = funca(a + b, b+3) * (a / funcbb(3) + b / a) + 5 / 2 + 5 * 4;
+//a = funca(funcb() + a + b, 3);
 //var2 = -b2 + 22 / 32;
 
 /*#import "Basic"

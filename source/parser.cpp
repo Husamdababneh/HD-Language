@@ -21,13 +21,15 @@
 
 
 static Arena ast_arena = make_arena(1024 * 1024); // 1MB ?? 
+static u8 counter = 0;
 
-
+static Ast_Node* PARSE_COMMAND(parse_expression);
+static Ast_Node* PARSE_COMMAND(parse_factor);
 
 inline Ast_Binary*
 PARSE_COMMAND(parse_operator)
 {
-	Token token = lexer->eat_token();
+	Token token = lexer->peek_next_token();
 	
 	
 	u32 op = 0; 
@@ -46,99 +48,103 @@ PARSE_COMMAND(parse_operator)
 			break;
 		}
 		case ';':
+		case ',':
+		case ')':
 		{
 			return nullptr;
 		}
 		default: 
 		{
-			logger->print_with_location(&token, "Unexpected Token [%s] :"_s, token.name);
+			logger->print_with_location(&token, "[parse_operator] Unexpected Token [%s] :"_s, token.name);
 			abort();
 			break;
 		}
 	}
-	
-	Ast_Binary* exp = allocate<Ast_Binary>(&ast_arena);
+	lexer->eat_token();
+	AllocateNode(Ast_Binary, exp);
 	exp->token = token;
 	exp->op = op;
 	return exp;
 	
 }
 
-static inline  Ast_Node*
-PARSE_COMMAND(parse_one_function_call_argument)
-{
-	Token token = lexer->peek_next_token();
-	if( token.Type == ')')
-		return nullptr;
-	
-	AllocateNode(Ast_Ident, argument);
-	
-	argument->token = lexer->eat_token();
-	
-	return argument;
-}
-
 static Ast_Node*
 PARSE_COMMAND(parse_function_call)
 {
 	AllocateNode(Ast_FunctionCall, function_call);
-	
-	Token token = lexer->eat_token(); // function name 
-	function_call->token = token;
-	
+	// eat '('
+	Token token = lexer->eat_token();
 	while(true){
-		Ast_Node* node = CallParseCommand(parse_one_function_call_argument);
-		if (node == nullptr)
+		token = lexer->peek_next_token();
+		
+		if (token.Type == ')'){
+			lexer->eat_token();
+			break;
+		}
+		
+		Ast_Node* node = CallParseCommand(parse_expression);
+		array_add(&function_call->arguments, node);
+		
+		token = lexer->peek_next_token();
+		
+		if (token.Type != ',')
 			break;
 		
-		if (node->type != AST_IDENT)
-			abort();
-		
-		Ast_Ident* arg = (Ast_Ident*)node; 
-		array_add(&function_call->arguments, arg);
+		// eat the ','
+		lexer->eat_token();
 	}
-	
-	
 	return function_call; 
 }
 
 static Ast_Node*
 PARSE_COMMAND(parse_subexpression)
 {
-	
-	Token token = lexer->eat_token();
+	Token token = lexer->peek_next_token();
 	switch(token.Type){
 		case TOKEN_IDENT:
 		{
+			token = lexer->eat_token();
+			// Function call 
 			if(lexer->peek_next_token().Type == '(')
+			{
+				Ast_FunctionCall* node  = (Ast_FunctionCall*)CallParseCommand(parse_function_call);
+				node->token = token;
+				return node;
+			}
+			else
+			{
 				AllocateNode(Ast_Ident, ident);
-			
-			break;
+				ident->token = token;
+				return ident;
+			}
 		}
 		case TOKEN_LITERAL:
 		{
 			AllocateNode(Ast_Literal, literal);
-			literal->token = token;
+			literal->token = lexer->eat_token();
 			return literal;
-			break;
 		}
 		case '!':
 		case '-':
 		{
 			AllocateNode(Ast_Unary, unary);
 			//unary->op = token.Type;
-			unary->token = token;
-			unary->child = parse_subexpression(lexer,logger);
+			unary->token = lexer->eat_token();
+			unary->child = CallParseCommand(parse_subexpression);
 			return unary;
+		}
+		case '(':
+		{
+			return CallParseCommand(parse_factor);
 		}
 		default: 
 		{
-			logger->print_with_location(&token, "Unexpected Token [%s] :"_s, token.name);
+			logger->print_with_location(&token, "[parse_subexpression]Unexpected Token [%s] :"_s, token.name);
 			abort();
 			break;
 		}
 	}
-	assert(true);
+	assert(false);
 	return nullptr;
 }
 
@@ -158,30 +164,54 @@ PARSE_COMMAND(parse_expression)
 	if (right->type == AST_BINARY_EXP)
 	{
 		Ast_Binary* rightSide = (Ast_Binary*)right;
-		if(rightSide->op < exp->op)
+		if(rightSide->op <= exp->op)
 		{
 			exp->right = rightSide->left;
 			rightSide->left = exp;
 			return rightSide;
 		}
+		
 	}
 	exp->right = right;
 	return exp;
 }
 
 
+
+
 static Ast_Node*
-PARSE_COMMAND(parse_directive)
+PARSE_COMMAND(parse_factor)
 {
-	return nullptr;
+	Token token = lexer->peek_next_token();
+	
+	if (token.Type == ';')
+		return nullptr;
+	
+	if (token.Type == '(')
+	{
+		lexer->eat_token();
+		AllocateNode(Ast_Factor, factor);
+		factor->node = CallParseCommand(parse_expression);
+		token = lexer->peek_next_token();
+		if (token.Type == ')') {
+			lexer->eat_token();
+		} 
+		
+		return factor;
+	}
+	else 
+	{
+		return CallParseCommand(parse_expression);
+	}
 }
+
+
+
 
 static Ast_Node*
 PARSE_COMMAND(parse_statement)
 {
-	//Ast_Declaration* decl = allocate<Ast_Declaration>(&ast_arena);
 	Token ident_token = lexer->eat_token();
-	//decl->name = token.name;
 	
 	Token token = lexer->peek_next_token();
 	switch(token.Type)
@@ -200,7 +230,8 @@ PARSE_COMMAND(parse_statement)
 			AllocateNode(Ast_Ident, ident);
 			ident->token = ident_token;
 			
-			Ast_Node* node = parse_expression(lexer, logger); 
+			//Ast_Node* node = parse_expression(lexer, logger); 
+			Ast_Node* node = CallParseCommand(parse_expression);
 			
 			assign->ident = ident;
 			assign->exp = node;
@@ -241,7 +272,7 @@ PARSE_COMMAND(parse)
 				logger->print("Token Name = [%s]\n"_s, token.name);
 				
 				
-				Ast_Node* node = CallParseCommand(parse_function_call);
+				Ast_Node* node = CallParseCommand(parse_statement);
 				//Ast_Node* node = parse_statement(lexer, logger);
 				
 				// @CleanUp(Husam): reset the array ... Do we need a "method for this";
@@ -273,7 +304,5 @@ void parse_file(const String& filename){
 	
 	parse(&lexer, &logger);
 }
-
-
 
 

@@ -26,6 +26,7 @@ enum {
 	AST_FUNCALL,
 	AST_ARGUMENT,
 	AST_PARMETER,
+	AST_FACTOR,
 	AST_UKNOWN,
 };
 
@@ -173,6 +174,7 @@ struct Ast_Unary : public Ast_Node {
 	
 };
 
+
 struct Ast_Binary : public Ast_Node {
 	//  <a> ? <b>
 	Ast_Binary() {
@@ -186,6 +188,15 @@ struct Ast_Binary : public Ast_Node {
 	Ast_Node* left;
 	Ast_Node* right;
 	
+};
+
+// This is just stupid !!!
+struct Ast_Factor : public Ast_Node {
+	Ast_Factor(){
+		type = AST_FACTOR;
+	}
+	
+	Ast_Node* node;
 };
 
 struct Ast_Type : public Ast_Node {
@@ -269,10 +280,10 @@ struct Ast_Parmeter : public Ast_Node {
 struct Ast_FunctionCall : public Ast_Node {
 	Ast_FunctionCall() {
 		type = AST_FUNCALL;
-		arguments = init_array<Ast_Ident*>(5);
+		arguments = init_array<Ast_Node*>(5);
 	}
 	
-	Array<Ast_Ident*> arguments;
+	Array<Ast_Node*> arguments;
 };
 
 struct Ast_Assign : public Ast_Node {

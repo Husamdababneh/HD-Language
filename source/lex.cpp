@@ -425,3 +425,10 @@ Token LexerState::peek_next_token()
 	return *top<Token>(&token_cache);
 }
 
+#if 0
+Token LexerState::peek_next_token()
+{
+	push<Token>(&token_cache, eat_token());
+	return *top<Token>(&token_cache);
+}
+#endif
