@@ -14,11 +14,18 @@
 #include <extra/graph.cpp>
 //
 
+#include "../submodules/tracy/Tracy.hpp"
+
 #define PARSE_COMMAND(name) name(LexerState* lexer, Logger* logger)
 #define CallParseCommand(command) command(lexer, logger);
 
 #define AllocateNode(type, name) type* name =  allocate<type>(&ast_arena);
 
+#ifdef _DEBUG
+#define PANIC() abort();
+#else
+#define PANIC() exit(-1)
+#endif
 
 static Arena ast_arena = make_arena(1024 * 1024); // 1MB ?? 
 static u8 counter = 0;
@@ -56,7 +63,7 @@ PARSE_COMMAND(parse_operator)
 		default: 
 		{
 			logger->print_with_location(&token, "[parse_operator] Unexpected Token [%s] :"_s, token.name);
-			abort();
+			PANIC();
 			break;
 		}
 	}
@@ -78,7 +85,7 @@ PARSE_COMMAND(parse_function_call)
 		token = lexer->peek_next_token();
 		
 		if (token.Type == ')'){
-			lexer->eat_token();
+			//lexer->eat_token();
 			break;
 		}
 		
@@ -99,6 +106,7 @@ PARSE_COMMAND(parse_function_call)
 static Ast_Node*
 PARSE_COMMAND(parse_subexpression)
 {
+	ZoneScoped;
 	Token token = lexer->peek_next_token();
 	switch(token.Type){
 		case TOKEN_IDENT:
@@ -109,6 +117,14 @@ PARSE_COMMAND(parse_subexpression)
 			{
 				Ast_FunctionCall* node  = (Ast_FunctionCall*)CallParseCommand(parse_function_call);
 				node->token = token;
+				token = lexer->peek_next_token();
+				if (token.Type != ')')
+				{
+					logger->print_with_location(&token, "Expected [(] got [%s]"_s, token.name  );
+					PANIC();
+				}
+				
+				lexer->eat_token();
 				return node;
 			}
 			else
@@ -139,8 +155,8 @@ PARSE_COMMAND(parse_subexpression)
 		}
 		default: 
 		{
-			logger->print_with_location(&token, "[parse_subexpression]Unexpected Token [%s] :"_s, token.name);
-			abort();
+			logger->print_with_location(&token, "[parse_subexpression] Unexpected Token [%s] :"_s, token.name);
+			PANIC();
 			break;
 		}
 	}
@@ -172,6 +188,7 @@ PARSE_COMMAND(parse_expression)
 		}
 		
 	}
+	
 	exp->right = right;
 	return exp;
 }
@@ -192,10 +209,18 @@ PARSE_COMMAND(parse_factor)
 		lexer->eat_token();
 		AllocateNode(Ast_Factor, factor);
 		factor->node = CallParseCommand(parse_expression);
+		//Ast_Node* node = CallParseCommand(parse_expression);
+		
 		token = lexer->peek_next_token();
-		if (token.Type == ')') {
-			lexer->eat_token();
-		} 
+		
+		
+		if (token.Type != ')') {
+			logger->print_with_location(&token, "Expected [)] here !!\n"_s);
+			exit(-1);//PANIC();
+		}
+		
+		
+		lexer->eat_token();
 		
 		return factor;
 	}

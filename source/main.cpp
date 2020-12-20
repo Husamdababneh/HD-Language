@@ -7,23 +7,43 @@
 
 #include "pch.h"
 
+
 #include "main.h"
 #include "parser.h"
+
+#include "../submodules/tracy/Tracy.hpp"
 
 
 constexpr bool verbos = false;
 int allocation_count = 0;
 
-void * operator new(u64 size){
+void* operator new(u64  count)
+{
 	allocation_count++;
-	
-	return malloc(size);
+	void* ptr = malloc(count);
+	TracyAlloc (ptr , count);
+	return ptr;
 }
 
-void * operator new[](u64 size){
+void * operator new[](u64 count){
 	allocation_count++;
-	return malloc(size);
+	void* ptr = malloc(count);
+	TracyAlloc (ptr , count);
+	return ptr;
 }
+
+void operator delete(void* ptr) noexcept
+{
+	TracyFree (ptr);
+	free(ptr);
+}
+
+void operator delete[](void* ptr) noexcept
+{
+	TracyFree (ptr);
+	free(ptr);
+}
+
 
 
 void Usage() {
@@ -31,15 +51,19 @@ void Usage() {
 	log.print("Usage: hd.exe <filename>\n"_s);
 }
 
+static const char* const sl_Parsing = "Parsing" ;
 int main(int argc, char ** argv)
 {
+	ZoneScoped;
 	if (argc < 2){
 		Usage();
 		return 0;
 	}
 	
 	String filename = {(u8*)argv[1],  strlen(argv[1])};
+	//FrameMarkStart (sl_Parsing );
 	parse_file(filename);
+	//FrameMarkEnd(sl_Parsing);
 	printf("#Allocations Using New KeyWord = %d\n", allocation_count);
 	
 }

@@ -1,4 +1,6 @@
 -- premake5.lua
+
+define_table = {}
 workspace "HD-Project"
 	location "generated"
 	architecture "x64"
@@ -19,7 +21,7 @@ project "HDLang"
 	files {
 		"source/**.h",
 		"source/**.c",
-		"source/**.cpp"
+		"source/**.cpp" 	   
 	}
 
 	excludes {
@@ -47,23 +49,28 @@ project "HDLang"
 		"-maes"
 	}
 
+	table.insert(define_table, "NOMINMAX")
+
 	filter "configurations:Debug"
-		defines { "DEBUG" }
+		table.insert(define_table, "DEBUG")
 		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Tracy"
-		files {"source/include_tracy.cpp"}
-		defines { "TRACY_ENABLE", "TRACY_NO_EXIT" }
+		table.insert(define_table, { "TRACY_ENABLE","TRACY_NO_EXIT"} )
+		files {"submodules/tracy/TracyClient.cpp" }
 		runtime "Release"
 		symbols "off"
 
 	filter "configurations:Release"
-		defines { "NDEBUG" }
+		table.insert(define_table, { "NDEBUG"} )
 		runtime "Release"
 		optimize "off"
-	
 
+	filter "files:**TracyClient.cpp"
+	    flags {"NoPCH"}
+	
+	defines { define_table } 
 -- Clean Function --
 newaction {
 	trigger     = "clean",
