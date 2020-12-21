@@ -62,7 +62,7 @@ PARSE_COMMAND(parse_operator)
 		}
 		default: 
 		{
-			logger->print_with_location(&token, "[parse_operator] Unexpected Token [%s] :"_s, token.name);
+			logger->print_with_location(&token, "[parse_operator] Unexpected Token [%s]\n"_s, token.name);
 			PANIC();
 			break;
 		}
@@ -201,8 +201,7 @@ PARSE_COMMAND(parse_factor)
 {
 	Token token = lexer->peek_next_token();
 	
-	if (token.Type == ';')
-		return nullptr;
+	if (token.Type == ';') return nullptr;
 	
 	if (token.Type == '(')
 	{
@@ -216,7 +215,7 @@ PARSE_COMMAND(parse_factor)
 		
 		if (token.Type != ')') {
 			logger->print_with_location(&token, "Expected [)] here !!\n"_s);
-			exit(-1);//PANIC();
+			PANIC();
 		}
 		
 		
@@ -236,6 +235,8 @@ PARSE_COMMAND(parse_factor)
 static Ast_Node*
 PARSE_COMMAND(parse_statement)
 {
+
+	Ast_Node* return_node = nullptr;
 	Token ident_token = lexer->eat_token();
 	
 	Token token = lexer->peek_next_token();
@@ -261,19 +262,23 @@ PARSE_COMMAND(parse_statement)
 			assign->ident = ident;
 			assign->exp = node;
 			
-			return assign;
+			return_node = assign;
 			//decl->decl_type = "NOT FUNCTION NOR  CONSTANT"_s;
 			break;
 		}
 		
 	}
-	
-	//logger->print("%s \n"_s, decl->decl_type);
-	
-	//token = lexer->eat_token();
-	
-	//return decl;
-	return nullptr;
+
+
+	token = lexer->peek_next_token();
+	if (token.Type != ';')
+	{
+		logger->print_with_location(&token, "Expected ';' here !!!\n"_s);
+		PANIC();
+	}
+
+	lexer->eat_token();
+	return return_node;
 }
 
 
