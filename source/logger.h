@@ -33,6 +33,7 @@ struct Logger {
 	
 	inline void print_prefix();
 	void print(String str, ...);
+	void vprint(String str,va_list args);
 	void print_token_pos(Token * token );
 	void print_with_location(Token * token , String str, ...);
 };
