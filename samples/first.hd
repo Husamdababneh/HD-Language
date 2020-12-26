@@ -1,41 +1,40 @@
 
-a = (( (( a(s / 5 * (f + 4) ) + b)) / (g) ));
-
-
-a = (( a + b ) * (5 + 4));
-
-/*var = 	*/ 
-
-//a = func(a, b / s * funv(a+b)) + 4;  // we are parsing this now 
-
-//a = a / b * s;
-
-//a = funca(a + b, b+3) * (a / funcbb(3) + b / a) + 5 / 2 + 5 * 4;
-//a = funca(funcb() + a + b, 3);
-//var2 = -b2 + 22 / 32;
-
-/*#import "Basic"
-
-#load "file.hd"
-
-
-
-add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
-	return a + b;
-}
-
-
-
-#scope internal  // this tells the compiler that everything under it is only accessed by the file
-
-main :: () {
-	
-	A ::= 1;
-	a :: b;
-	return add();	
-}
-*/
 /*
---!1 + -0x1 - h + b + a * b + 5 - 8 / 10 + 17 + 5 * 17 + 5 + 17 + 5 * a + b + 5 + 17 * 5 + 17 + 5 + 17 + 5 ;
+
+
+
+
+
+
+/*
 */
 
+
+main :: proc ( u16 : a  = s ) {
+
+}
+
+a :: 4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
+
+a = 4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
+
+a := 4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
+*/
+
+// Inferred types
+// assingment ( a should already be declared)
+// a = value; 
+// constatnt declaration and assigment 
+// a :: value;
+// declaration with assignment
+// a := value;
+
+// Staticlly typed 
+a : type =  4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
+a : type;
+//a = g + 5 * (s/5) + f(s);
+
+/*
+// A :: 6;
+
+*/

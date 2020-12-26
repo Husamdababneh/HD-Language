@@ -12,6 +12,7 @@ patterns = {
 "*.4coder",
 "*.txt",
 "*.hd",
+"*.jai",
 };
 blacklist_patterns = {
 "submodules\\**.*",

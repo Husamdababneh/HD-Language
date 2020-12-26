@@ -56,8 +56,11 @@ struct LexerState
 	Queue<Token> token_cache;
 	
 	Token eat_token();
+	Token process_token();
+	Token eat_token_cache();
 	Token peek_token(u64 lookAhead = 0);
 	Token peek_next_token();
+	Token peek_forward(u64 lookahead);
 	
 	inline u8& peek_next_character();
 	inline u8& peek_character(u64 lookAhead = 0);

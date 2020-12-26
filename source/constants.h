@@ -9,6 +9,7 @@
 
 enum  {
     TOKEN_IDENT = 256,
+    TOKEN_HDTYPE,
     TOKEN_KEYWORD,
     TOKEN_LITERAL,
     TOKEN_COMMENT,
@@ -36,5 +37,5 @@ enum  {
     TOKEN_ERROR,
 };
 
-extern String ETOKENStrings[];
-extern String ETOKENToString(u64 var);
+String ETOKENStrings[];
+String ETOKENToString(u64 var);

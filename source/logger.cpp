@@ -47,6 +47,11 @@ void Logger::print(String str, ...) {
 }
 
 void Logger::vprint(String str, va_list args) {
+	// @NOCHECKIN 
+	// TODO: 
+#if 0
+	vprintf((const char*)str.data, args);
+#endif
 	// print body
 	for(size_t i = 0; i < str.count; i++) {
 		if (str[i] == '%'){
@@ -94,6 +99,7 @@ void Logger::vprint(String str, va_list args) {
 		}
 	}
 	return;
+	
 }
 
 inline void Logger::print_prefix() {

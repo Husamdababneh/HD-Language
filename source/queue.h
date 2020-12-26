@@ -7,6 +7,13 @@ $Desc:
 
 #pragma once
 
+/*
+
+TODO(Husam) : safty checks here would be nice i think !!.. -_-.
+
+*/
+
+
 #include "common.h"
 
 template<typename T>
@@ -32,6 +39,14 @@ make_queue(u64 size)
 
 
 template<typename T> T*
+top_plus(Queue<T>* queue, u64 plus)
+{
+	//assert(queue->start + plus < queue->end);
+	return &queue->data[queue->start + plus];
+}
+
+
+template<typename T> T*
 top(Queue<T>* queue)
 {
 	return &queue->data[queue->start];
@@ -47,14 +62,12 @@ pop(Queue<T>* queue)
 	return result;
 }
 
-template<typename T> void
+template<typename T> T*
 push(Queue<T>* queue, T data)
 {
 	queue->data[queue->end] = data;
 	queue->end = (queue->end + 1) % queue->cap;
 	queue->count++;
+	return top(queue);
 }
-
-
-
 

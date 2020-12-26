@@ -66,6 +66,9 @@ output_graph(Ast_Node* node, Logger* logger)
 	if (node == nullptr)
 		return;
 	
+	if (node->type == AST_UKNOWN)
+		abort();
+	
 	if (node->type == AST_BINARY_EXP){
 		Ast_Binary* bin = (Ast_Binary*)node;
 		
@@ -104,15 +107,26 @@ output_graph(Ast_Node* node, Logger* logger)
 		
 		array_add(&labels, { MeowU32From(hash_left, 3), Shape_Type::RECT, unary->token.name});
 		
-	} else if (node->type == AST_ASSIGN) {
-		Ast_Assign* assign =  (Ast_Assign*) node;
+	} else if (node->type == AST_DECLARATION) {
+		Ast_Declaration* assign =  (Ast_Declaration*) node;
 		meow_u128 hash = MeowHash(MeowDefaultSeed, sizeof(*assign), assign);
 		
-		output_graph(assign->ident, logger);
-		logger->print("-> T_%x\n"_s, MeowU32From(hash, 3));
+		if (assign->ident){
+			output_graph(assign->ident, logger);
+			logger->print("-> T_%x\n"_s, MeowU32From(hash, 3));
+		}
 		
-		logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-		output_graph(assign->exp, logger);
+		if (assign->data_type){
+			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+			output_graph(assign->data_type, logger);
+		}
+		
+		if (assign->body){
+			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+			output_graph(assign->body, logger);
+		}
+		
+		
 		
 		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::MDIAMOND, assign->token.name});
 		

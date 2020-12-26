@@ -12,8 +12,8 @@
 #include "common.h"
 #include "auxiliary.h"
 
-
-String reserved [] = {
+// TODO : Remove them from reserved[]  
+String predefined_types [] = {
 	// Types
 	"int"_s, "float"_s,
 	"u8"_s , "s8"_s,
@@ -24,7 +24,9 @@ String reserved [] = {
 	"float64"_s,
 	"string"_s,
 	"bool"_s,
-	
+};
+
+String reserved [] = {
     // loop
 	"for"_s,
 	
@@ -176,12 +178,15 @@ LexerState::LexerState(const String& filepath)
 LexerState::~LexerState()
 {
 	printf("Getting Out\n");
-	delete[] input.data;
-	input.data = nullptr;
+	if (input.count){
+		delete[] input.data;
+		//input.data = nullptr;
+	}
 }
 
 
-Token LexerState::eat_token()
+
+Token LexerState::process_token()
 {
 	// @TODO: init a token and return it.
 	static int COUTNER = 1;
@@ -190,11 +195,6 @@ Token LexerState::eat_token()
 	
 	Token token = {};
 	
-	
-	if (token_cache.count > 0){
-		token = *pop<Token>(&token_cache);
-		return token;
-	}
 	token.id = COUTNER;
 	COUTNER++;
 	u8 ch = eat_until_character();
@@ -336,7 +336,6 @@ Token LexerState::eat_token()
 		case ':':
 		{
 			auto next = peek_character();
-			token.value = String {&input[temp], input_cursor - temp};
 			if (next == ':')  {
 				token.Type = TOKEN_DOUBLECOLON; // uninitailizaed
 				eat_character();
@@ -347,7 +346,9 @@ Token LexerState::eat_token()
 			}
 			else{
 				token.Type = TOKEN_COLON;
-			} 
+			}
+			token.value = String {&input[temp], input_cursor - temp};
+			//token.Type = TOKEN_COLON;
 			break;
 		}
 		break;
@@ -366,6 +367,8 @@ Token LexerState::eat_token()
 			};
 			if (isKeyword(token.value))
 				token.Type = TOKEN_KEYWORD;
+			else if (isKeyword(token.value))
+				token.Type = TOKEN_HDTYPE;
 			else
 				token.Type = TOKEN_IDENT;
 			
@@ -401,34 +404,30 @@ Token LexerState::eat_token()
 	return token;
 }
 
+Token LexerState::eat_token()
+{
+	if (token_cache.count == 0)
+		return process_token();
+	return *pop(&token_cache);
+}
 
-// TODO:@Optimization(Husam): This may be called to many times ?? use cache ??
-// 
 
-
-// When lookAhead == 0 it's exactlly as peek_next_token
+#define FOR_RANGE(x) for(u64 it = 0; it < x; it++)
 
 Token LexerState::peek_token(u64 lookAhead /* = 0*/ )
 {
+	if (token_cache.count == 0) {
+		if (lookAhead == 0) return *push(&token_cache, process_token());
+		
+	}
 	
-	Token result = peek_next_token();
-	for(u64 counter = 0; counter < lookAhead; counter++)
-		result = peek_next_token();
-	return result;
+	if (!(token_cache.count > lookAhead))
+	{
+		FOR_RANGE(lookAhead - token_cache.count + 1){
+			push(&token_cache, process_token());
+		}
+	}
+	
+	return *top_plus(&token_cache, lookAhead);
 }
 
-
-
-Token LexerState::peek_next_token()
-{
-	push<Token>(&token_cache, eat_token());
-	return *top<Token>(&token_cache);
-}
-
-#if 0
-Token LexerState::peek_next_token()
-{
-	push<Token>(&token_cache, eat_token());
-	return *top<Token>(&token_cache);
-}
-#endif

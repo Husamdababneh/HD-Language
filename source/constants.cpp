@@ -9,6 +9,7 @@
 
 String ETOKENStrings[] =   {
     "IDENT"_s,
+    "HDTYPE"_s,
     "KEYWORD"_s,
     "LITERAL"_s,
     "COMMENT"_s,
@@ -36,7 +37,7 @@ String ETOKENStrings[] =   {
     "ERROR"_s,
 };
 
-String ETOKENToString(u64 var) {
+String  ETOKENToString(u64 var) {
     if (var < TOKEN_IDENT)
         return {(u8*) var , 1};
     return ETOKENStrings[(u64)var - (u64)TOKEN_IDENT  + 1];

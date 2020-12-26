@@ -64,7 +64,7 @@ int main(int argc, char ** argv)
 	//FrameMarkStart (sl_Parsing );
 	parse_file(filename);
 	//FrameMarkEnd(sl_Parsing);
-	printf("#Allocations Using New KeyWord = %d\n", allocation_count);
+	printf("#Allocations Using New Keyword = %d\n", allocation_count);
 	
 }
 

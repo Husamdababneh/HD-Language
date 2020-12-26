@@ -1,0 +1,49 @@
+/* ========================================================================
+$File: a.hd
+$Date: December 23rd 2020 6:03 pm 
+$Creator: Husam 
+$Desc:  
+=========================================================================*/
+
+
+//a = (( (( a(s / 5 * (f + 4) ) + b)) / (g) ));
+
+
+//a = (( a + b ) * (5 + 4));
+
+/*var = 	*/ 
+
+//a = func(a, b / s * funv(a+b)) + 4;  // we are parsing this now 
+
+//a = a / b * s;
+
+//a = b *  a + 5 / 2 + 4 * 3 ;// / 2 + 5 * 4;
+//a = funca(a + b, b+3) * (a / funcbb(3) + b / a) + 5 / 2 + 5 * 4
+//a = funca(funcb() + a + b, 3);
+//var2 = -b2 + 22 / 32;
+
+/*#import "Basic"
+
+#load "file.hd"
+
+
+
+add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
+	return a + b;
+}
+
+
+
+#scope internal  // this tells the compiler that everything under it is only accessed by the file
+
+main :: () {
+	
+	A ::= 1;
+	a :: b;
+	return add();	
+}
+*/
+/*
+--!1 + -0x1 - h + b + a * b + 5 - 8 / 10 + 17 + 5 * 17 + 5 + 17 + 5 * a + b + 5 + 17 * 5 + 17 + 5 + 17 + 5 ;
+*/
+
