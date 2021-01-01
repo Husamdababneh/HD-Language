@@ -399,7 +399,6 @@ Token LexerState::process_token()
 	}
 	token.end_position = get_current_position();
 	assert(token.Type != TOKEN_NONE);
-	//last_token = token;
 	token.value = String { &input[temp], input_cursor  - temp};
 	return token;
 }

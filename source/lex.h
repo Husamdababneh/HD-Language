@@ -72,7 +72,7 @@ struct LexerState
 	
 	Position get_current_position() { return {current_line_number, current_char_index}; }
 	
-	LexerState() = delete;					 // copy constructor
+	//LexerState() = delete;					 // copy constructor
 	LexerState(const LexerState& ) = delete; // copy constructor
 	
 };

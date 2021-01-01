@@ -1,40 +1,25 @@
-
-/*
-
-
-
-
+#import "File"
 
 
 /*
-*/
-
-
-main :: proc ( u16 : a  = s ) {
-
+struct Symbol {
+	String name;
+	u64 Type;
+	HASH scope;
 }
 
-a :: 4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
 
-a = 4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
+main :: proc ( a : u16  = s , a : u8) {
 
-a := 4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
+	b : u16 = 12;
+
+}
 */
 
-// Inferred types
-// assingment ( a should already be declared)
-// a = value; 
-// constatnt declaration and assigment 
-// a :: value;
-// declaration with assignment
-// a := value;
 
-// Staticlly typed 
-a : type =  4 + 5 * 3 + fin(s) / ( 9 + 6 ) ;
-a : type;
-//a = g + 5 * (s/5) + f(s);
-
-/*
-// A :: 6;
-
-*/
+{
+	{
+		a :: func(5, 2) + 6 / (85 + 3);
+		b := 2;
+	}
+}

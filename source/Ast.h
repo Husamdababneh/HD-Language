@@ -15,6 +15,7 @@ enum {
 	AST_IDENT,
 	AST_ASSIGN,
 	AST_DECLARATION,
+	AST_PORCDECLARATION,
 	AST_TYPE,
 	AST_BLOCK,
 	AST_DEFINETION,
@@ -193,7 +194,7 @@ struct Ast_Block : public Ast_Node {
 
 struct Ast_ProcDecl : public Ast_Declaration  {
 	Ast_ProcDecl() {
-		//type = AST_PORCDECLARATION;
+		type = AST_PORCDECLARATION;
 		constant = true;
 		arguments = init_array<Ast_Declaration*>(5);
 	}

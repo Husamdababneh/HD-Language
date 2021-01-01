@@ -14,7 +14,7 @@ project "HDLang"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "On"
-
+	
 	targetdir "bin/"
 	objdir "bin-int/%{cfg.buildcfg}/"
 

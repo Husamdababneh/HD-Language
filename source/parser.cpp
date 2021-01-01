@@ -30,6 +30,7 @@
 static Arena ast_arena = make_arena(1024 * 1024); // 1MB ?? 
 static u8 counter = 0;
 
+static Ast_Node* PARSE_COMMAND(parse_statement);
 static Ast_Node* PARSE_COMMAND(parse_expression);
 static Ast_Node* PARSE_COMMAND(parse_factor);
 
@@ -256,37 +257,65 @@ proc->
 static Ast_Node*
 PARSE_COMMAND(parse_porc_declaration)
 {
-	// ::
+	// proc
 	Token token = lexer->eat_token();
-	logger->print("%s\n"_s, token.name);
-	// proc 
+	// (
 	token = lexer->eat_token();
-	logger->print("%s\n"_s, token.name);
-	// :: 
-	token = lexer->eat_token();
-	logger->print("%s\n"_s, token.name);
-	// ( 
-	//token = lexer->eat_token();
 	if (token.Type != '(')
 	{
 		logger->print_with_location(&token, "Excpected '(' and got [%s]"_s, token.name);
-		PANIC();
+		assert(false);
+		//PANIC();
 	}
 	
-	//AllocateNode(Ast_ProcDecl, proc);
-	while(token.Type != ')'){
+	AllocateNode(Ast_ProcDecl, proc);
+	// parse parmeters 
+	while(true){
+		token = lexer->peek_token();
+		AllocateNode(Ast_Declaration, decl);
+		AllocateNode(Ast_Ident, ident);
+		ident->token = lexer->eat_token();
 		
-		// name/type 
-		//  :
-		// type
-		// optional = 
-		// value iff = 
-		// if , continue ; if ) break; else error 
+		if (lexer->peek_token().Type != TOKEN_COLON){
+			logger->print_with_location(&token, "Excpected ':' and got [%s]\n"_s, lexer->peek_token().name);
+			goto exit;
+		}
+		lexer->eat_token();
 		
-		token = lexer->eat_token();
+		AllocateNode(Ast_Ident, data_type);
+		data_type->token = lexer->eat_token();
+		
+		AllocateNode(Ast_Ident, body);
+		
+		if (lexer->peek_token().Type == TOKEN_ASSIGN){
+			decl->token = lexer->eat_token();
+			decl->body = CallParseCommand(parse_expression);// ?? -_-
+		}
+		
+		decl->ident = ident;
+		decl->data_type = data_type;
+		array_add(&proc->arguments, decl);
+		
+		exit:
+		if (lexer->peek_token().Type == ',') lexer->eat_token();
+		else if (lexer->peek_token().Type == ')') { lexer->eat_token(); break;}
+		else assert(false);// @TODO(Husam): Report Error
 	}
-	
-	return nullptr;
+	//parse statments
+	// This should be parse block ?? 
+	if (lexer->peek_token().Type != '{')  assert(false);
+	lexer->eat_token();
+	AllocateNode(Ast_Block, block);
+	while(true){
+		Ast_Node* node = CallParseCommand(parse_statement);
+		if (node) array_add(&block->statements, node);
+		
+		if (lexer->peek_token().Type == '}')
+			break;
+		
+	}
+	proc->body = block;
+	return proc;
 }
 
 static Ast_Node*
@@ -296,9 +325,10 @@ PARSE_COMMAND(parse_statement)
 	Ast_Node* return_node = nullptr;
 	
 	// We know it's identifer
-	Token ident_token = lexer->eat_token();
-	
-	Token token = lexer->peek_token();
+	Token ident_token = lexer->peek_token();
+	if (ident_token.Type == '}') //TODO: rethink this part .. ?? 
+		return nullptr;
+	Token token = lexer->peek_token(1);
 	switch(token.Type)
 	{
 		case TOKEN_ASSIGN:
@@ -306,12 +336,11 @@ PARSE_COMMAND(parse_statement)
 		case TOKEN_COLONEQUAL:
 		{
 			
+			ident_token = lexer->eat_token();
 			if (!check_if_proc(lexer, logger)){
-				lexer->eat_token();
-				
 				AllocateNode(Ast_Declaration, decl);
+				decl->token = lexer->eat_token();
 				decl->body = CallParseCommand(parse_expression);
-				decl->token = token;
 				
 				AllocateNode(Ast_Ident, ident);
 				ident->token = ident_token;
@@ -320,21 +349,26 @@ PARSE_COMMAND(parse_statement)
 				if (token.Type == TOKEN_DOUBLECOLON) decl->constant = true;
 				return_node = decl;
 			} else {
+				// ::
+				lexer->eat_token();
 				Ast_ProcDecl* decl = (Ast_ProcDecl*) CallParseCommand(parse_porc_declaration);
 				if (!decl) {
 					// TODO: @CleanUp
+					assert(false);
 					return nullptr;
 				}
 				AllocateNode(Ast_Ident, ident);
 				ident->token = ident_token;
 				decl->ident = ident;
-				
-				exit(0);
+				decl->token = token;
+				return decl;
+				//exit(0);
 			}
 			break;
 		}
 		case TOKEN_COLON: 
 		{
+			ident_token = lexer->eat_token();
 			AllocateNode(Ast_Declaration, decl);
 			// name 
 			AllocateNode(Ast_Ident, ident);
@@ -361,8 +395,16 @@ PARSE_COMMAND(parse_statement)
 			// EXP iff = | :
 			break;
 		}
+#if 0
+		case TOKEN_COMMENT:
+		case TOKEN_MULTILINE_COMMENT:
+		//case TOKEN_EOFA:
+		case '}': return nullptr;
+#endif
+		
 		default : {
-			abort();
+			logger->print_with_location(&token,"Got %s %d\n"_s, token.name, (u64)token.Type);
+			assert(false);
 		}
 		
 	}
@@ -383,6 +425,20 @@ static Ast_Node*
 PARSE_COMMAND(parse_scope)
 {
 	
+	AllocateNode(Ast_Block, block);
+	block->token = lexer->eat_token();
+	Ast_Node* node = nullptr;
+	while(true){
+		if (lexer->peek_token().Type == '{') { node = CallParseCommand(parse_scope);}
+		else node = CallParseCommand(parse_statement);
+		
+		if (node) array_add(&block->statements, node);
+		
+		if (lexer->peek_token().Type == '}') break;
+		
+	}
+	
+	return block;
 }
 
 
@@ -402,11 +458,11 @@ PARSE_COMMAND(parse)
 				
 				break;
 			}
-			//case '{': 
+			case '{': 
 			{
 				//logger->print("Scope"_s);
-				//Ast_Node* scope = CallParseCommand(parse_scope);
-				//panic();
+				Ast_Node* scope = CallParseCommand(parse_scope);
+				PRINT_GRAPH(scope, logger);
 			}
 			default:
 			{
@@ -425,6 +481,7 @@ void parse_file(const String& filename){
 	LexerState lexer(filename);
 	
 	parse(&lexer, &logger);
+	
 	
 }
 
