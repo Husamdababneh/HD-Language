@@ -29,6 +29,7 @@ enum {
 	AST_PARMETER,
 	AST_FACTOR,
 	AST_PROC,
+	AST_STRUCT,
 	AST_UKNOWN,
 };
 
@@ -99,7 +100,6 @@ struct Ast_Binary : public Ast_Node {
 	
 };
 
-// This is just stupid !!!
 struct Ast_Factor : public Ast_Node {
 	Ast_Factor(){
 		type = AST_FACTOR;
@@ -115,13 +115,6 @@ struct Ast_Type : public Ast_Node {
 	
 };
 
-struct Ast_Declaration ;
-struct Ast_ParmeterList : public Ast_Node {
-	// ( name : type, name : type ... )
-	Array<Ast_Declaration*> declerations;
-};
-
-
 struct Ast_Ident : public Ast_Node {
 	Ast_Ident() {
 		type = AST_IDENT;
@@ -130,23 +123,24 @@ struct Ast_Ident : public Ast_Node {
 
 
 struct Ast_Declaration : public Ast_Node {
-	// name := value;
-	// name :  type  = value;
-	// name :: value;   // constant
-	// name :  type  : value; // constant
-	// name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
-	// name :: struct { ... }
-	// name :: struct (   ) { ... }
+	// [X] name := value;
+	// [X] name :  type  = value;
+	// [X] name :: value;   // constant
+	// [X] name :  type  : value; // constant
+	// [X] name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
+	// [ ] name :: enum { ... }
+	// [ ] name :: struct { ... }
+	// [ ] name :: struct (   ) { ... }
 	
 	Ast_Declaration(){
 		type = AST_DECLARATION;
 	}
 	// name = "value" ---> in this case the type refers to the type's value not the name 
 	
-	Ast_Ident* ident; 
-	Ast_Node* body; // this could be a function body, expression, 
-	Ast_Node* data_type; // for now this is ident
-	bool constant;
+	Ast_Ident* ident;  //Name of the symbol
+	Ast_Node*  body; // this could be a function body, expression, 
+	Ast_Node*  data_type; // for now this is ident
+	bool 	  constant;
 };
 
 
@@ -192,12 +186,23 @@ struct Ast_Block : public Ast_Node {
 };
 
 
+struct Ast_Struct : public Ast_Declaration  {
+	Ast_Struct() {
+		type = AST_STRUCT;
+		constant = true;
+		fields = init_array<Ast_Declaration*>(5);
+	}
+	Array<Ast_Declaration*> fields;
+};
+
+
 struct Ast_ProcDecl : public Ast_Declaration  {
 	Ast_ProcDecl() {
 		type = AST_PORCDECLARATION;
 		constant = true;
 		arguments = init_array<Ast_Declaration*>(5);
 	}
-	
+	//Array<Ast_Declaration*> return_types;
+	Ast_Ident * return_type; // TODO: 
 	Array<Ast_Declaration*> arguments;
 };

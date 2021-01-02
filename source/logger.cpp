@@ -79,6 +79,7 @@ void Logger::vprint(String str, va_list args) {
 				case 's':
 				{
 					String string = va_arg(args, String);
+					//if (string.str == 0) assert(false);
 					for(int a = 0; a < string.count; a++)
 						putc(string[a], out);
 					break;

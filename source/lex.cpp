@@ -24,6 +24,7 @@ String predefined_types [] = {
 	"float64"_s,
 	"string"_s,
 	"bool"_s,
+	"void"_s
 };
 
 String reserved [] = {
@@ -100,6 +101,13 @@ bool isKeyword(String& string)
 	return false;
 }
 
+bool isHDType(String& string)
+{
+	for(int a = 0; a < KeywordCount; a++)
+		if(isEqual(&string, &predefined_types[a]))
+		return true;
+	return false;
+}
 u8& LexerState::peek_next_character()
 {
 	return input[input_cursor + 1];
@@ -236,15 +244,27 @@ Token LexerState::process_token()
 			break;
 		}
 		break;
-		case '+': case '-': case '*': case '{': case '}':
+		case '+': case '*': case '{': case '}':
 		case ';': case '[': case ']': case '`':
 		case '(': case ')': case ',': 
 		case '~': case '!': case '$': case '%': case '^':
-		case '&': case '?': case '|': 
-		case '\'': case '\\':
+		case '&': case '?': case '|': case '\'': case '\\':
 		{
 			token.Type = ch;
 			break;
+		}
+		case '-':
+		{
+			auto next = peek_character();
+			if (next == '>'){ 
+				token.Type = TOKEN_ARROW;
+				eat_character();
+			}else {
+				token.Type = ch;
+			}
+			
+			break;
+			
 		}
 		// Notes 
 		case '@': 
@@ -365,9 +385,10 @@ Token LexerState::process_token()
 					break;
 				eat_character();
 			};
+			token.value = String { &input[temp], input_cursor  - temp};
 			if (isKeyword(token.value))
 				token.Type = TOKEN_KEYWORD;
-			else if (isKeyword(token.value))
+			else if (isHDType(token.value))
 				token.Type = TOKEN_HDTYPE;
 			else
 				token.Type = TOKEN_IDENT;
@@ -420,9 +441,10 @@ Token LexerState::peek_token(u64 lookAhead /* = 0*/ )
 		
 	}
 	
-	if (!(token_cache.count > lookAhead))
+	if (token_cache.count <= lookAhead)
 	{
-		FOR_RANGE(lookAhead - token_cache.count + 1){
+		u64 range = lookAhead - token_cache.count + 1;
+		FOR_RANGE(range){
 			push(&token_cache, process_token());
 		}
 	}

@@ -301,6 +301,15 @@ PARSE_COMMAND(parse_porc_declaration)
 		else if (lexer->peek_token().Type == ')') { lexer->eat_token(); break;}
 		else assert(false);// @TODO(Husam): Report Error
 	}
+	
+	if (lexer->peek_token().Type == TOKEN_ARROW) {
+		lexer->eat_token();
+		assert((lexer->peek_token(0).Type == TOKEN_IDENT) || (lexer->peek_token(0).Type == TOKEN_HDTYPE));
+		
+		AllocateNode(Ast_Ident, ident);
+		ident->token = lexer->eat_token();
+		proc->return_type = ident;
+	}
 	//parse statments
 	// This should be parse block ?? 
 	if (lexer->peek_token().Type != '{')  assert(false);
@@ -319,6 +328,27 @@ PARSE_COMMAND(parse_porc_declaration)
 }
 
 static Ast_Node*
+PARSE_COMMAND(parse_struct)
+{
+	
+	Token token = lexer->eat_token();
+	
+	if (token.Type != '{') assert(false); // @TODO @Cleanup :  error message 
+	
+	
+	
+	AllocateNode(Ast_Struct, _struct);
+	while(true) {
+		if (lexer->peek_token().Type == '}') break;
+		Ast_Node* node = CallParseCommand(parse_statement);
+		if (node->type != AST_DECLARATION) assert(false);
+		array_add(&_struct->fields, (Ast_Declaration*)node);
+	}
+	
+	return _struct;
+}
+
+static Ast_Node*
 PARSE_COMMAND(parse_statement)
 {
 	
@@ -326,29 +356,46 @@ PARSE_COMMAND(parse_statement)
 	
 	// We know it's identifer
 	Token ident_token = lexer->peek_token();
+	
 	if (ident_token.Type == '}') //TODO: rethink this part .. ?? 
 		return nullptr;
+	
+	bool need_semi_colon = true;
+	
 	Token token = lexer->peek_token(1);
 	switch(token.Type)
 	{
 		case TOKEN_ASSIGN:
 		case TOKEN_DOUBLECOLON:
+		{
+			//lexer->eat_token();
+			Token temp = lexer->peek_token(1);
+			Token maybe_struct = lexer->peek_token(2);
+			if (maybe_struct.name.isEqual("struct"_s)){
+				lexer->eat_token(); // ident 
+				lexer->eat_token(); // :: 
+				lexer->eat_token(); // struct  
+				Ast_Declaration* decl = (Ast_Declaration*) CallParseCommand(parse_struct);
+				if (!decl) {
+					// TODO: @CleanUp
+					assert(false);
+					return nullptr;
+				}
+				AllocateNode(Ast_Ident, ident);
+				ident->token = ident_token;
+				decl->ident = ident;
+				decl->token = token;
+				need_semi_colon= false;
+				break;
+			} 
+		}
 		case TOKEN_COLONEQUAL:
 		{
 			
 			ident_token = lexer->eat_token();
-			if (!check_if_proc(lexer, logger)){
-				AllocateNode(Ast_Declaration, decl);
-				decl->token = lexer->eat_token();
-				decl->body = CallParseCommand(parse_expression);
-				
-				AllocateNode(Ast_Ident, ident);
-				ident->token = ident_token;
-				decl->ident = ident;
-				
-				if (token.Type == TOKEN_DOUBLECOLON) decl->constant = true;
-				return_node = decl;
-			} else {
+			Token temp = lexer->peek_token(1);
+			// TODO : @CleanUp  
+			if (temp.name.isEqual("proc"_s)){
 				// ::
 				lexer->eat_token();
 				Ast_ProcDecl* decl = (Ast_ProcDecl*) CallParseCommand(parse_porc_declaration);
@@ -362,7 +409,18 @@ PARSE_COMMAND(parse_statement)
 				decl->ident = ident;
 				decl->token = token;
 				return decl;
-				//exit(0);
+			} else {
+				
+				AllocateNode(Ast_Declaration, decl);
+				decl->token = lexer->eat_token();
+				decl->body = CallParseCommand(parse_expression);
+				
+				AllocateNode(Ast_Ident, ident);
+				ident->token = ident_token;
+				decl->ident = ident;
+				
+				if (token.Type == TOKEN_DOUBLECOLON) decl->constant = true;
+				return_node = decl;
 			}
 			break;
 		}
@@ -395,28 +453,22 @@ PARSE_COMMAND(parse_statement)
 			// EXP iff = | :
 			break;
 		}
-#if 0
-		case TOKEN_COMMENT:
-		case TOKEN_MULTILINE_COMMENT:
-		//case TOKEN_EOFA:
-		case '}': return nullptr;
-#endif
-		
 		default : {
 			logger->print_with_location(&token,"Got %s %d\n"_s, token.name, (u64)token.Type);
 			assert(false);
 		}
-		
 	}
 	
-	
-	token = lexer->peek_token();
-	if (token.Type != ';')
+	// TODO: Parse notes here
+	if(need_semi_colon)
 	{
-		logger->print_with_location(&token, "Expected ';' here !!!\n"_s);
-		PANIC();
+		token = lexer->peek_token();
+		if (token.Type != ';')
+		{
+			logger->print_with_location(&token, "Expected ';' here !!!\n"_s);
+			PANIC();
+		}
 	}
-	
 	lexer->eat_token();
 	return return_node;
 }

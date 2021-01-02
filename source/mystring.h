@@ -12,7 +12,10 @@
 
 struct myString
 {
-	u8* data;
+	union{
+		u8* data;
+		u8* str;
+	};
 	u64 count;
 	
 	u8& operator[]  (u64 i) {
