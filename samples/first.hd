@@ -2,21 +2,20 @@
 
 
 Symbol :: struct  {
-	name  : String;
+	name  : String = "as";
 	Type  : u16;
 	scope : u16;
+}
+
+    func(1,2, fin(), a + 5 /3 + -2 *5);
 main :: proc ( a : u16  = s , a : u8) -> void  {
 
 	b : u16 = 12;
 
-}
-}
-
-
-main :: proc ( a : u16  = s , a : u8) -> void  {
-
-	b : u16 = 12;
-
+	Sybmbol :: 1;
+	Sybmbol2 := 2;
+	scope : u16;
+    func();
 }
 
 
