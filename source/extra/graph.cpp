@@ -118,6 +118,7 @@ output_graph(Ast_Node* node, Logger* logger)
 			output_graph(decl->ident, logger);
 			logger->print("-> T_%x\n"_s, MeowU32From(hash, 3));
 		}
+		
 		if (decl->data_type){
 			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
 			output_graph(decl->data_type, logger);
@@ -130,7 +131,7 @@ output_graph(Ast_Node* node, Logger* logger)
 		
 		
 		
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::MDIAMOND, decl->token.name});
+		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::PENTAGON, decl->token.name});
 		
 	} else if (node->type == AST_IDENT) {
 		Ast_Ident* ident = (Ast_Ident*) node;
@@ -174,9 +175,9 @@ output_graph(Ast_Node* node, Logger* logger)
 			logger->print("-> T_%x\n"_s, MeowU32From(hash, 3));
 		}
 		
-		if (decl->data_type){
+		if (decl->return_type){
 			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(decl->data_type, logger);
+			output_graph(decl->return_type, logger);
 		}
 		
 		if (decl->body){
@@ -189,8 +190,7 @@ output_graph(Ast_Node* node, Logger* logger)
 			output_graph(*decl->arguments[i], logger);
 			//logger->print(" \n"_s);
 		}
-		/*
-*/
+		
 		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::MDIAMOND, decl->token.name});
 	} else if (node->type == AST_BLOCK) {
 		Ast_Block* block =  (Ast_Block*) node;
@@ -200,7 +200,8 @@ output_graph(Ast_Node* node, Logger* logger)
 			output_graph(*block->statements[i], logger);
 			logger->print(" \n"_s);
 		}
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::MDIAMOND, block->token.name});
+		//block->token.name
+		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::INVTRIANGLE, "Block"_s });
 	} else {
 		logger->print("Unsupported Node Element!!!!!!!!!!!!!!!!!!\n"_s);
 		abort();

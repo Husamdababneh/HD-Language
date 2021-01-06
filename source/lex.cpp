@@ -421,7 +421,13 @@ Token LexerState::process_token()
 	token.end_position = get_current_position();
 	assert(token.Type != TOKEN_NONE);
 	token.value = String { &input[temp], input_cursor  - temp};
-	return token;
+	
+	//nocheckin 
+	if (token.Type == TOKEN_COMMENT ||
+		token.Type == TOKEN_MULTILINE_COMMENT)
+		return process_token();
+	else
+		return token;
 }
 
 Token LexerState::eat_token()
