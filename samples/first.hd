@@ -2,7 +2,7 @@
 
 
 Symbol :: struct  {
-	name  : String = "as";
+	name  : String;//= "as";
 	Type  : u16;
 	scope : u16;
 }
@@ -19,12 +19,9 @@ main :: proc ( a : u16  = s , a : u8) -> void  {
 }
 
 
-
-/*
 {
 	{
 		a :: func(5, 2) + 6 / (85 + 3);
 		b := 2;
 	}
 }
-*/

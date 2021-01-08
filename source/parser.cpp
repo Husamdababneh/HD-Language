@@ -261,6 +261,8 @@ PARSE_COMMAND(parse_porc_declaration)
 	// @TODO @IMPORTANT : check this .
 	token = lexer->peek_token();
 	while(true){
+		
+		// TODO : Rethink this part.
 		Ast_Node* node = parse_statement(lexer, logger, false);
 		if (node->type != AST_DECLARATION)
 			assert(false);
@@ -292,8 +294,8 @@ PARSE_COMMAND(parse_porc_declaration)
 	//parse statments
 	// This should be parse block ?? 
 	if (lexer->peek_token().Type != '{')  assert(false);
-	lexer->eat_token();
 	AllocateNode(Ast_Block, block);
+	block->token = lexer->eat_token();
 	while(true){
 		Ast_Node* node = CallParseCommand(parse_statement);
 		if (node) array_add(&block->statements, node);
@@ -354,28 +356,18 @@ parse_statement(LexerState* lexer, Logger* logger, bool need_semi_colon)
 				lexer->eat_token(); // ident 
 				lexer->eat_token(); // :: 
 				lexer->eat_token(); // struct  
-				Ast_Declaration* decl = (Ast_Declaration*) CallParseCommand(parse_struct);
-				if (!decl) {
+				Ast_Struct* struct_decl  = (Ast_Struct*) CallParseCommand(parse_struct);
+				if (!struct_decl) {
 					// TODO: @CleanUp
 					assert(false);
 					return nullptr;
 				}
 				AllocateNode(Ast_Ident, ident);
 				ident->token = ident_token;
-				decl->ident = ident;
-				decl->token = token;
-				need_semi_colon= false;
-				break;
-			} 
-		}
-		case TOKEN_COLONEQUAL:
-		{
-			
-			//ident_token = lexer->eat_token();
-			Token temp = lexer->peek_token(1);
-			Token maybe_proc = lexer->peek_token(2);
-			// TODO : @CleanUp  
-			if (maybe_proc.name.isEqual("proc"_s)){
+				struct_decl->ident = ident;
+				struct_decl->token = token;
+				return struct_decl;
+			} else if (maybe_struct.name.isEqual("proc"_s)){
 				lexer->eat_token(); // ident 
 				lexer->eat_token(); // :: 
 				lexer->eat_token(); // proc  
@@ -390,21 +382,28 @@ parse_statement(LexerState* lexer, Logger* logger, bool need_semi_colon)
 				decl->ident = ident;
 				decl->token = token;
 				return decl;
-			} else {
-				
-				// Eat := or ::
-				lexer->eat_token();
-				AllocateNode(Ast_Declaration, decl);
-				decl->token = lexer->eat_token();
-				decl->body = CallParseCommand(parse_expression);
-				
-				AllocateNode(Ast_Ident, ident);
-				ident->token = ident_token;
-				decl->ident = ident;
-				
-				if (token.Type == TOKEN_DOUBLECOLON) decl->constant = true;
-				return_node = decl;
 			}
+		}
+		case TOKEN_COLONEQUAL:
+		{
+			
+			//ident_token = lexer->eat_token();
+			Token temp = lexer->peek_token(1);
+			Token maybe_proc = lexer->peek_token(2);
+			// TODO : @CleanUp  
+			
+			// Eat := or ::
+			lexer->eat_token();
+			AllocateNode(Ast_Declaration, decl);
+			decl->token = lexer->eat_token();
+			decl->body = CallParseCommand(parse_expression);
+			
+			AllocateNode(Ast_Ident, ident);
+			ident->token = ident_token;
+			decl->ident = ident;
+			
+			if (token.Type == TOKEN_DOUBLECOLON) decl->constant = true;
+			return_node = decl;
 			break;
 		}
 		case TOKEN_COLON: 

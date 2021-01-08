@@ -200,10 +200,19 @@ output_graph(Ast_Node* node, Logger* logger)
 			output_graph(*block->statements[i], logger);
 			logger->print(" \n"_s);
 		}
-		//block->token.name
 		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::INVTRIANGLE, "Block"_s });
+	} else if (node->type == AST_STRUCT) {
+		Ast_Struct* st  =  (Ast_Struct*) node;
+		meow_u128 hash = Hash(st);
+		for(u64 i = 0; i < st->fields.occupied; i++){
+			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+			output_graph(*st->fields[i], logger);
+			logger->print(" \n"_s);
+		}
+		
+		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::TRIPLEOCTAGON, "Struct"_s });
 	} else {
-		logger->print("Unsupported Node Element!!!!!!!!!!!!!!!!!!\n"_s);
+		logger->print("Unsupported Node Element [%d]!!!!!!!!!!!!!!!!!!\n"_s, node->type);
 		abort();
 	}
 	//logger->print("Unsupported Node Element!!!!!!!!!!!!!!!!!!\n"_s);
