@@ -8,8 +8,8 @@ $Desc:
 #pragma once
 
 struct Arena {
-	char* data = nullptr;
-	char* cursor = nullptr;
+	u8* data = nullptr;
+	u8* cursor = nullptr;
 	u64 cap = 0;
 };
 

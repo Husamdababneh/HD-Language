@@ -2,30 +2,34 @@ version(1);
 project_name = "HD Langauge";
 
 patterns = {
-"*.c",
-"*.cpp",
-"*.h",
-"*.m",
-"*.mm",
-"*.bat",
-"*.sh",
-"*.4coder",
-"*.txt",
-"*.hd",
-"*.jai",
+	"*.c",
+	"*.cpp",
+	"*.h",
+	"*.m",
+	"*.mm",
+	"*.bat",
+	"*.sh",
+	"*.4coder",
+	"*.txt",
+	"*.hd",
+	"*.jai",
 };
+
 blacklist_patterns = {
-"submodules\\**.*",
-".*",
+	"submodules\\**.*",
+	".*",
 };
+
 load_paths_custom = {
- {".\\source"},
- {".\\samples"},
+	{".\\source"},
+	{".\\meta-source"},
+	{".\\samples"},
 };
+
 load_paths = {
- { load_paths_custom, .os = "win"  },
- { load_paths_custom, .os = "linux"},
- { load_paths_custom, .os = "mac"  },
+	{ load_paths_custom, .os = "win"  },
+	{ load_paths_custom, .os = "linux"},
+	{ load_paths_custom, .os = "mac"  },
 };
 
 

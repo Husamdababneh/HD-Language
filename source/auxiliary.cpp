@@ -7,7 +7,7 @@
 
 #include "pch.h"
 
-// TODO(Husam Dababneh): Clean Up and move to platfrom specific files
+#include "platform/platform.h"
 
 
 u64 read_entire_file(FILE* file, void** data_return)
@@ -36,18 +36,17 @@ u64 read_entire_file(FILE* file, void** data_return)
 
 u64 read_entire_file(const char* filepath, void** data_return)
 {
-	FILE* file;
-#ifdef _WIN32
-	fopen_s(&file, filepath, "rb");
-#else
-	file = fopen(filepath, "rb");
-#endif
+	open_file(file, filepath, "rb");
+	
 	if (!file)
 	{
 		printf("Couldn't find file [%s]\n", filepath);
 		return false;
 	}
-	return	read_entire_file(file, data_return);
+	
+	u64 result = read_entire_file(file, data_return);
+	fclose(file);
+	return result;
 }
 
 u64 read_entire_file(const String& filename, void** data_return)

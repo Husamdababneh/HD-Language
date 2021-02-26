@@ -37,6 +37,13 @@ make_queue(u64 size)
 	return result; 
 }
 
+template<typename T> 
+void
+free_queue(Queue<T>* queue)
+{
+	delete queue->data;
+	
+}
 
 template<typename T> T*
 top_plus(Queue<T>* queue, u64 plus)

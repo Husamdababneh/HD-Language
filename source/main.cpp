@@ -14,8 +14,10 @@
 #include "../submodules/tracy/Tracy.hpp"
 
 
+
 constexpr bool verbos = false;
 int allocation_count = 0;
+
 
 void* operator new(u64  count)
 {
@@ -32,11 +34,14 @@ void * operator new[](u64 count){
 	return ptr;
 }
 
+
+
 void operator delete(void* ptr) noexcept
 {
 	TracyFree (ptr);
 	free(ptr);
 }
+
 
 void operator delete[](void* ptr) noexcept
 {
@@ -46,12 +51,12 @@ void operator delete[](void* ptr) noexcept
 
 
 
+
 void Usage() {
 	Logger log("USAGE"_s);
 	log.print("Usage: hd.exe <filename>\n"_s);
 }
 
-static const char* const sl_Parsing = "Parsing" ;
 int main(int argc, char ** argv)
 {
 	ZoneScoped;
@@ -66,5 +71,6 @@ int main(int argc, char ** argv)
 	//FrameMarkEnd(sl_Parsing);
 	printf("#Allocations Using New Keyword = %d\n", allocation_count);
 	
+	return 0;
 }
 

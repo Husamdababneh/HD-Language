@@ -30,6 +30,7 @@ enum {
 	AST_FACTOR,
 	AST_PROC,
 	AST_STRUCT,
+	AST_SUBSCRIPT,
 	AST_UKNOWN,
 };
 
@@ -185,6 +186,14 @@ struct Ast_Block : public Ast_Node {
 	Array<Ast_Node*> statements;
 };
 
+struct Ast_Subscript : public Ast_Node {
+	Ast_Subscript(){
+		type = AST_SUBSCRIPT;
+	}
+	
+	Ast_Ident*  array;
+	Ast_Node*   expression;
+};
 
 struct Ast_Struct : public Ast_Declaration  {
 	Ast_Struct() {
@@ -202,7 +211,6 @@ struct Ast_ProcDecl : public Ast_Declaration  {
 		constant = true;
 		arguments = init_array<Ast_Declaration*>(5);
 	}
-	//Array<Ast_Declaration*> return_types;
 	Ast_Ident * return_type; // TODO: 
 	Array<Ast_Declaration*> arguments;
 };

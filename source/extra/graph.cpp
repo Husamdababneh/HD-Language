@@ -51,7 +51,7 @@ output_labels(Logger* logger)
 {
 	for(u64 i = 0; i < labels.occupied; i++)
 	{
-		auto& label = *labels[i];
+		auto& label = labels[i];
 		logger->print("T_%x [shape=\"%s\" label=\"%s\"];\n"_s, label.hash, Shape_Names[(u64)label.type], 
 					  label.str);
 	}
@@ -147,7 +147,7 @@ output_graph(Ast_Node* node, Logger* logger)
 		if (ident->arguments.occupied > 0){
 			for(u64 i = 0; i < ident->arguments.occupied; i++){
 				logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-				output_graph(*ident->arguments[i], logger);
+				output_graph(ident->arguments[i], logger);
 				logger->print(" \n"_s);
 			}
 		}else{
@@ -187,7 +187,7 @@ output_graph(Ast_Node* node, Logger* logger)
 		
 		for(u64 i = 0; i < decl->arguments.occupied; i++){
 			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(*decl->arguments[i], logger);
+			output_graph(decl->arguments[i], logger);
 			//logger->print(" \n"_s);
 		}
 		
@@ -197,7 +197,7 @@ output_graph(Ast_Node* node, Logger* logger)
 		meow_u128 hash = Hash(block);
 		for(u64 i = 0; i < block->statements.occupied; i++){
 			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(*block->statements[i], logger);
+			output_graph(block->statements[i], logger);
 			logger->print(" \n"_s);
 		}
 		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::INVTRIANGLE, "Block"_s });
@@ -206,11 +206,21 @@ output_graph(Ast_Node* node, Logger* logger)
 		meow_u128 hash = Hash(st);
 		for(u64 i = 0; i < st->fields.occupied; i++){
 			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(*st->fields[i], logger);
+			output_graph(st->fields[i], logger);
 			logger->print(" \n"_s);
 		}
 		
 		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::TRIPLEOCTAGON, "Struct"_s });
+	} else if (node->type == AST_SUBSCRIPT) {
+		Ast_Subscript* st  =  (Ast_Subscript*) node;
+		meow_u128 hash = Hash(st);
+		logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+		output_graph(st->array, logger);
+		
+		logger->print("T_%x -> "_s, MeowU32From(hash, 3));
+		output_graph(st->expression, logger);
+		
+		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::INVHOUSE, st->token.name });
 	} else {
 		logger->print("Unsupported Node Element [%d]!!!!!!!!!!!!!!!!!!\n"_s, node->type);
 		abort();

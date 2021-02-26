@@ -11,6 +11,10 @@
 
 #include "common.h"
 #include "auxiliary.h"
+#include "stack.h"
+
+
+#define FOR_RANGE(x) for(u64 it = 0; it < x; it++)
 
 // TODO : Remove them from reserved[]  
 String predefined_types [] = {
@@ -162,7 +166,6 @@ u8 LexerState::eat_character()
 	return input[input_cursor - 1];
 }
 
-char * filename = nullptr;
 LexerState::LexerState(const String& filepath)
 {
 	printf("initing Lexer\n");
@@ -181,18 +184,29 @@ LexerState::LexerState(const String& filepath)
 	
 	//// Cache
 	token_cache = make_queue<Token>(100);
+	// This stack can be very small since i don't think one will write so deep scopes 
+	paranthases_stack = make_stack<u8>(26);
+	this->preprosses();
 }
 
 LexerState::~LexerState()
 {
 	printf("Getting Out\n");
-	if (input.count){
+	free_queue(&token_cache);
+	if (input.data){
 		delete[] input.data;
-		//input.data = nullptr;
 	}
 }
 
-
+void LexerState::preprosses() 
+{
+#if ENABLE_LEX_PREPROSSES == 1
+	// TODO: Is there anything usefull we can do here? or it's just a waste of time ?? 
+#else
+	
+#endif
+	
+}
 
 Token LexerState::process_token()
 {
@@ -244,12 +258,38 @@ Token LexerState::process_token()
 			break;
 		}
 		break;
-		case '+': case '*': case '{': case '}':
-		case ';': case '[': case ']': case '`':
-		case '(': case ')': case ',': 
+		case '+': case '*': 
+		case ';': case '`':
+		case ',': 
 		case '~': case '!': case '$': case '%': case '^':
 		case '&': case '?': case '|': case '\'': case '\\':
 		{
+			token.Type = ch;
+			break;
+		}
+		// TODO: Put Matching Paranthases Here 
+		case '[': 
+		case '{': 
+		case '(': 
+		{
+			paranthases_stack.push(ch);
+			token.Type = ch;
+			break;
+		}
+		case ']': 
+		{
+			if (paranthases_stack.top() == '[') paranthases_stack.pop();
+			else assert(false);
+		}
+		case '}':
+		{
+			if (paranthases_stack.top() == '{') paranthases_stack.pop();
+			else assert(false);
+		}
+		case ')': 
+		{
+			if (paranthases_stack.top() == '(') paranthases_stack.pop();
+			else assert(false);
 			token.Type = ch;
 			break;
 		}
@@ -262,13 +302,13 @@ Token LexerState::process_token()
 			}else {
 				token.Type = ch;
 			}
-			
 			break;
 			
 		}
 		// Notes 
 		case '@': 
 		{
+			//TODO : Notes
 			token.Type = TOKEN_DIRECTIVE;
 			eat_until_whitespace();
 			break;
@@ -327,10 +367,7 @@ Token LexerState::process_token()
 				eat_character();
 				token.Type = TOKEN_DOUBLEDOT;
 			}
-			else if (next == '>'){
-				eat_character();
-				token.Type = TOKEN_ARROW;
-			} else {
+			else {
 				token.Type = ch;
 			}
 			break;
@@ -352,28 +389,28 @@ Token LexerState::process_token()
 			token.Type = TOKEN_LITERAL;
 			break;	  
 		}
-		break;
 		case ':':
 		{
-			auto next = peek_character();
+			/*auto next = peek_character();
 			if (next == ':')  {
-				token.Type = TOKEN_DOUBLECOLON; // uninitailizaed
+				token.Type = TOKEN_DOUBLECOLON; // constant
 				eat_character();
 			}
 			else if (next == '=')  {
-				token.Type = TOKEN_COLONEQUAL; // initialized
+				token.Type = TOKEN_COLONEQUAL; // nonconstant 
 				eat_character();
 			}
 			else{
 				token.Type = TOKEN_COLON;
-			}
-			token.value = String {&input[temp], input_cursor - temp};
+			}*/
+			token.Type = TOKEN_COLON;
+			//token.value = String {&input[temp], input_cursor - temp};
 			//token.Type = TOKEN_COLON;
 			break;
 		}
 		break;
+		case '\0':
 		{
-			case '\0':
 			return { TOKEN_EOFA , 0 , 0 };
 			break;
 		}
@@ -438,8 +475,6 @@ Token LexerState::eat_token()
 }
 
 
-#define FOR_RANGE(x) for(u64 it = 0; it < x; it++)
-
 Token LexerState::peek_token(u64 lookAhead /* = 0*/ )
 {
 	if (token_cache.count == 0) {
@@ -458,3 +493,4 @@ Token LexerState::peek_token(u64 lookAhead /* = 0*/ )
 	return *top_plus(&token_cache, lookAhead);
 }
 
+#undef FOR_RANGE

@@ -5,7 +5,50 @@ workspace "HD-Project"
 	location "generated"
 	architecture "x64"
 	configurations { "Debug", "Release", "Tracy" }
-	startproject "HDLang"
+	startproject "MetaProgram"
+
+rule "MetaGenerator"
+	display "Generate Files"
+	fileextension ".cpp"
+
+	buildmessage 'Generating MetaData %(Filename) With CL'
+	buildcommands 'CL /EP %(FullPath) > ../generated-source/%(Filename).i'
+	buildoutputs  '../bin'
+
+project "MetaProgram"
+	kind "ConsoleApp"
+	--kind "None"
+	targetname "meta"
+	language "C++"
+	cppdialect "C++17"
+	rules { "MetaGenerator" }
+
+	prebuildcommands {
+		"cd ..",
+		"mkdir generated-source",
+		"cd generated",
+	}
+	-- Check this out.. i don't want any dependency to another libs expect Tracy 
+
+	targetdir "bin/"
+	objdir "bin-int/%{cfg.buildcfg}/"
+
+	files {
+		"meta-source/enum.cpp",
+		"meta-source/string.cpp"
+	}
+
+	includedirs {
+		"source"
+	}
+
+
+	filter "toolset:msc"
+		-- EP Output Preprocessor result without "#line"s
+		-- P  Output Preprocessor to stdout
+		-- c  Compile wihtout Link (Maybe we don't need this in the future)
+		--buildoptions { "/EP", "/P" , "/c"}
+
 
 project "HDLang"
 	kind "ConsoleApp"
@@ -34,11 +77,12 @@ project "HDLang"
 
 	includedirs {
 		"source/meow_hash",
+		"generated-source",
 		"source"
 	}
 
 	filter  "system:windows" 
-		editandcontinue "Off"
+		editandcontinue "on"
 
 	filter "system:linux"
 		links { "pthread", "dl" }
@@ -81,6 +125,10 @@ newaction {
 		os.rmdir("./bin-int")
 		os.rmdir("./.vs")
 		os.rmdir("./generated")
+		os.rmdir("./generated-source")
+		os.remove("MetaGenerator.props")
+		os.remove("MetaGenerator.targets")
+		os.remove("MetaGenerator.xml")
 		print("done.")
 	end
 }

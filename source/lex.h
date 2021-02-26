@@ -8,9 +8,7 @@
 #pragma once
 
 #include "logger.h"
-#include "array.h"
-#include "constants.h"
-#include "queue.h"
+#include "enum.i"
 
 struct Position
 {
@@ -54,6 +52,7 @@ struct LexerState
 	u32 current_char_index; 
 	
 	Queue<Token> token_cache;
+	Stack<u8> paranthases_stack;
 	
 	Token eat_token();
 	Token process_token();
@@ -69,6 +68,8 @@ struct LexerState
 	inline u8 eat_until_character();
 	inline void eat_characters(u64 count = 1);
 	inline void eat_until_whitespace();
+	
+	void preprosses();
 	
 	Position get_current_position() { return {current_line_number, current_char_index}; }
 	

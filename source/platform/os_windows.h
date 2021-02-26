@@ -6,8 +6,14 @@
 #include <windows.h>
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
+
+
 #define fileno _fileno
 #define fstat _fstat
 #define stat _stat
+#define open_file(handle, path, mode) FILE* handle; fopen_s(&handle, path,mode);
+
+#else 
+#error("We only support MSVC compiler on windows");"
 #endif

@@ -4,6 +4,7 @@ test.txt
 4coder.helper
 
 /bin-int/
+/generated-source/
 /bin/
 /**/*.obj
 /**/*.xml
@@ -376,3 +377,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/MetaGenerator.props
+/MetaGenerator.targets

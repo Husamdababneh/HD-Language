@@ -23,9 +23,9 @@ struct Array {
 	u64 occupied;
 	T* data;
 	
-	T* operator[]  (u64 i) {
+	T operator[]  (u64 i) {
 		//assert(i <= occupied);
-		return &data[i];
+		return data[i];
 	}
 };
 
