@@ -7,7 +7,7 @@ workspace "HD-Project"
 	configurations { "Debug", "Release", "Tracy" }
 	startproject "MetaProgram"
 
-rule "MetaGenerator"
+rule "MetaGeneratorWindows"
 	display "Generate Files"
 	fileextension ".cpp"
 
@@ -16,22 +16,8 @@ rule "MetaGenerator"
 	buildoutputs  '../bin'
 
 project "MetaProgram"
-	kind "ConsoleApp"
-	--kind "None"
-	targetname "meta"
-	language "C++"
-	cppdialect "C++17"
-	rules { "MetaGenerator" }
-
-	prebuildcommands {
-		"cd ..",
-		"mkdir generated-source",
-		"cd generated",
-	}
-	-- Check this out.. i don't want any dependency to another libs expect Tracy 
-
+	kind "Utility"
 	targetdir "bin/"
-	objdir "bin-int/%{cfg.buildcfg}/"
 
 	files {
 		"meta-source/enum.cpp",
@@ -43,12 +29,20 @@ project "MetaProgram"
 	}
 
 
-	filter "toolset:msc"
-		-- EP Output Preprocessor result without "#line"s
-		-- P  Output Preprocessor to stdout
-		-- c  Compile wihtout Link (Maybe we don't need this in the future)
-		--buildoptions { "/EP", "/P" , "/c"}
+	if os.host() == "windows" then 
+		prebuildcommands {
+			"[ -d ..\\generated-source ] || mkdir ..\\generated-source",
+		}
 
+		rules { "MetaGeneratorWindows" }
+
+	elseif os.host() == "linux" then 
+		prebuildcommands {
+			"mkdir -p ..\\generated-source",
+		}
+
+		printf("We do NOT suppor linux yet")
+	end
 
 project "HDLang"
 	kind "ConsoleApp"

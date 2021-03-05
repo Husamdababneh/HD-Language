@@ -1,17 +1,13 @@
-
 #define Index 256
-#define EnumName(x) Tokens
-_enum(EnumName(x),
+#define EnumName Tokens
+_enum(Tokens,;,
 	  entry_name_value(IDENT, Index)
-	  //entry_name(IDENT = Index)
 	  entry_name(HDTYPE)
 	  entry_name(KEYWORD)
 	  entry_name(LITERAL)
 	  entry_name(COMMENT)
 	  entry_name(MULTILINE_COMMENT)
 	  entry_name(COLON)
-	  entry_name(DOUBLECOLON)
-	  entry_name(COLONEQUAL)
 	  entry_name(OPERATOR)
 	  entry_name(DIRECTIVE)
 	  entry_name(DOUBLEDOT)
@@ -29,8 +25,7 @@ _enum(EnumName(x),
 	  entry_name(SHIFT_RIGHT)
 	  entry_name(NONE)
 	  entry_name(EOFA)
-	  entry_name(ERROR),
-	  ;
+	  entry_name(ERROR)
 	  )
 
-string_function(EnumName(x))
+string_function(Tokens)
