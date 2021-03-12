@@ -12,4 +12,4 @@
 #include <new> // this is for the placement (new) operator on linux 
 #include <string.h> // "memset, memcpy .. etc "
 
-#define openfile(handle, path, mode) FILE* handle; handle = fopen(path,mode);
+#define open_file(handle, path, mode) FILE* handle; handle = fopen(path,mode);
