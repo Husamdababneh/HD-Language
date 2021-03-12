@@ -1,27 +1,47 @@
-//#import "File"
+/*
+a :: struct {
+	a : int = 5;
+	a : int ;
+	a : int ;
+	a : int ;
+	a : int ;
+	a : int ;
+}
+*/
+//a :: #type (u16 , u8) -> void 
 
-
-Symbol :: struct  {
-	name  : String;//= "as";
-	Type  : u16;
-	scope : u16;
+funcSig :: proc ( a : u16  = s , a : u8)  {
+	a := 5;
 }
 
-    func(1,2, fin(), a + 5 /3 + -2 *5);
+
+
+//(a[1] * -g(1, 2, a[3*5 - 2 /5]) - (5 + b) )
+//a[1]
+
+
+
+/*
+/*
+Entity : struct : {
+	
+}
+
+main : funcSig : { }
 main :: proc ( a : u16  = s , a : u8) -> void  {
-
+	
 	b : u16 = 12;
-
+	
 	Sybmbol :: 1;
 	Sybmbol2 := 2;
-	scope : u16;
-    func();
+	scopeope : u16;
+	
+	//func(a[]);
 }
 
-
+__x :: (_af : s8 : __r) -> u8, s64, bool, s32
 {
-	{
-		a :: func(5, 2) + 6 / (85 + 3);
-		b := 2;
-	}
 }
+
+*/
+*/

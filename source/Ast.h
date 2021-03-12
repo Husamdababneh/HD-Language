@@ -6,10 +6,13 @@
    ========================================================================*/
 #pragma once
 
-#include "array.h"
-#include "lex.h"
-
-
+enum {
+	AST_DEF_VAR,
+	AST_DEF_PROC,
+	AST_DEF_STRUCT,
+	AST_DEF_ENUM,
+	AST_DEF_FLAG, // do I need this ?? 
+};
 
 enum {
 	AST_IDENT,
@@ -31,6 +34,7 @@ enum {
 	AST_PROC,
 	AST_STRUCT,
 	AST_SUBSCRIPT,
+	AST_LIST,
 	AST_UKNOWN,
 };
 
@@ -123,6 +127,13 @@ struct Ast_Ident : public Ast_Node {
 };
 
 
+struct Ast_Subscript : public Ast_Node {
+	Ast_Subscript() {
+		type = AST_SUBSCRIPT;
+	}
+	Ast_Node* exp;
+};
+
 struct Ast_Declaration : public Ast_Node {
 	// [X] name := value;
 	// [X] name :  type  = value;
@@ -136,15 +147,27 @@ struct Ast_Declaration : public Ast_Node {
 	Ast_Declaration(){
 		type = AST_DECLARATION;
 	}
-	// name = "value" ---> in this case the type refers to the type's value not the name 
 	
-	Ast_Ident* ident;  //Name of the symbol
-	Ast_Node*  body; // this could be a function body, expression, 
+	u64 def_type;
+	Ast_Ident* ident;  // Name of the symbol -> should be registered in the symbol table
+	
+	// I'm thinking of seperating this from this Node `
+	// to make it as a compile unit by itself 
+	Ast_Node*  body; // this could be a function body, expression, struct Body, enum body ... 
 	Ast_Node*  data_type; // for now this is ident
+	Ast_Node*  params; // if this is a procedure call.. ?? 
 	bool 	  constant;
+	bool 	  inforced_type;;
 };
 
 
+
+
+struct Ast_List : public Ast_Node {
+	Ast_List() { type = AST_LIST; }
+	
+	Array<Ast_Declaration*> list = init_array<Ast_Declaration*>(5);
+};
 
 
 
@@ -180,37 +203,8 @@ struct Ast_FunctionCall : public Ast_Node {
 struct Ast_Block : public Ast_Node {
 	Ast_Block(){
 		type = AST_BLOCK;
-		statements = init_array<Ast_Node*>(10);
 	}
 	
 	Array<Ast_Node*> statements;
 };
 
-struct Ast_Subscript : public Ast_Node {
-	Ast_Subscript(){
-		type = AST_SUBSCRIPT;
-	}
-	
-	Ast_Ident*  array;
-	Ast_Node*   expression;
-};
-
-struct Ast_Struct : public Ast_Declaration  {
-	Ast_Struct() {
-		type = AST_STRUCT;
-		constant = true;
-		fields = init_array<Ast_Declaration*>(5);
-	}
-	Array<Ast_Declaration*> fields;
-};
-
-
-struct Ast_ProcDecl : public Ast_Declaration  {
-	Ast_ProcDecl() {
-		type = AST_PORCDECLARATION;
-		constant = true;
-		arguments = init_array<Ast_Declaration*>(5);
-	}
-	Ast_Ident * return_type; // TODO: 
-	Array<Ast_Declaration*> arguments;
-};

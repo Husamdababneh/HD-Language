@@ -379,3 +379,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /MetaGenerator.props
 /MetaGenerator.targets
+/MetaGeneratorWindows.props
+/MetaGeneratorWindows.targets

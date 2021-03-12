@@ -107,9 +107,8 @@ bool isKeyword(String& string)
 
 bool isHDType(String& string)
 {
-	for(int a = 0; a < KeywordCount; a++)
-		if(isEqual(&string, &predefined_types[a]))
-		return true;
+	// Make this a hashmap lookup, faster...
+	for(int a = 0; a < KeywordCount; a++) if(isEqual(&string, &predefined_types[a])) return true;
 	return false;
 }
 u8& LexerState::peek_next_character()
@@ -141,8 +140,13 @@ u8 LexerState::eat_until_character()
 
 void LexerState::eat_until_whitespace()
 {
+	
 	for(u64 a = input_cursor;  a < input.count; a++)
-		if (isWhitechar(eat_character())) break;
+	{
+		if (isWhitechar(peek_character())) break; 
+		eat_character();
+	}
+	
 }
 
 
@@ -156,8 +160,8 @@ u8 LexerState::eat_character()
 		current_char_index = 0;
 		break;
 		case '\t':
-		current_char_index+=4;
-		break;
+		//current_char_index+=4;
+		//break;
 		default:
 		current_char_index++;
 		break;
@@ -280,11 +284,15 @@ Token LexerState::process_token()
 		{
 			if (paranthases_stack.top() == '[') paranthases_stack.pop();
 			else assert(false);
+			token.Type = ch;
+			break;
 		}
 		case '}':
 		{
 			if (paranthases_stack.top() == '{') paranthases_stack.pop();
 			else assert(false);
+			token.Type = ch;
+			break;
 		}
 		case ')': 
 		{
@@ -375,7 +383,8 @@ Token LexerState::process_token()
 		case '"':
 		{
 			// @Cleanup: We could check the prev instead ?? wont it be easer ??
-			u8 escape = 0;
+			// @TODO: Make sure this works ?? 
+			// u8 escape = 0;
 			while(true){
 				auto peeked = peek_character();
 				auto ahead =  peek_character(1);
@@ -391,21 +400,8 @@ Token LexerState::process_token()
 		}
 		case ':':
 		{
-			/*auto next = peek_character();
-			if (next == ':')  {
-				token.Type = TOKEN_DOUBLECOLON; // constant
-				eat_character();
-			}
-			else if (next == '=')  {
-				token.Type = TOKEN_COLONEQUAL; // nonconstant 
-				eat_character();
-			}
-			else{
-				token.Type = TOKEN_COLON;
-			}*/
+			// @CleanUp: Make this use it's ASCII Value instead.. i think ??
 			token.Type = TOKEN_COLON;
-			//token.value = String {&input[temp], input_cursor - temp};
-			//token.Type = TOKEN_COLON;
 			break;
 		}
 		break;

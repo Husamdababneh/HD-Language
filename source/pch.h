@@ -17,3 +17,4 @@
 #include "stack.h"
 #include "queue.h"
 #include "arena.h"
+#include "logger.h"

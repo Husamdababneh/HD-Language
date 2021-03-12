@@ -49,7 +49,7 @@ void Logger::print(String str, ...) {
 void Logger::vprint(String str, va_list args) {
 	// @NOCHECKIN 
 	// TODO: 
-#if 1
+#if 0
 	vprintf((const char*)str.data, args);
 #else
 	// print body
@@ -69,19 +69,25 @@ void Logger::vprint(String str, va_list args) {
 					printf("%08X", number);
 					break;
 				}
-				
 				case 'd':
 				{
 					long number = va_arg(args, long);
 					printf("%ld", number);
 					break;
 				}
+				case 'c':
+				{
+					char number = va_arg(args, char);
+					printf("%c", number);
+					break;
+				}
 				case 's':
 				{
 					String string = va_arg(args, String);
-					//if (string.str == 0) assert(false);
+					
 					for(int a = 0; a < string.count; a++)
 						putc(string[a], out);
+					
 					break;
 				}
 				default:

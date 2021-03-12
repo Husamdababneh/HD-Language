@@ -5,10 +5,10 @@ workspace "HD-Project"
 	location "generated"
 	architecture "x64"
 	configurations { "Debug", "Release", "Tracy" }
-	startproject "MetaProgram"
+	startproject "HDLang"
 
 rule "MetaGeneratorWindows"
-	display "Generate Files"
+	display "Generating Files"
 	fileextension ".cpp"
 
 	buildmessage 'Generating MetaData %(Filename) With CL'
@@ -41,6 +41,7 @@ project "MetaProgram"
 			"mkdir -p ..\\generated-source",
 		}
 
+		--rules { "MetaGeneratorLinux" }
 		printf("We do NOT suppor linux yet")
 	end
 
@@ -75,9 +76,11 @@ project "HDLang"
 		"source"
 	}
 
+	links { "MetaProgram" }	
+
 	filter  "system:windows" 
 		editandcontinue "on"
-
+	
 	filter "system:linux"
 		links { "pthread", "dl" }
 		buildoptions {

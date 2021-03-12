@@ -15,7 +15,6 @@ struct Position
 	union
 	{
 		// Do we need bigger size ??
-		// 
 		struct {u32 line, index;};
 		struct {u32 x, y;};
 	};
@@ -23,10 +22,12 @@ struct Position
 
 struct Token
 {
-	u16 Type = TOKEN_NONE;
-	u16 id = 0;
+	u16          Type = TOKEN_NONE;
+	u16          id = 0;
 	Position 	start_position;
 	Position 	end_position;
+	
+	
 	
 	union
 	{
