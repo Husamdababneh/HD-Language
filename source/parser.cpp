@@ -21,7 +21,9 @@
 #define PARSE_COMMAND(name) name(LexerState* lexer, Logger* logger)
 #define CallParseCommand(command) command(lexer, logger);
 
-#define AllocateNode(type, name) type* name =  allocate<type>(&ast_arena);
+#define AllocateNode(type, name) type* name;\
+ name = (type*) arena_alloc(&ast_arena, sizeof(type));\
+ name = ::new(name) type();
 
 #ifdef _DEBUG
 #define PANIC() exit(0);//abort();
@@ -143,7 +145,7 @@ void parse_file(const String& filename){
 	
 	parse(&lexer, &logger);
 	
-	delete ast_arena.data;
+	arena_free(&ast_arena);
 }
 
 static Ast_Node*

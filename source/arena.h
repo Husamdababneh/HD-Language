@@ -7,31 +7,24 @@ $Desc:
 
 #pragma once
 
-struct Arena {
-	u8* data = nullptr;
-	u8* cursor = nullptr;
-	u64 cap = 0;
+
+struct Region {
+    Region* next;
+    size_t  capacity;
+    size_t  size;
+    u8      buffer[];
 };
 
+Region *region_create(size_t capacity);
 
+#define ARENA_DEFAULT_CAPACITY (640 * 1000)
 
+struct Arena {
+    Region* first;
+    Region* last;
+};
 
-Arena make_arena(u64 size);
-
-
-template<typename T>
-T* allocate(Arena* arena){
-	assert(arena->cap > ((arena->cursor - arena->data) +  sizeof(T)));
-	arena->cursor += sizeof(T);
-	return ::new(arena->cursor - sizeof(T)) T();
-}
-
-
-
-
-
-
-
-
-
-
+void* arena_alloc(Arena *arena, size_t size);
+void  arena_clean(Arena *arena);
+void  arena_free(Arena *arena);
+void  arena_summary(Arena *arena);
