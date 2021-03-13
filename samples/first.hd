@@ -1,4 +1,4 @@
-/*
+
 a :: struct {
 	a : int = 5;
 	a : int ;
@@ -7,7 +7,7 @@ a :: struct {
 	a : int ;
 	a : int ;
 }
-*/
+
 //a :: #type (u16 , u8) -> void 
 
 funcSig :: proc ( a : u16  = s , a : u8)  {

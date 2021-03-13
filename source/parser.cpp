@@ -8,7 +8,6 @@
 #include "pch.h"
 #include "lex.h"
 #include "Ast.h"
-#include "hash_table.h"
 #include "parser.h"
 
 
@@ -22,7 +21,9 @@
 #define PARSE_COMMAND(name) name(LexerState* lexer, Logger* logger)
 #define CallParseCommand(command) command(lexer, logger);
 
-#define AllocateNode(type, name) type* name =  allocate<type>(&ast_arena);
+#define AllocateNode(type, name) type* name;\
+ name = (type*) arena_alloc(&ast_arena, sizeof(type));\
+ name = ::new(name) type();
 
 #ifdef _DEBUG
 #define PANIC() exit(0);//abort();
@@ -30,19 +31,16 @@
 #define PANIC() exit(-1);
 #endif
 
-static Arena ast_arena = make_arena(1024 * 1024); // 1MB ?? 
+static Arena ast_arena = {0};
 static u8 counter = 0;
 
-//static Ast_Node* PARSE_COMMAND(parse_statement);
-static Ast_Node* parse_statement(LexerState* lexer, Logger* logger, bool need_semi_colon = true);
 static Ast_Node* PARSE_COMMAND(parse_expression);
 static Ast_Node* PARSE_COMMAND(parse_factor);
 static Ast_Node* PARSE_COMMAND(parse_scope);
-static Ast_Node* PARSE_COMMAND(parse_statment_v2);
+static Ast_Node* PARSE_COMMAND(parse_statment);
 static Ast_Node* PARSE_COMMAND(parse_def);
 static Ast_Node* PARSE_COMMAND(parse_block_of_statments);
 
-static HashTable<Ast_Node*>  symbols; 
 
 inline Ast_Binary*
 PARSE_COMMAND(parse_operator)
@@ -114,7 +112,7 @@ PARSE_COMMAND(parse)
 			case TOKEN_IDENT:
 			{
 				//logger->print("Token Name = [%s]\n"_s, token.name);
-				Ast_Node* node = CallParseCommand(parse_statment_v2);
+				Ast_Node* node = CallParseCommand(parse_statment);
 				if(node){
 					output_graph(node, logger);
 					output_labels(logger);
@@ -147,7 +145,7 @@ void parse_file(const String& filename){
 	
 	parse(&lexer, &logger);
 	
-	delete ast_arena.data;
+	arena_free(&ast_arena);
 }
 
 static Ast_Node*
@@ -326,7 +324,7 @@ PARSE_COMMAND(parse_def)
 }
 
 static Ast_Node*
-PARSE_COMMAND(parse_statment_v2)
+PARSE_COMMAND(parse_statment)
 {
 	Ast_Node* return_node = nullptr;
 	
@@ -543,7 +541,7 @@ PARSE_COMMAND(parse_block_of_statments)
 			lexer->eat_token();
 			break;
 		}
-		Ast_Node* node =  CallParseCommand(parse_statment_v2);
+		Ast_Node* node =  CallParseCommand(parse_statment);
 		
 		array_add(&block->statements, node);
 		t = lexer->eat_token();
