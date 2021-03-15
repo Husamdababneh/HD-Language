@@ -162,11 +162,13 @@ struct Ast_Declaration : public Ast_Node {
 
 
 
-
+// TODO: Cleanup
 struct Ast_List : public Ast_Node {
-	Ast_List() { type = AST_LIST; }
+	Ast_List() { 
+		type = AST_LIST; 
+	}
 	
-	Array<Ast_Declaration*> list = init_array<Ast_Declaration*>(5);
+	Array<Ast_Declaration*> list;
 };
 
 

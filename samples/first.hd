@@ -1,17 +1,18 @@
 
 a :: struct {
 	a : int = 5;
-	a : int ;
-	a : int ;
-	a : int ;
-	a : int ;
-	a : int ;
-}
+	b : int ;
+	c : int ;
+};
 
 //a :: #type (u16 , u8) -> void 
 
-funcSig :: proc ( a : u16  = s , a : u8)  {
-	a := 5;
+funcSig :: proc (a : u16  = 2, a : u8) -> void
+{
+
+	{
+		a := 5;
+	}
 }
 
 
@@ -25,7 +26,7 @@ funcSig :: proc ( a : u16  = s , a : u8)  {
 /*
 Entity : struct : {
 	
-}
+};
 
 main : funcSig : { }
 main :: proc ( a : u16  = s , a : u8) -> void  {

@@ -55,10 +55,14 @@ output_labels(Logger* logger)
 		logger->print("T_%x [shape=\"%s\" label=\"%s\"];\n"_s, label.hash, Shape_Names[(u64)label.type], 
 					  label.str);
 	}
+	
+	labels.occupied = 0;
+	
 }
 
 #define Hash(x)  MeowHash(MeowDefaultSeed, sizeof(u16),(void*)&x->token.id); 
 // Make this more sophisticated 
+// TODO CLeanUp : This must be rewritten *0*
 static void
 output_graph(Ast_Node* node, Logger* logger)
 {
@@ -195,12 +199,10 @@ output_graph(Ast_Node* node, Logger* logger)
 		}
 		
 		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::STAR, st->token.name });
-		
 	} else {
 		logger->print("Unsupported Node Element [%d]!!!!!!!!!!!!!!!!!!\n"_s, node->type);
 		abort();
 	}
-	//logger->print("Unsupported Node Element!!!!!!!!!!!!!!!!!!\n"_s);
 }
 
 
