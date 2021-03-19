@@ -149,24 +149,23 @@ struct Ast_Declaration : public Ast_Node {
 	}
 	
 	u64 def_type;
-	Ast_Ident* ident;  // Name of the symbol -> should be registered in the symbol table
 	
-	// I'm thinking of seperating this from this Node `
-	// to make it as a compile unit by itself 
 	Ast_Node*  body; // this could be a function body, expression, struct Body, enum body ... 
 	Ast_Node*  data_type; // for now this is ident
 	Ast_Node*  params; // if this is a procedure call.. ?? 
 	bool 	  constant;
-	bool 	  inforced_type;;
+	bool 	  inforced_type;
 };
 
 
 
-
+// TODO: Cleanup
 struct Ast_List : public Ast_Node {
-	Ast_List() { type = AST_LIST; }
+	Ast_List() { 
+		type = AST_LIST; 
+	}
 	
-	Array<Ast_Declaration*> list = init_array<Ast_Declaration*>(5);
+	Array<Ast_Declaration*> list;
 };
 
 

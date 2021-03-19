@@ -55,158 +55,211 @@ output_labels(Logger* logger)
 		logger->print("T_%x [shape=\"%s\" label=\"%s\"];\n"_s, label.hash, Shape_Names[(u64)label.type], 
 					  label.str);
 	}
+	
+	labels.occupied = 0;
+	
 }
-
-#define Hash(x)  MeowHash(MeowDefaultSeed, sizeof(u16),(void*)&x->token.id); 
-// Make this more sophisticated 
 static void
-output_graph(Ast_Node* node, Logger* logger)
+output_graph_v2(Ast_Node* node, Logger* logger)
 {
+	if (node == nullptr) return; 
+	if (node->type == AST_UKNOWN) return;
 	
-	if (node == nullptr)
-		return;
-	
-	if (node->type == AST_UKNOWN)
-		abort();
-	
-	if (node->type == AST_BINARY_EXP){
-		Ast_Binary* bin = (Ast_Binary*)node;
-		
-		meow_u128 hash = Hash(bin);
-		
-		
-		if (bin->left != nullptr){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(bin->left, logger);
-			logger->print("\n"_s);
-		}
-		
-		if (bin->right != nullptr){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(bin->right, logger);
-			logger->print("\n"_s);
-		}
-		
-		
-		array_add<Graph_Label>(&labels, { MeowU32From(hash, 3), Shape_Type::DIAMOND,
-								   bin->token.name });
-	} else if (node->type == AST_LITERAL) {
-		Ast_Literal * literal = (Ast_Literal*) node;
-		meow_u128 hash_left = Hash(literal);
-		logger->print("T_%x "_s, MeowU32From(hash_left, 3));
-		array_add(&labels, { MeowU32From(hash_left, 3), Shape_Type::BOX, literal->token.name});
-		
-	} else if (node->type == AST_UNARY_EXP) {
-		Ast_Unary * unary = (Ast_Unary*) node;
-		meow_u128 hash_left = Hash(unary);
-		
-		if (unary->child != nullptr){
-			logger->print("T_%x -> "_s, MeowU32From(hash_left, 3));
-			output_graph(unary->child, logger);
-		}
-		
-		array_add(&labels, { MeowU32From(hash_left, 3), Shape_Type::RECT, unary->token.name});
-		
-	} else if (node->type == AST_IDENT) {
-		Ast_Ident* ident = (Ast_Ident*) node;
-		meow_u128 hash = Hash(ident);
-		
-		logger->print("T_%x "_s, MeowU32From(hash, 3));
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::SQUARE, ident->token.name});
-		
-	} else if (node->type == AST_DECLARATION) {
-		Ast_Declaration* decl =  (Ast_Declaration*) node;
-		meow_u128 hash = Hash(decl);
-		
-		if (decl->data_type){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(decl->data_type, logger);
-		}
-		
-		if (decl->params){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(decl->params, logger);
-			logger->print("\n"_s);
-		}
-		
-		if (decl->body){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(decl->body, logger);
-			logger->print("\n"_s);
-		}
-		
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::PENTAGON, decl->token.name});
-		
-	} else if (node->type == AST_FUNCALL) {
-		Ast_FunctionCall* ident = (Ast_FunctionCall*) node;
-		meow_u128 hash = Hash(ident);
-		
-		if (ident->arguments.occupied > 0){
-			for(u64 i = 0; i < ident->arguments.occupied; i++){
-				logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-				output_graph(ident->arguments[i], logger);
-				logger->print(" \n"_s);
+	meow_u128 hash = node->token.hash;
+	//auto hash = MeowU32From(full_hash, 3);
+	switch(node->type)
+	{
+		case AST_BINARY_EXP:
+		{
+			Ast_Binary* bin = (Ast_Binary*)node;
+			logger->print("T_%x -> { "_s, hash);
+			
+			if (bin->left != nullptr){
+				logger->print("T_%x "_s, bin->left->token.hash);
 			}
-		}else{
-			logger->print("T_%x \n"_s, MeowU32From(hash, 3));
+			
+			if (bin->right!= nullptr){
+				logger->print("T_%x "_s, bin->right->token.hash);
+			}
+			logger->print("}\n"_s);
+			
+			output_graph_v2(bin->left, logger);
+			output_graph_v2(bin->right, logger);
+			array_add<Graph_Label>(&labels, { hash, Shape_Type::DIAMOND,
+									   bin->token.name });
+			break;
 		}
-		
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::TRIANGLE, ident->token.name});
-		
-	} else if (node->type == AST_FACTOR) {
-		Ast_Factor* factor = (Ast_Factor*)node;
-		meow_u128 hash = Hash(factor);
-		
-		
-		logger->print("T_%x -> "_s, MeowU32From(hash, 3),MeowU32From(hash, 3));
-		output_graph(factor->node, logger);
-		
-		
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::COMPONENT, "Factor"_s});
-	} else if (node->type == AST_BLOCK) {
-		Ast_Block* block =  (Ast_Block*) node;
-		meow_u128 hash = Hash(block);
-		
-		for(u64 i = 0; i < block->statements.occupied; i++){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(block->statements[i], logger);
-			logger->print(" \n"_s);
+		case AST_DECLARATION:
+		{
+			Ast_Declaration* decl =  (Ast_Declaration*) node;
+			logger->print("T_%x -> { "_s, hash);
+			
+			if (decl->data_type) {
+				logger->print("T_%x "_s, decl->data_type->token.hash);
+			}
+			
+			if (decl->params){
+				logger->print("T_%x "_s, decl->params->token.hash);
+			}
+			
+			if (decl->body){
+				logger->print("T_%x "_s, decl->body->token.hash);
+			}
+			
+			logger->print("}\n"_s);
+			
+			output_graph_v2(decl->data_type, logger);
+			output_graph_v2(decl->params, logger);
+			output_graph_v2(decl->body, logger);
+			array_add<Graph_Label>(&labels, { hash, Shape_Type::PENTAGON,
+									   decl->token.name });
+			break;
 		}
-		
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::INVTRIANGLE, "Block"_s });
-		
-	} else if (node->type == AST_SUBSCRIPT) {
-		Ast_Subscript* st  =  (Ast_Subscript*) node;
-		meow_u128 hash = Hash(st);
-		
-		logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-		output_graph(st->exp, logger);
-		logger->print("\n"_s);
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::INVHOUSE, st->token.name });
-		
-	} else if (node->type == AST_LIST) {
-		Ast_List* st  =  (Ast_List*) node;
-		meow_u128 hash = Hash(st);
-		
-		for(u64 i = 0; i < st->list.occupied; i++){
-			logger->print("T_%x -> "_s, MeowU32From(hash, 3));
-			output_graph(st->list[i], logger);
-			logger->print(" \n"_s);
+		case AST_IDENT:
+		{
+			Ast_Ident* ident = (Ast_Ident*) node;
+			array_add(&labels, { hash, Shape_Type::SQUARE, ident->token.name});
+			break;
 		}
-		
-		array_add(&labels, { MeowU32From(hash, 3), Shape_Type::STAR, st->token.name });
-		
-	} else {
-		logger->print("Unsupported Node Element [%d]!!!!!!!!!!!!!!!!!!\n"_s, node->type);
-		abort();
+		case AST_LITERAL:
+		{
+			Ast_Literal * literal = (Ast_Literal*) node;
+			array_add(&labels, { hash, Shape_Type::BOX, literal->token.name});
+			break;
+		}
+		case AST_ASSIGN:
+		{
+			logger->print("Node Type AST_ASSIGN is not supported yet\n"_s);
+			break;
+		}
+		case AST_PORCDECLARATION:
+		{
+			logger->print("Node Type AST_PORCDECLARATION is not supported yet\n"_s);
+			break;
+		}
+		case AST_TYPE:
+		{
+			logger->print("Node Type AST_TYPE is not supported yet\n"_s);
+			break;
+		}
+		case AST_BLOCK:
+		{
+			Ast_Block* block =  (Ast_Block*) node;
+			logger->print("T_%x -> { "_s, hash);
+			
+			for(u64 i = 0; i < block->statements.occupied; i++){
+				logger->print("T_%x "_s, block->statements[i]->token.hash);
+				
+			}
+			
+			logger->print("}\n"_s);
+			
+			for(u64 i = 0; i < block->statements.occupied; i++){
+				output_graph_v2(block->statements[i], logger);
+			}
+			//logger->print("Node Type AST_BLOCK is not supported yet\n"_s);
+			array_add(&labels, { hash, Shape_Type::INVTRIANGLE, "Block"_s });
+			break;
+		}
+		case AST_DEFINETION:
+		{
+			logger->print("Node Type AST_DEFINETION is not supported yet\n"_s);
+			break;
+		}
+		case AST_IF:
+		{
+			logger->print("Node Type AST_IF is not supported yet\n"_s);
+			break;
+		}
+		case AST_WHILE:
+		{
+			logger->print("Node Type AST_WHILE is not supported yet\n"_s);
+			break;
+		}
+		case AST_UNARY_EXP:
+		{
+			logger->print("Node Type AST_UNARY_EXP is not supported yet\n"_s);
+			break;
+		}
+		case AST_FUNCALL:
+		{
+			logger->print("Node Type AST_FUNCALL is not supported yet\n"_s);
+			break;
+		}
+		case AST_ARGUMENT:
+		{
+			logger->print("Node Type AST_ARGUMENT is not supported yet\n"_s);
+			break;
+		}
+		case AST_PARMETER:
+		{
+			logger->print("Node Type AST_PARMETER is not supported yet\n"_s);
+			break;
+		}
+		case AST_FACTOR:
+		{
+			logger->print("Node Type AST_FACTOR is not supported yet\n"_s);
+			break;
+		}
+		case AST_PROC:
+		{
+			logger->print("Node Type AST_PROC is not supported yet\n"_s);
+			break;
+		}
+		case AST_STRUCT:
+		{
+			logger->print("Node Type AST_STRUCT is not supported yet\n"_s);
+			break;
+		}
+		case AST_SUBSCRIPT:
+		{
+			logger->print("Node Type AST_SUBSCRIPT is not supported yet\n"_s);
+			break;
+		}
+		case AST_LIST:
+		{
+			Ast_List* list = (Ast_List*)node;
+			logger->print("T_%x -> { "_s, hash);
+			
+			for(u64 a = 0; a < list->list.occupied; a++ )
+			{
+				logger->print("T_%x "_s,list->list[a]->token.hash);
+			}
+			
+			logger->print("}\n"_s);
+			
+			for(u64 a = 0; a < list->list.occupied; a++ )
+			{
+				output_graph_v2(list->list[a], logger);
+			}
+			
+			array_add(&labels, { hash, Shape_Type::STAR, list->token.name });
+			//logger->print("Node Type AST_LIST is not supported yet\n"_s);
+			break;
+		}
+		default:
+		{
+			//output_graph_v2(node, logger);
+			logger->print("Unknown Node Type ?? \n"_s);
+			break;
+		}
 	}
-	//logger->print("Unsupported Node Element!!!!!!!!!!!!!!!!!!\n"_s);
+	return;
 }
 
-
-#define PRINT_GRAPH(node, logger)  labels.occupied = 0;output_graph(node, logger); output_labels(logger);
+#define PRINT_GRAPH(node, logger)  labels.occupied = 0; output_graph_v2(node, logger); output_labels(logger);
 #else
 #define PRINT_GRAPH(node, logger)
 #endif
+
+
+
+
+
+
+
+
+
+
 
 

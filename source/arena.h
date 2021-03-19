@@ -17,7 +17,7 @@ struct Region {
 
 Region *region_create(size_t capacity);
 
-#define ARENA_DEFAULT_CAPACITY (640 * 1000)
+#define ARENA_DEFAULT_CAPACITY (500 * 1024) // 0.5 MB
 
 struct Arena {
     Region* first;

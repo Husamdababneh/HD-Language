@@ -25,8 +25,7 @@ void *arena_alloc(Arena *arena, u64 size)
     if (arena->last == NULL) {
         assert(arena->first == NULL);
 		
-        Region *region = region_create(
-									   size > ARENA_DEFAULT_CAPACITY ? size : ARENA_DEFAULT_CAPACITY);
+        Region *region = region_create(size > ARENA_DEFAULT_CAPACITY ? size : ARENA_DEFAULT_CAPACITY);
 		
         arena->last = region;
         arena->first = region;
@@ -38,8 +37,7 @@ void *arena_alloc(Arena *arena, u64 size)
     }
 	
     if (arena->last->size + size > arena->last->capacity) {
-        Region *region = region_create(
-									   size > ARENA_DEFAULT_CAPACITY ? size : ARENA_DEFAULT_CAPACITY);
+        Region *region = region_create(size > ARENA_DEFAULT_CAPACITY ? size : ARENA_DEFAULT_CAPACITY);
 		
         arena->last->next = region;
         arena->last = region;

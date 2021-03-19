@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "logger.h"
 #include "enum.i"
 
 struct Position
@@ -24,10 +23,9 @@ struct Token
 {
 	u16          Type = TOKEN_NONE;
 	u16          id = 0;
-	Position 	start_position;
-	Position 	end_position;
-	
-	
+	Position 	start_position = {0};
+	Position 	end_position = {0};
+	meow_u128    hash;
 	
 	union
 	{

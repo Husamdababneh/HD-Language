@@ -14,6 +14,14 @@ rule "MetaGeneratorWindows"
 	buildmessage 'Generating MetaData %(Filename) With CL'
 	buildcommands 'CL /EP %(FullPath) > ../generated-source/%(Filename).i'
 	buildoutputs  '../bin'
+	
+rule "MetaGeneratorLinux"
+	display "Generate Files"
+	fileextension ".cpp"
+
+	buildmessage 'Generating MetaData %(Filename) With G++'
+	buildcommands 'g++ -E -P %(FullPath) > ../generated-source/%(Filename).i'
+	buildoutputs  '../bin'
 
 project "MetaProgram"
 	kind "Utility"
@@ -40,9 +48,9 @@ project "MetaProgram"
 		prebuildcommands {
 			"mkdir -p ..\\generated-source",
 		}
-
-		--rules { "MetaGeneratorLinux" }
-		printf("We do NOT suppor linux yet")
+		
+		buildcommands { 'g++ -E -P %(FullPath) > ../generated-source/%(Filename).i' }
+		rules { "MetaGeneratorLinux" }
 	end
 
 project "HDLang"

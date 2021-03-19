@@ -11,8 +11,6 @@
 #include "string.h"
 #include "common.h"
 
-//#include "lex.h"
-
 struct Token;
 
 // TODO: Change putchar to putc ?? to make the user able to output to files 
