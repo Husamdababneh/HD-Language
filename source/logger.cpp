@@ -65,8 +65,9 @@ void Logger::vprint(String str, va_list args) {
 				}
 				case 'x':
 				{
-					u32 number = va_arg(args, int);
-					printf("%08X", number);
+					meow_u128 hash = va_arg(args, meow_u128);
+					u32 x = MeowU32From(hash, 3);
+					printf("%08X", x);
 					break;
 				}
 				case 'd':

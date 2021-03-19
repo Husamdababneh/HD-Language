@@ -10,7 +10,6 @@
 #include "Ast.h"
 #include "parser.h"
 
-
 // @TEMP @CLEANUP This may break the premake generated files
 #define ENABLE_GRAPH_PRINTING 1
 #include <extra/graph.cpp>
@@ -136,8 +135,8 @@ PARSE_COMMAND(parse)
 				//logger->print("Token Name = [%s]\n"_s, token.name);
 				Ast_Node* node = CallParseCommand(parse_statement);
 				if(node){
-					output_graph(node, logger);
-					output_labels(logger);
+					PRINT_GRAPH(node, logger);
+					//PRINT_GRAPH(logger);
 					//if(node->def_type == AST_DEF_STRUCT) printf("Number of decls = %I64i\n", ((Ast_List*)node->body)->list.occupied);
 				}
 				break;
@@ -220,6 +219,7 @@ PARSE_COMMAND(parse_def)
 		decl->constant = false;
 		decl->def_type = AST_DEF_VAR;
 		decl->body = CallParseCommand(parse_expression);
+		// TODO: Rethink this part
 		auto tok = lexer->peek_token();
 		if(tok.Type == ';') lexer->eat_token();
 		return decl;
@@ -229,13 +229,14 @@ PARSE_COMMAND(parse_def)
 		return decl;
 	}
 	
-	t = lexer->eat_token();
+	t = lexer->peek_token();
 	
 	if(decl->constant){
 		if(isEqual(&t.name, &"struct"_s)){
 			decl->def_type = AST_DEF_STRUCT;
 			AllocateNode(Ast_List, decls);
-			
+			lexer->eat_token();
+			decls->token = t;
 			expect_token(lexer,logger, '{');
 			
 			// TODO: Test this
@@ -260,11 +261,13 @@ PARSE_COMMAND(parse_def)
 		}
 		//@TODO: Error messages.
 		else if (isEqual(&t.name, &"proc"_s)){
+			lexer->eat_token();
 			decl->def_type = AST_DEF_PROC;
 			AllocateNode(Ast_Block, block);
 			
 			//assert(false); // for now 
 			// Parse header
+			block->token = lexer->peek_token();
 			expect_token(lexer,logger, '(');
 			
 			// @TODO: Test this
@@ -286,6 +289,7 @@ PARSE_COMMAND(parse_def)
 				lexer->eat_token();
 				t = lexer->peek_token();
 				AllocateNode(Ast_Block, return_types);
+				return_types->token = t;
 				while(true){
 					if (t.Type == TOKEN_HDTYPE || 
 						t.Type == TOKEN_IDENT)
@@ -308,17 +312,22 @@ PARSE_COMMAND(parse_def)
 			
 			// Parse directives
 			
-			expect_token(lexer,logger, '{');
+			//expect_token(lexer,logger, '{');
+			if(lexer->peek_token().Type != '{'){
+				assert(false);
+			}
 			// Parse Body
 			decl->body = CallParseCommand(parse_block_of_statments);
 			return decl;
 			
 		}
 		else if (isEqual(&t.name, &"enum"_s)){
+			lexer->eat_token();
 			decl->def_type = AST_DEF_ENUM;
 			assert((false && "We DO NOT support enum"));
 		}
 		else if (isEqual(&t.name, &"flag"_s)){
+			lexer->eat_token();
 			decl->def_type = AST_DEF_FLAG;
 			assert((false && "We DO NOT support flag"));
 		}
@@ -330,10 +339,10 @@ PARSE_COMMAND(parse_def)
 				logger->print_with_location(&lexer->peek_token(), "Type Directive is not supported yet %s\n"_s, t.name);
 				assert(false);
 			}
-			/// What type is this ??
-			logger->print_with_location(&lexer->peek_token(), "What ? %s\n"_s, t.name);
-			assert(false);
 			
+			decl->body =  CallParseCommand(parse_expression);
+			expect_token(lexer, logger, ';');
+			return decl;
 		}
 		
 		// Parse Expression
@@ -357,7 +366,11 @@ PARSE_COMMAND(parse_statement)
 	{
 		return_node = CallParseCommand(parse_block_of_statments);
 		auto t = lexer->eat_token();
-		if (t.Type != '}') assert(false);
+		if (t.Type != '}') 
+		{
+			logger->print_with_location(&t, "Expected [}] got [%s]\n"_s, t.name);
+			assert(false);
+		}
 		
 		return return_node ;
 		
@@ -560,11 +573,10 @@ parse_comma_seperated(LexerState* lexer, Logger* logger, Ast_Node* (func) (Lexer
 static Ast_Node*
 PARSE_COMMAND(parse_block_of_statments)
 {
-	u8 scope_count = 0;
-	Token t = lexer->eat_token(); // it must be "{"
-	t = lexer->peek_token();
+	Token t = lexer->peek_token(); // it must be "{"
+	expect_token(lexer, logger, '{');
 	AllocateNode(Ast_Block, block);
-	
+	block->token = t;
 	while(true){
 		if(t.Type == '}') {
 			lexer->eat_token();

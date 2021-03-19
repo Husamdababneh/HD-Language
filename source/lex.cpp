@@ -211,7 +211,7 @@ void LexerState::preprosses()
 #endif
 	
 }
-
+#define Hash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
 Token LexerState::process_token()
 {
 	// @TODO: init a token and return it.
@@ -219,7 +219,7 @@ Token LexerState::process_token()
 	if(input_cursor >= input.count)
 		return { TOKEN_EOFA , 0, 0 , 0 };
 	
-	Token token = {};
+	Token token = {0};
 	
 	token.id = COUTNER;
 	COUTNER++;
@@ -407,7 +407,7 @@ Token LexerState::process_token()
 		break;
 		case '\0':
 		{
-			return { TOKEN_EOFA , 0 , 0 };
+			return { TOKEN_EOFA , 0 , 0 , 0};
 			break;
 		}
 		default:
@@ -454,7 +454,7 @@ Token LexerState::process_token()
 	token.end_position = get_current_position();
 	assert(token.Type != TOKEN_NONE);
 	token.value = String { &input[temp], input_cursor  - temp};
-	
+	token.hash = Hash(token);
 	//nocheckin 
 	if (token.Type == TOKEN_COMMENT ||
 		token.Type == TOKEN_MULTILINE_COMMENT)
