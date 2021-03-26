@@ -13,8 +13,8 @@ $Desc:
 
 Region *region_create(u64 capacity)
 {
-    const u64 region_size = sizeof(Region) + capacity;
-    Region *region = (Region*)new u8[region_size];
+	const u64 region_size = sizeof(Region) + capacity;
+	Region *region = (Region*)new u8[region_size];
     memset(region, 0, region_size);
     region->capacity = capacity;
     return region;

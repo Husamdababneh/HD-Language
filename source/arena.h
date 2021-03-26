@@ -7,6 +7,9 @@ $Desc:
 
 #pragma once
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4200)
+#endif
 
 struct Region {
     Region* next;
@@ -14,6 +17,10 @@ struct Region {
     size_t  size;
     u8      buffer[];
 };
+#ifdef _MSC_VER
+#pragma warning(default: 4200)
+#endif
+
 
 Region *region_create(size_t capacity);
 

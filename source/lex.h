@@ -40,9 +40,10 @@ struct Token
 
 struct LexerState
 {
-	LexerState(const String& filepath);
+	LexerState(const String& str, bool isfile = true);
 	~LexerState();
 	
+	void* data; // hack for string;
 	String input;				// Data
 	Logger logger = Logger("Lexer"_s);
 	u64 input_cursor;			// to keep track were we are

@@ -53,29 +53,12 @@ struct myString
 };
 
 
-
-struct myStringView
-{
-	myString* string;
-	u64 cursor;
-	
-	operator u64() const
-	{
-		return cursor;
-	}
-	
-	u8 operator[]  (u64 i) {
-		return (*string)[i];
-	}
-	
-	
-};
-
 myString operator "" _s(const char* a, size_t s);
 
 typedef myString String;
-typedef myStringView StringView;
-
 bool isEqual(String* first, String* second);
-myStringView make_view(const myString& str);
-u64 c_str_size(const char* str);
+
+
+
+
+

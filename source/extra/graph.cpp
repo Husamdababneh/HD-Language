@@ -129,7 +129,20 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 		}
 		case AST_ASSIGN:
 		{
-			logger->print("Node Type AST_ASSIGN is not supported yet\n"_s);
+			Ast_Assign* assign = (Ast_Assign*) node;
+			logger->print("T_%x -> { "_s, hash);
+			if (assign->left) {
+				logger->print("T_%x "_s, assign->left->token.hash);
+			}
+			
+			if (assign->right) {
+				logger->print("T_%x "_s, assign->right->token.hash);
+			}
+			logger->print("}\n"_s);
+			output_graph_v2(assign->left, logger);
+			output_graph_v2(assign->right, logger);
+			
+			array_add(&labels, { hash, Shape_Type::BOX, assign->token.name});
 			break;
 		}
 		case AST_PORCDECLARATION:
@@ -237,10 +250,30 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			//logger->print("Node Type AST_LIST is not supported yet\n"_s);
 			break;
 		}
+		case AST_MEBMER_ACCESS:
+		{
+			Ast_MemberAccess* ma = (Ast_MemberAccess*)node;
+			
+			logger->print("T_%x -> { "_s, hash);
+			if (ma->left) {
+				logger->print("T_%x "_s, ma->left->token.hash);
+			}
+			
+			if (ma->right) {
+				logger->print("T_%x "_s, ma->right->token.hash);
+			}
+			logger->print("}\n"_s);
+			output_graph_v2(ma->left, logger);
+			output_graph_v2(ma->right, logger);
+			
+			array_add(&labels, { hash, Shape_Type::BOX, ma->token.name});
+			break;
+			break;
+		}
 		default:
 		{
 			//output_graph_v2(node, logger);
-			logger->print("Unknown Node Type ?? \n"_s);
+			logger->print("Unknown Node Type %d?? \n"_s, node->type);
 			break;
 		}
 	}

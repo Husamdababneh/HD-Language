@@ -1,10 +1,10 @@
+//#import "test.hd"
 
-a :: struct {
+Entity :: struct {
 	a : int = 5;
 	b : int ;
-	c : int ;
+	c : int ;	
 };
-
 
 
 //a :: #type (u16 , u8) -> void 
@@ -13,8 +13,11 @@ funcSig :: proc (a : u16  = 2, a : u8) -> void
 {
 
 	{
-		a := 5;
-		b :: (5 * 2);
+		
+		//a : Entity;
+		a = 4;
+		a.a = 4;
+		b :: (5 * 2 + (8 / (1 + 3) ));
 	}
 }
 

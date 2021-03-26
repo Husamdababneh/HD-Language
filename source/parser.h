@@ -14,3 +14,4 @@ struct Parser {
 
 
 void parse_file(const String& filename);
+void parse_str(const String& str);

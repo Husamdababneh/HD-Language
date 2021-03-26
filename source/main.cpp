@@ -1,9 +1,9 @@
 /* ========================================================================
-   $File: main.cpp
-   $Date: 2020-10-02
-   $Creator: Husam Dababneh
-   $Description: main function
-   ========================================================================*/
+$File: main.cpp
+$Date: 2020-10-02
+$Creator: Husam Dababneh
+$Description: main function
+========================================================================*/
 
 #include "pch.h"
 
@@ -67,6 +67,7 @@ int main(int argc, char ** argv)
 	
 	String filename = {(u8*)argv[1],  strlen(argv[1])};
 	//FrameMarkStart (sl_Parsing );
+	//parse_str("f :: s; "_s);
 	parse_file(filename);
 	//FrameMarkEnd(sl_Parsing);
 	printf("#Allocations Using New Keyword = %d\n", allocation_count);

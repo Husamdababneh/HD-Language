@@ -17,6 +17,7 @@ enum {
 enum {
 	AST_IDENT,
 	AST_ASSIGN,
+	AST_MEBMER_ACCESS,
 	AST_DECLARATION,
 	AST_PORCDECLARATION,
 	AST_TYPE,
@@ -57,7 +58,7 @@ enum {
 struct Ast_Node;
 
 struct Ast {
-	Ast_Node* rootNode;
+	Array<Ast_Node*> nodes;
 };
 
 
@@ -74,6 +75,27 @@ struct Ast_Literal : Ast_Node
 	}
 };
 
+
+struct Ast_MemberAccess: Ast_Node
+{
+	Ast_MemberAccess()
+	{
+		type = AST_MEBMER_ACCESS;
+	}
+	
+	Ast_Node* left;
+	Ast_Node* right;
+};
+
+struct Ast_Assign: Ast_Node
+{
+	Ast_Assign(){
+		type = AST_ASSIGN;
+	}
+	
+	Ast_Node* left;
+	Ast_Node* right;
+};
 
 
 struct Ast_Unary : public Ast_Node {
@@ -99,6 +121,7 @@ struct Ast_Binary : public Ast_Node {
 		right= nullptr;
 	}
 	
+	bool isFactor = false;
 	u32       op;
 	Ast_Node* left;
 	Ast_Node* right;

@@ -170,17 +170,24 @@ u8 LexerState::eat_character()
 	return input[input_cursor - 1];
 }
 
-LexerState::LexerState(const String& filepath)
+LexerState::LexerState(const String& str, bool isfile /* = true*/)
 {
-	printf("initing Lexer\n");
-	u64 length = read_entire_file(filepath, (void**)&input.data);
-	if (length < 0)
-	{
-		logger.print("Couldn't read file %s\n"_s, filepath);
-		exit(1);
+	if (isfile){
+		u64 length = read_entire_file(str, (void**)&input.data);
+		if (length < 0)
+		{
+			logger.print("Couldn't read file %s\n"_s, str);
+			exit(1);
+		}
+		input.count = length;
+		input_cursor = 0;
+		data = input.data;
+	}else {
+		data = nullptr;
+		input.data = str.data;
+		input.count = str.count;
+		input_cursor = 0;
 	}
-	input.count = length;
-	input_cursor = 0;
 	
 	current_line_number = 1;
 	current_char_index = 0;	
@@ -197,8 +204,9 @@ LexerState::~LexerState()
 {
 	printf("Getting Out\n");
 	free_queue(&token_cache);
-	if (input.data){
-		delete[] input.data;
+	//string_free(input);
+	if (data){
+		delete[] data;
 	}
 }
 

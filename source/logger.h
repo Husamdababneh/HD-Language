@@ -18,7 +18,7 @@ struct Logger {
 	String prefix;
 	FILE * out;
 	Logger(const char * name, FILE* stream = stdout ) {
-		prefix.count = c_str_size(name);
+		prefix.count = strlen(name);
 		prefix.data  = (u8*) name;
 		out = stream;
 	}
