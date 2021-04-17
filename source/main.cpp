@@ -65,10 +65,12 @@ int main(int argc, char ** argv)
 		return 0;
 	}
 	
-	String filename = {(u8*)argv[1],  strlen(argv[1])};
+	StringView filename = {(u8*)argv[1],  strlen(argv[1])};
 	//FrameMarkStart (sl_Parsing );
 	//parse_str("f :: s; "_s);
-	parse_file(filename);
+	Parser parser(filename, filename, true);
+	parser.parse();
+	parser.free();
 	//FrameMarkEnd(sl_Parsing);
 	printf("#Allocations Using New Keyword = %d\n", allocation_count);
 	

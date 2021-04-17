@@ -51,5 +51,5 @@ struct Graph_Label {
 	//s32 hash = 0;
 	meow_u128 hash = {0};
 	Shape_Type type = Shape_Type::BOX;
-	String str;
+	StringView str;
 };

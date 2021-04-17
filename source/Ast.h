@@ -6,6 +6,8 @@
    ========================================================================*/
 #pragma once
 
+#include "lex.h"
+
 enum {
 	AST_DEF_VAR,
 	AST_DEF_PROC,
@@ -39,12 +41,6 @@ enum {
 	AST_UKNOWN,
 };
 
-
-struct Symbol {
-	String name;
-	u32 type;
-	s32 Scope; // This is Hash 
-};
 
 enum {
 	OP_UNKOWN = -1,
@@ -229,4 +225,20 @@ struct Ast_Block : public Ast_Node {
 	
 	Array<Ast_Node*> statements;
 };
+
+
+enum SymbolType {
+	SYMBOL_STRUCT,
+	SYMBOL_PROC, 
+	SYMBOL_VAR,
+};
+
+struct Symbol {
+	//String name;
+	Ast_Node node;
+	u64      type;
+	u64      scope;
+};
+
+
 

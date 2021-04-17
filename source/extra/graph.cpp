@@ -8,7 +8,7 @@ $Desc:
 #if ENABLE_GRAPH_PRINTING == 1
 #include "graph.h"
 
-String Shape_Names [] = {
+StringView Shape_Names [] = {
 	"box"_s,
 	"polygon"_s,
 	"ellipse"_s,

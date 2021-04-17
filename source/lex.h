@@ -29,22 +29,22 @@ struct Token
 	
 	union
 	{
-		String   name;
+		StringView   name;
 		bool     boolean;
 		u64      integer;
 		f32      _float32;
 		f64 	 _float64;
-		String   value;
+		StringView   value;
 	};
 };
 
 struct LexerState
 {
-	LexerState(const String& str, bool isfile = true);
+	LexerState(const StringView& str, bool isfile = true);
 	~LexerState();
 	
 	void* data; // hack for string;
-	String input;				// Data
+	StringView input;				// Data
 	Logger logger = Logger("Lexer"_s);
 	u64 input_cursor;			// to keep track were we are
 	

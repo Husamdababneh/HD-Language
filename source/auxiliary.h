@@ -27,10 +27,10 @@ struct Arguments
 	bool isSet = false;
 };
 
-Arguments ParseArguments(int argc, char** argv);
+//Arguments ParseArguments(int argc, char** argv);
 u64 read_entire_file(FILE* file, void** data_return);
 u64 read_entire_file(const char* file, void** data_return);
-u64 read_entire_file(const String& filename, void** data_return);
+u64 read_entire_file(const StringView& filename, void** data_return);
 
 template <typename F>
 struct Defer

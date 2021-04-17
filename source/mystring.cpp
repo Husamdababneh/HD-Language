@@ -8,9 +8,9 @@
 #include "pch.h"
 #include "string.h"
 
-typedef myString String;
+typedef myString StringView;
 
-bool isEqual(String* first, String* second)  {
+bool isEqual(StringView* first, StringView* second)  {
 	if (first->count != second->count) return false;
 	
 	for(u32 a = 0; a < first->count; a++){

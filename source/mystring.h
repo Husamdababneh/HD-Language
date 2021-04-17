@@ -1,9 +1,9 @@
 /* ========================================================================
-   $File: String.h
-   $Date: 2020-04-23
-   $Creator: Husam Dababneh
-   $Description: Custom String Type
-   ========================================================================*/
+$File: String.h
+$Date: 2020-04-23
+$Creator: Husam Dababneh
+$Description: Custom String Type
+========================================================================*/
 #pragma once
 
 #include "common.h"
@@ -55,8 +55,8 @@ struct myString
 
 myString operator "" _s(const char* a, size_t s);
 
-typedef myString String;
-bool isEqual(String* first, String* second);
+typedef myString StringView;
+bool isEqual(StringView* first, StringView* second);
 
 
 

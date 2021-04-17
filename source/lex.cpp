@@ -17,9 +17,8 @@
 #define FOR_RANGE(x) for(u64 it = 0; it < x; it++)
 
 // TODO : Remove them from reserved[]  
-String predefined_types [] = {
+StringView predefined_types [] = {
 	// Types
-	"int"_s, "float"_s,
 	"u8"_s , "s8"_s,
 	"u16"_s, "s16"_s,
 	"u32"_s, "s32"_s,
@@ -31,7 +30,7 @@ String predefined_types [] = {
 	"void"_s
 };
 
-String reserved [] = {
+StringView reserved [] = {
     // loop
 	"for"_s,
 	
@@ -67,7 +66,7 @@ String reserved [] = {
 	"no_inline"_s
 };
 
-constexpr int KeywordCount = sizeof(reserved) / sizeof(String);
+constexpr int KeywordCount = sizeof(reserved) / sizeof(StringView);
 
 static inline bool isWhitechar(u8 c){
 	if (c == '\t' ||
@@ -97,7 +96,7 @@ static inline bool isInLireralChar(u8 ch){
 
 
 
-bool isKeyword(String& string)
+bool isKeyword(StringView& string)
 {
 	for(int a = 0; a < KeywordCount; a++)
 		if(isEqual(&string, &reserved[a]))
@@ -105,7 +104,7 @@ bool isKeyword(String& string)
 	return false;
 }
 
-bool isHDType(String& string)
+bool isHDType(StringView& string)
 {
 	// Make this a hashmap lookup, faster...
 	for(int a = 0; a < KeywordCount; a++) if(isEqual(&string, &predefined_types[a])) return true;
@@ -170,7 +169,7 @@ u8 LexerState::eat_character()
 	return input[input_cursor - 1];
 }
 
-LexerState::LexerState(const String& str, bool isfile /* = true*/)
+LexerState::LexerState(const StringView& str, bool isfile /* = true*/)
 {
 	if (isfile){
 		u64 length = read_entire_file(str, (void**)&input.data);
@@ -279,7 +278,7 @@ Token LexerState::process_token()
 			token.Type = ch;
 			break;
 		}
-		// TODO: Put Matching Paranthases Here 
+		// TODO: Remove the stack,, a 3Xu16 variables are enough to do the work 
 		case '[': 
 		case '{': 
 		case '(': 
@@ -291,21 +290,32 @@ Token LexerState::process_token()
 		case ']': 
 		{
 			if (paranthases_stack.top() == '[') paranthases_stack.pop();
-			else assert(false);
+			else {
+				logger.print_with_location(&token, "Unbalanced '['\n"_s);
+				exit(-1);
+			}
 			token.Type = ch;
 			break;
 		}
 		case '}':
 		{
 			if (paranthases_stack.top() == '{') paranthases_stack.pop();
-			else assert(false);
+			else {
+				logger.print_with_location(&token, "Unbalanced '{'\n"_s);
+				exit(-1);
+			}
+			
 			token.Type = ch;
 			break;
 		}
 		case ')': 
 		{
 			if (paranthases_stack.top() == '(') paranthases_stack.pop();
-			else assert(false);
+			else {
+				logger.print_with_location(&token, "Unbalanced '('\n"_s);
+				exit(-1);
+			}
+			
 			token.Type = ch;
 			break;
 		}
@@ -426,15 +436,13 @@ Token LexerState::process_token()
 					break;
 				eat_character();
 			};
-			token.value = String { &input[temp], input_cursor  - temp};
+			token.value = StringView{ &input[temp], input_cursor  - temp};
 			if (isKeyword(token.value))
 				token.Type = TOKEN_KEYWORD;
 			else if (isHDType(token.value))
 				token.Type = TOKEN_HDTYPE;
 			else
 				token.Type = TOKEN_IDENT;
-			
-			
 		} else {
 			// We assume that this will be only numbers
 			// (0x -> hex) (0b -> binary) (0o  -> Octal)
@@ -461,7 +469,7 @@ Token LexerState::process_token()
 	}
 	token.end_position = get_current_position();
 	assert(token.Type != TOKEN_NONE);
-	token.value = String { &input[temp], input_cursor  - temp};
+	token.value = StringView{ &input[temp], input_cursor  - temp};
 	token.hash = Hash(token);
 	//nocheckin 
 	if (token.Type == TOKEN_COMMENT ||

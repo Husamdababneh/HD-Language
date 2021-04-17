@@ -24,7 +24,7 @@ void Logger::print_token_pos(Token * token ) {
 }
 
 
-void Logger::print_with_location(Token * token , String str, ...) {
+void Logger::print_with_location(Token * token , StringView str, ...) {
 	//print_prefix();
 	print_token_pos(token);
 	// print body
@@ -36,7 +36,7 @@ void Logger::print_with_location(Token * token , String str, ...) {
 }
 
 
-void Logger::print(String str, ...) {
+void Logger::print(StringView str, ...) {
 	// print body
 	va_list	args;
 	va_start(args, str);
@@ -46,7 +46,7 @@ void Logger::print(String str, ...) {
 	return;
 }
 
-void Logger::vprint(String str, va_list args) {
+void Logger::vprint(StringView str, va_list args) {
 	// @NOCHECKIN 
 	// TODO: 
 #if 0
@@ -84,7 +84,7 @@ void Logger::vprint(String str, va_list args) {
 				}
 				case 's':
 				{
-					String string = va_arg(args, String);
+					StringView string = va_arg(args, StringView);
 					
 					for(int a = 0; a < string.count; a++)
 						putc(string[a], out);

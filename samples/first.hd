@@ -6,49 +6,18 @@ Entity :: struct {
 	c : int ;	
 };
 
-
-//a :: #type (u16 , u8) -> void 
-
 funcSig :: proc (a : u16  = 2, a : u8) -> void
 {
 
 	{
 		
-		//a : Entity;
+		a : Entity;
+		a := "Hi";
 		a = 4;
 		a.a = 4;
+		a.b = 3;
 		b :: (5 * 2 + (8 / (1 + 3) ));
 	}
 }
 
-
-
-//(a[1] * -g(1, 2, a[3*5 - 2 /5]) - (5 + b) )
-//a[1]
-
-
-
-/*
-/*
-Entity : struct : {
-	
-};
-
-main : funcSig : { }
-main :: proc ( a : u16  = s , a : u8) -> void  {
-	
-	b : u16 = 12;
-	
-	Sybmbol :: 1;
-	Sybmbol2 := 2;
-	scopeope : u16;
-	
-	//func(a[]);
-}
-
-__x :: (_af : s8 : __r) -> u8, s64, bool, s32
-{
-}
-
-*/
-*/
+		

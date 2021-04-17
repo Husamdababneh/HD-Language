@@ -49,7 +49,7 @@ u64 read_entire_file(const char* filepath, void** data_return)
 	return result;
 }
 
-u64 read_entire_file(const String& filename, void** data_return)
+u64 read_entire_file(const StringView& filename, void** data_return)
 {
 	assert(filename.count <= 255);
 	char name[256];
