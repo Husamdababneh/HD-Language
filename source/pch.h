@@ -10,9 +10,9 @@
 
 
 #include <meow_hash.h>
+#include "vendor/stb_ds.h"
 #include "common.h"
 #include "mystring.h"
-#include "array.h"
 #include "auxiliary.h"
 #include "stack.h"
 #include "queue.h"

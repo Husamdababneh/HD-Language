@@ -45,18 +45,18 @@ StringView Shape_Names [] = {
 	"component"_s,	
 };
 
-static Array<Graph_Label> labels = init_array<Graph_Label>(50);
+static Graph_Label* labels = nullptr;
 static void 	
 output_labels(Logger* logger)
 {
-	for(u64 i = 0; i < labels.occupied; i++)
+	for(u64 i = 0; i < arrlenu(labels); i++)
 	{
 		auto& label = labels[i];
 		logger->print("T_%x [shape=\"%s\" label=\"%s\"];\n"_s, label.hash, Shape_Names[(u64)label.type], 
 					  label.str);
 	}
 	
-	labels.occupied = 0;
+	arrfree(labels);
 	
 }
 static void
@@ -85,8 +85,8 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			
 			output_graph_v2(bin->left, logger);
 			output_graph_v2(bin->right, logger);
-			array_add<Graph_Label>(&labels, { hash, Shape_Type::DIAMOND,
-									   bin->token.name });
+			Graph_Label label= { hash, Shape_Type::DIAMOND, bin->token.name };
+			arrput(labels, label);
 			break;
 		}
 		case AST_DECLARATION:
@@ -111,20 +111,22 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			output_graph_v2(decl->data_type, logger);
 			output_graph_v2(decl->params, logger);
 			output_graph_v2(decl->body, logger);
-			array_add<Graph_Label>(&labels, { hash, Shape_Type::PENTAGON,
-									   decl->token.name });
+			Graph_Label label = { hash, Shape_Type::PENTAGON, decl->token.name };
+			arrput(labels, label);
 			break;
 		}
 		case AST_IDENT:
 		{
 			Ast_Ident* ident = (Ast_Ident*) node;
-			array_add(&labels, { hash, Shape_Type::SQUARE, ident->token.name});
+			Graph_Label label = { hash, Shape_Type::SQUARE, ident->token.name};
+			arrput(labels, label);
 			break;
 		}
 		case AST_LITERAL:
 		{
 			Ast_Literal * literal = (Ast_Literal*) node;
-			array_add(&labels, { hash, Shape_Type::BOX, literal->token.name});
+			Graph_Label label = { hash, Shape_Type::BOX, literal->token.name};
+			arrput(labels, label);
 			break;
 		}
 		case AST_ASSIGN:
@@ -142,7 +144,8 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			output_graph_v2(assign->left, logger);
 			output_graph_v2(assign->right, logger);
 			
-			array_add(&labels, { hash, Shape_Type::BOX, assign->token.name});
+			Graph_Label label = { hash, Shape_Type::BOX, assign->token.name};
+			arrput(labels, label);
 			break;
 		}
 		case AST_PORCDECLARATION:
@@ -160,18 +163,19 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			Ast_Block* block =  (Ast_Block*) node;
 			logger->print("T_%x -> { "_s, hash);
 			
-			for(u64 i = 0; i < block->statements.occupied; i++){
+			for(u64 i = 0; i < arrlenu(block->statements); i++){
 				logger->print("T_%x "_s, block->statements[i]->token.hash);
 				
 			}
 			
 			logger->print("}\n"_s);
 			
-			for(u64 i = 0; i < block->statements.occupied; i++){
+			for(u64 i = 0; i < arrlenu(block->statements); i++){
 				output_graph_v2(block->statements[i], logger);
 			}
 			//logger->print("Node Type AST_BLOCK is not supported yet\n"_s);
-			array_add(&labels, { hash, Shape_Type::INVTRIANGLE, "Block"_s });
+			Graph_Label label = { hash, Shape_Type::INVTRIANGLE, "Block"_s };
+			arrput(labels, label);
 			break;
 		}
 		case AST_DEFINETION:
@@ -234,19 +238,20 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			Ast_List* list = (Ast_List*)node;
 			logger->print("T_%x -> { "_s, hash);
 			
-			for(u64 a = 0; a < list->list.occupied; a++ )
+			for(u64 a = 0; a < arrlenu(list->list); a++ )
 			{
 				logger->print("T_%x "_s,list->list[a]->token.hash);
 			}
 			
 			logger->print("}\n"_s);
 			
-			for(u64 a = 0; a < list->list.occupied; a++ )
+			for(u64 a = 0; a < arrlenu(list->list); a++ )
 			{
 				output_graph_v2(list->list[a], logger);
 			}
 			
-			array_add(&labels, { hash, Shape_Type::STAR, list->token.name });
+			Graph_Label label = { hash, Shape_Type::STAR, list->token.name };
+			arrput(labels, label);
 			//logger->print("Node Type AST_LIST is not supported yet\n"_s);
 			break;
 		}
@@ -266,7 +271,8 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			output_graph_v2(ma->left, logger);
 			output_graph_v2(ma->right, logger);
 			
-			array_add(&labels, { hash, Shape_Type::BOX, ma->token.name});
+			Graph_Label label = { hash, Shape_Type::BOX, ma->token.name};
+			arrput(labels, label);
 			break;
 			break;
 		}
@@ -280,7 +286,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 	return;
 }
 
-#define PRINT_GRAPH(node, logger)  labels.occupied = 0; output_graph_v2(node, logger); output_labels(logger);
+#define PRINT_GRAPH(node, logger)  output_graph_v2(node, logger); output_labels(logger);
 #else
 #define PRINT_GRAPH(node, logger)
 #endif

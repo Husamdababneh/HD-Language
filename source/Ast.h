@@ -54,7 +54,7 @@ enum {
 struct Ast_Node;
 
 struct Ast {
-	Array<Ast_Node*> nodes;
+	Ast_Node** nodes;
 };
 
 
@@ -178,14 +178,16 @@ struct Ast_Declaration : public Ast_Node {
 
 
 
+
 // TODO: Cleanup
 struct Ast_List : public Ast_Node {
 	Ast_List() { 
 		type = AST_LIST; 
 	}
 	
-	Array<Ast_Declaration*> list;
+	Ast_Declaration** list;
 };
+
 
 
 
@@ -212,10 +214,9 @@ struct Ast_Parmeter : public Ast_Node {
 struct Ast_FunctionCall : public Ast_Node {
 	Ast_FunctionCall() {
 		type = AST_FUNCALL;
-		arguments = init_array<Ast_Node*>(5);
 	}
 	
-	Array<Ast_Node*> arguments;
+	Ast_Node** arguments;
 };
 
 struct Ast_Block : public Ast_Node {
@@ -223,22 +224,6 @@ struct Ast_Block : public Ast_Node {
 		type = AST_BLOCK;
 	}
 	
-	Array<Ast_Node*> statements;
+	Ast_Node** statements;
 };
-
-
-enum SymbolType {
-	SYMBOL_STRUCT,
-	SYMBOL_PROC, 
-	SYMBOL_VAR,
-};
-
-struct Symbol {
-	//String name;
-	Ast_Node node;
-	u64      type;
-	u64      scope;
-};
-
-
 

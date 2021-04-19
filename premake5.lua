@@ -119,6 +119,9 @@ project "HDLang"
 	filter "files:**TracyClient.cpp"
 	    flags {"NoPCH"}
 	
+	filter "files:**stb_*.cpp"
+	    flags {"NoPCH"}
+
 	defines { define_table } 
 -- Clean Function --
 newaction {

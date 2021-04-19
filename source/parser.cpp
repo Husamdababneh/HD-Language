@@ -10,6 +10,9 @@
 #include "Ast.h"
 #include "parser.h"
 
+
+
+
 // @TEMP @CLEANUP This may break the premake generated files
 #define ENABLE_GRAPH_PRINTING 1
 #include <extra/graph.cpp>
@@ -34,11 +37,6 @@ name = ::new(name) type();
 #else
 #define PANIC() exit(-1);
 #endif
-
-//static Arena ast_arena = {0};
-static Arena Symbol_Table = {0};
-static u8 counter = 0;
-
 
 inline Ast_Node*
 Parser::parse_operator()
@@ -95,8 +93,8 @@ print_simple_c_struct(Logger* logger, Ast_Struct* node) {
 	logger.print("struct %s {\n"_s, node->ident->token.name);
 	for(u64 i = 0; i < node->fields.occupied; i++){
 		logger.print("\t%s %s; \n"_s,
-					  node->fields[i]->data_type->token.name,
-					  node->fields[i]->ident->token.name);
+					 node->fields[i]->data_type->token.name,
+					 node->fields[i]->ident->token.name);
 	}
 	logger.print("};\n"_s, node->ident->token.name);
 	
@@ -112,13 +110,34 @@ Parser::expect_and_eat(u64 type)
 	{
 		//logger.parse
 		// TODO loghere : 
-		logger.print("expect_and_eat Broke \n"_s);
+		logger.print("expect_and_eat:\n"_s);
 		logger.print_with_location(&lexer.peek_token(), "Expected [%c] got \"%s\"\n"_s, (u8) type,
-									lexer.peek_token().name);
+								   lexer.peek_token().name);
 		//_CrtDbgBreak();
 		assert(false);
 	}
 	lexer.eat_token();
+}
+
+inline void 
+Parser::register_scope(const StringView& name)
+{
+	u64 id = arrlenu(scopes);
+	Scope scope = {id,  name};
+	arrput(scopes, scope);
+}
+
+inline Scope 
+Parser::get_current_scope()
+{
+	// TODO: Add checks here
+	return scopes[arrlen(scopes) - 1];
+}
+
+inline void 
+Parser::exit_scope()
+{
+	arrdel(scopes, arrlen(scopes) - 1);
 }
 
 Ast Parser::parse()
@@ -127,6 +146,7 @@ Ast Parser::parse()
 	auto token = lexer.peek_token();
 	Ast ast = {0};
 	
+	register_scope("GLOBAL"_s);
 	// Parse All Needed files
 	while(token.Type != TOKEN_EOFA){
 		switch(token.Type)
@@ -135,7 +155,7 @@ Ast Parser::parse()
 			case TOKEN_IDENT:
 			{
 				Ast_Node* node = CallParseCommand(parse_statement);
-				array_add(&ast.nodes, node);
+				arrput(ast.nodes, node);
 				break;
 			}
 			case TOKEN_DIRECTIVE:
@@ -155,11 +175,25 @@ Ast Parser::parse()
 		token = lexer.peek_token();
 	}	
 	
+	/* 
+	for (int i=0; i < hmlen(symbolTable); ++i)
+		logger.print("%s %s\n"_s, symbolTable[i].value.node->token.name, symbolTable[i].value.scope.name );
 	
 	
-	for(u64 a = 0; a < ast.nodes.occupied ; a++){
-		PRINT_GRAPH(ast.nodes[a], &logger);
+	// this should not work ?? 
+	 */
+	exit_scope();
+	for (int i=0; i < arrlen(scopes); ++i){
+		auto scope = scopes[i];
+		logger.print("Scope [%s], Id: [%d]\n"_s, scope.name, scope.id);
 	}
+	
+	/* 	
+		for(u64 a = 0; a < arrlenu(ast.nodes); a++){
+			PRINT_GRAPH(ast.nodes[a], &logger);
+		}
+		 */
+	
 	return {0};
 }
 
@@ -234,6 +268,7 @@ Parser::parse_def()
 			decls->token = t;
 			expect_and_eat('{');
 			
+			register_scope(decl->token.name);
 			// TODO: Test this
 			while(true){
 				Ast_Declaration* cur = (Ast_Declaration*) CallParseCommand(parse_def);
@@ -245,12 +280,12 @@ Parser::parse_def()
 				
 				// @CleanUp: This will eventually be removed ... i think ?? ... structs inside strcuts ?? 
 				if(cur->def_type != AST_DEF_VAR) assert(false);
-				array_add(&decls->list, cur);
+				arrput(decls->list, cur);
 			}
 			
 			expect_and_eat('}');
 			expect_and_eat(';');
-			
+			exit_scope();
 			decl->body = decls;
 			goto returnDecl;
 		}
@@ -260,7 +295,9 @@ Parser::parse_def()
 			decl->def_type = AST_DEF_PROC;
 			AllocateNode(Ast_Block, block);
 			
-			//assert(false); // for now 
+			register_scope(decl->token.name);
+			register_scope("Header"_s);
+			
 			// Parse header
 			block->token = lexer.peek_token();
 			expect_and_eat('(');
@@ -269,7 +306,7 @@ Parser::parse_def()
 			while(true){
 				Ast_Node* cur = CallParseCommand(parse_def);
 				if(cur == nullptr) break;// what happened here ? 
-				array_add(&block->statements, cur);
+				arrput(block->statements, cur);
 				if (lexer.peek_token().Type == ',') lexer.eat_token();
 				else break;
 				
@@ -291,7 +328,7 @@ Parser::parse_def()
 					{
 						AllocateNode(Ast_Ident, ident);
 						ident->token = t;
-						array_add(&return_types->statements, (Ast_Node*)ident);
+						arrput(return_types->statements, (Ast_Node*)ident);
 						lexer.eat_token();
 					}
 					else break;
@@ -304,7 +341,7 @@ Parser::parse_def()
 				}
 				
 			} 
-			
+			exit_scope();
 			// Parse directives
 			
 			//expect_and_eat('{');
@@ -313,6 +350,7 @@ Parser::parse_def()
 			}
 			// Parse Body
 			decl->body = CallParseCommand(parse_block_of_statments);
+			exit_scope();
 			goto returnDecl;
 			
 		}
@@ -346,7 +384,8 @@ Parser::parse_def()
 	
 	return nullptr;
 	returnDecl:
-	
+	MySymbol symbol = {decl, get_current_scope()};
+	hmput(symbolTable, ident.name, symbol);
 	
 	return decl;
 }
@@ -359,7 +398,7 @@ Parser::parse_statement()
 	
 	Token t1 = lexer.peek_token();
 	Token t2 = lexer.peek_token(1);
-	
+	// ?? What is this 
 	if(t1.Type == 279 ) return nullptr;
 	
 	// parse blocks
@@ -437,7 +476,7 @@ Parser::parse_subexpression()
 					Ast_Node* node = CallParseCommand(parse_expression);
 					assert(node != nullptr);
 					
-					array_add(&funcall->arguments, node);
+					arrput(funcall->arguments, node);
 					
 					t = lexer.peek_token();
 					
@@ -601,16 +640,20 @@ Parser::parse_block_of_statments()
 	Token t = lexer.peek_token(); // it must be "{"
 	expect_and_eat('{');
 	AllocateNode(Ast_Block, block);
+	
+	auto scope = get_current_scope();
+	register_scope(scope.name);
 	block->token = t;
 	while(true){
 		if(t.Type == '}') {
+			exit_scope();
 			lexer.eat_token();
 			break;
 		}
 		Ast_Node* node =  CallParseCommand(parse_statement);
 		if(!node) break;
 		
-		array_add(&block->statements, node);
+		arrput(block->statements, node);
 		t = lexer.peek_token();
 	}
 	
