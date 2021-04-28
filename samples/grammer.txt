@@ -1,64 +1,51 @@
 
+# In My opinion  programming is the act of manipulating a set of formally defined types using alogrithms and basic procedures.
 
-S     -> H B C $
-H     -> Header : { Decls }
-B	  -> Body : { Bs  }
-Ds    -> D Ds | &
-D     -> IDENT : TV ;
+# Data Types (aka data structures) are the building blocks of any program .
+# The act of manipulating these structure is how you build the program. 
 
-TV    -> TYPE |
-	  	 TYPE =  VALUE |
-		 = VALUE
+In this project, I'm trying to design a consistent prgraming language 
 
-VALUE -> LETIRAL |
-	  	 REFERENCED
+# Defining statments consistently, means that every type, sturct, procedure with all their variation must have a consistent way of being defined 
 
-TYPE  -> u8  | u16 | u32  | u64 |
-		 s8  | s16 | s32  | s64 |
-		 f32 | f64 |
-		 string  | char | range 
+Here is the basic Idea
 
+defining stuff : 
+                             = mutable
+  Defineing Symbol           : immutable
+--------------------|        -----|
+	                V             V
+			<name>  :  <<type>> [:, =]  <value*> ; 
 
-string -> size , data (pointer to the data)
-range -> start , end, increment 
-
-min & max for all other types
+ Type can be infferd       ^
+---------------------------|
+	in many cases
 
 
 
-IDENT -> [ a-z A-z _ ]+ [ a-z A-z _ 0-9]*
-///
- primitive types
- 
-    
-2 - Variables 
- 2.1 - Numbers.
-       var1 : u8 : 
-
-Definitions
-
-1 - primitive types
-	constants	     -> <name> ::= <value> ->functions and structs are considered constants 
-	unsigned integers -> u8, u16, u32, u64
-	signed   integers -> s8, s16, s32, s64
-	floating points   -> float32 ,float64
-	strings	 	  -> string 
-	static array 	 -> [<size>/ <constexpr int> ] 
-	dynamic array     -> [..]
-	ranges 		   -> int .. int
-
-2 - expresion		  ->  
-
-3 - Blocks		    -> { <statments> }
-
-4 - Functions (Procedures)
-	anonymous 		->  () -> () { } 
-	normal definition -> <name> :: (<argument list>) -> (<return list>) <block>
-		   			  	 this should work inside other functions
-						 
-5 - Data Structers
-  	strcuture 	  -> <name> :: struct <block>
+Note : 
+ - *Value could be a  expression, procedure scope or struct block
+ -  At least [type] or a [value] should be defined 
 
 
+
+
+
+This syign "<<>>" means : Optional
+
+
+
+
+
+struct { }
+
+
+
+
+
+
+
++ * / - % << >>  == != > < <= >= & |   [BINARY OPERATORS]
+= 									 [ASSIGN OPERATORS]
 
 

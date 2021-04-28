@@ -1,9 +1,9 @@
 /* ========================================================================
-   $File: Ast.h
-   $Date: 2020-10-03
-   $Creator: Husam Dababneh
-   $Description: Ast.h
-   ========================================================================*/
+$File: Ast.h
+$Date: 2020-10-03
+$Creator: Husam Dababneh
+$Description: Ast.h
+========================================================================*/
 #pragma once
 
 #include "lex.h"
@@ -167,9 +167,13 @@ struct Ast_Declaration : public Ast_Node {
 		type = AST_DECLARATION;
 	}
 	
-	u64 def_type;
+	u64 kind;
 	
-	Ast_Node*  body; // this could be a function body, expression, struct Body, enum body ... 
+	union {
+		Ast_Node*  body; // this could be a function body, expression, struct Body, enum body ... 
+		Ast_Node*  expression;
+	};
+	
 	Ast_Node*  data_type; // for now this is ident
 	Ast_Node*  params; // if this is a procedure call.. ?? 
 	bool 	  constant;
@@ -200,7 +204,6 @@ struct Ast_Argument : public Ast_Node {
 	
 	Ast_Ident* type_name;
 	Ast_Ident* name;
-	//  TODO
 	
 };
 
@@ -224,6 +227,7 @@ struct Ast_Block : public Ast_Node {
 		type = AST_BLOCK;
 	}
 	
+	Ast_Node* enclosing_scope;
 	Ast_Node** statements;
 };
 

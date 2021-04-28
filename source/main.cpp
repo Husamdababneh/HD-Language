@@ -13,7 +13,7 @@ $Description: main function
 
 #include "../submodules/tracy/Tracy.hpp"
 
-
+#include "typer.h"
 
 constexpr bool verbos = false;
 int allocation_count = 0;
@@ -64,15 +64,20 @@ int main(int argc, char ** argv)
 		Usage();
 		return 0;
 	}
-	
-	StringView filename = {(u8*)argv[1],  strlen(argv[1])};
 	//FrameMarkStart (sl_Parsing );
-	//parse_str("f :: s; "_s);
+	
+	
+	
+	register_predefined_types();
+	StringView filename = {(u8*)argv[1],  strlen(argv[1])};
 	Parser parser(filename, filename, true);
 	parser.parse();
 	parser.free();
+	
+	//generate_proc();
+	
 	//FrameMarkEnd(sl_Parsing);
-	printf("#Allocations Using New Keyword = %d\n", allocation_count);
+	//printf("#Allocations Using New Keyword = %d\n", allocation_count);
 	
 	return 0;
 }

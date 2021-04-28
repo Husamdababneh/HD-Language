@@ -11,26 +11,29 @@
 #include "parser.h"
 
 
-
+#include "typer.h"
 
 // @TEMP @CLEANUP This may break the premake generated files
 #define ENABLE_GRAPH_PRINTING 1
+#define GRAPH_SHOW_BLOCK_PARENT 0
 #include <extra/graph.cpp>
-//
 
 #include "../submodules/tracy/Tracy.hpp"
 
 
-#define CallParseCommand(command) command();
+// :nocheckin
+#include "generator.cpp"
 
+#define cmpsv(x, y) memcmp(x, y, strlen(x))
+#define SV_PRINT(x) (int)x.count, x.data
 // How does this perform ?? 
+
+Ast_Node** flaten_ast = NULL;
+
 #define AllocateNode(type, name) type* name;\
 name = (type*) arena_alloc(&ast_arena, sizeof(type));\
-name = ::new(name) type();
-
-#define AllocateSymbol(type, name) type* name;\
-name = (type*) arena_alloc(&ast_arena, sizeof(type));\
-name = ::new(name) type();
+name = ::new(name) type();\
+arrput(flaten_ast,(Ast_Node*)name);
 
 #ifdef _DEBUG
 #define PANIC() exit(0);//abort();
@@ -44,7 +47,7 @@ Parser::parse_operator()
 	Token token = lexer.peek_token();
 	
 	
-	if (token.Type == '.'){
+	if (token.type == '.'){
 		lexer.eat_token();
 		AllocateNode(Ast_MemberAccess, exp);
 		exp->token = token;
@@ -52,7 +55,7 @@ Parser::parse_operator()
 	}
 	
 	u32 op = 0;
-	switch(token.Type)
+	switch(token.type)
 	{
 		case TOKEN_SHIFT_LEFT:
 		case TOKEN_SHIFT_RIGHT:
@@ -88,8 +91,8 @@ Parser::parse_operator()
 
 #if 0
 void 
-print_simple_c_struct(Logger* logger, Ast_Struct* node) {
-	
+print_simple_c_struct(Logger* logger, Ast_Struct* node) 
+{
 	logger.print("struct %s {\n"_s, node->ident->token.name);
 	for(u64 i = 0; i < node->fields.occupied; i++){
 		logger.print("\t%s %s; \n"_s,
@@ -97,8 +100,6 @@ print_simple_c_struct(Logger* logger, Ast_Struct* node) {
 					 node->fields[i]->ident->token.name);
 	}
 	logger.print("};\n"_s, node->ident->token.name);
-	
-	
 }
 #endif
 
@@ -106,7 +107,7 @@ print_simple_c_struct(Logger* logger, Ast_Struct* node) {
 inline void 
 Parser::expect_and_eat(u64 type)
 {
-	if(lexer.peek_token().Type != type)
+	if(lexer.peek_token().type != type)
 	{
 		//logger.parse
 		// TODO loghere : 
@@ -140,6 +141,7 @@ Parser::exit_scope()
 	arrdel(scopes, arrlen(scopes) - 1);
 }
 
+
 Ast Parser::parse()
 {
 	int a = 0;
@@ -148,13 +150,13 @@ Ast Parser::parse()
 	
 	register_scope("GLOBAL"_s);
 	// Parse All Needed files
-	while(token.Type != TOKEN_EOFA){
-		switch(token.Type)
+	while(token.type != TOKEN_EOFA){
+		switch(token.type)
 		{
 			case '{': 
 			case TOKEN_IDENT:
 			{
-				Ast_Node* node = CallParseCommand(parse_statement);
+				Ast_Node* node = parse_statement();
 				arrput(ast.nodes, node);
 				break;
 			}
@@ -166,58 +168,124 @@ Ast Parser::parse()
 			}
 			default:
 			{
-				// This should be an error eventually.. since we are not really handleing it
-				//lexer.eat_token();
+				assert(false && "Unexpected Token");
 				break;
 			}
 			
 		}
+		
 		token = lexer.peek_token();
 	}	
 	
-	/* 
-	for (int i=0; i < hmlen(symbolTable); ++i)
-		logger.print("%s %s\n"_s, symbolTable[i].value.node->token.name, symbolTable[i].value.scope.name );
-	
-	
-	// this should not work ?? 
-	 */
-	exit_scope();
-	for (int i=0; i < arrlen(scopes); ++i){
-		auto scope = scopes[i];
-		logger.print("Scope [%s], Id: [%d]\n"_s, scope.name, scope.id);
-	}
 	
 	/* 	
-		for(u64 a = 0; a < arrlenu(ast.nodes); a++){
-			PRINT_GRAPH(ast.nodes[a], &logger);
+		for (int i=0; i < hmlen(symbolTable); ++i)
+			logger.print("%s %s\n"_s, symbolTable[i].value.node->token.name, symbolTable[i].value.scope.name );
+		 */
+	
+	
+	exit_scope();
+	
+	/* 	
+		for (int i=0; i < arrlen(scopes); ++i){
+			auto scope = scopes[i];
+			logger.print("Scope [%s], Id: [%d]\n"_s, scope.name, scope.id);
 		}
 		 */
+	
+	for(u64 i = 0; i < arrlenu(flaten_ast); i++){
+#if 0
+		if (flaten_ast[i]->type == AST_DECLARATION) {
+			Ast_Declaration* decl = (Ast_Declaration*)flaten_ast[i];
+			if (decl->kind == AST_DEF_STRUCT){
+				if (decl->data_type != nullptr) 
+				{
+					StringView type_name = decl->data_type->token.name;
+					u8 name[256] = {0};
+					memcpy(name, type_name.str, type_name.count + 1);
+					name[type_name.count] = 0;
+					type type = shget(types, name);
+					if (type.size == 0){
+						printf("Size:%2d, Name[%.*s], Aliases[], children[]\n", 
+							   (int)type.size,
+							   SV_PRINT(type_name));
+					}
+				}
+			}
+			
+			/* 
+						if (decl->kind == AST_DEF_PROC) {
+							generate_proc(decl);
+						}
+			 */
+		}
+#endif
+		
+		if (flaten_ast[i]->type == AST_BINARY_EXP) {
+			Ast_Binary* binary = (Ast_Binary*)flaten_ast[i];
+			printf("Binary [%.*s]\n", SV_PRINT(binary->token.name));
+			//generate_binary_expression(binary);
+		}
+	}
+	
+	/* 
+		for(u64 a = 0; a < arrlenu(ast.nodes); a++){
+			Ast_Node* node = ast.nodes[a];
+			
+			if (node->type == AST_DECLARATION){
+				Ast_Declaration* decl = (Ast_Declaration*)ast.nodes[a];
+				if (decl->data_type != nullptr){
+					
+					StringView type_name = decl->data_type->token.name;
+					u8 name[256] = {0};
+					memcpy(name, type_name.str, type_name.count + 1);
+					name[type_name.count] = 0;
+					type type = shget(types, name);
+					printf("Size:%2d, Name[%s], Aliases[], children[]\n", 
+						   (int)type.size,
+						   type.name);
+					
+					printf("type [%.*s]\n", SV_PRINT(type_name));
+				}
+			}
+			//PRINT_GRAPH(ast.nodes[a], &logger);
+		}
+		 */
+	
 	
 	return {0};
 }
 
 
+
+Ast_Node* 
+Parser::parse_proc_def()
+{
+	
+	
+	return  nullptr;
+}
+
 Ast_Node*
-Parser::parse_def()
+Parser::parse_def(bool semicolon /* = true */)
 {
 	AllocateNode(Ast_Declaration, decl);
 	Token ident = lexer.peek_token();
-	if (ident.Type != TOKEN_IDENT) return nullptr;
+	if (ident.type != TOKEN_IDENT) return nullptr;
 	lexer.eat_token();
 	
 	decl->token = ident;
 	
 	// eat colon 
-	if (lexer.peek_token().Type != TOKEN_COLON) return nullptr;
+	if (lexer.peek_token().type != TOKEN_COLON) return nullptr;
 	lexer.eat_token();
 	
 	Token t = lexer.peek_token();
 	
 	decl->inforced_type = false;
 	
-	// Inforced Type 
-	if (t.Type == TOKEN_IDENT || t.Type == TOKEN_HDTYPE) {
+	// Inforced type 
+	if (t.type == TOKEN_IDENT || t.type == TOKEN_HDTYPE) {
 		AllocateNode(Ast_Ident, type);
 		type->token = t;
 		decl->inforced_type = true;
@@ -228,29 +296,39 @@ Parser::parse_def()
 	
 	
 	// var : int ; 
-	if (t.Type == ';') {
+	if (t.type == ';') {
 		if(!decl->inforced_type) assert(false); // TODO: Log error
-		decl->def_type = AST_DEF_VAR;
+		decl->kind = AST_DEF_VAR;
 		lexer.eat_token();
 		goto returnDecl;
 	}
 	
 	
 	
-	if (t.Type == TOKEN_COLON){ // Inferred type - Constant Value 
-		// Struct - Procedure - Constant Variable - Enum - Flags(Not yet)
+	if (t.type == TOKEN_COLON){ // Inferred type - Constant Value 
+		// Struct - Procedure - Constant Variable - Enum(Not yet) - Flags(Not yet)
 		lexer.eat_token();
 		decl->constant = true;
-	} else if (t.Type == TOKEN_ASSIGN){ // Inferred type - Mutable Value 
+	} else if (t.type == TOKEN_ASSIGN){ // Inferred type - Mutable Value 
 		lexer.eat_token();
 		// var : =  asd 
-		// Variable
 		decl->constant = false;
-		decl->def_type = AST_DEF_VAR;
-		decl->body = CallParseCommand(parse_expression);
+		//  Normal variable with type, 
+		decl->kind = AST_DEF_VAR;
+		
+		decl->body = parse_expression();
 		// TODO: Rethink this part
 		auto tok = lexer.peek_token();
-		if(tok.Type == ';') lexer.eat_token();
+		if (semicolon)
+		{
+			if (tok.type != ';') {
+				logger.print_with_location(&tok, "Expected [;] got [%s]\n"_s, tok.name);
+				//exit(-1);
+				assert(false);
+			}
+			lexer.eat_token();
+		}
+		
 		goto returnDecl;
 	}else {
 		//logger.print_with_location(&t, "Expected [;], got [%s]\n"_s, t.name); 
@@ -260,9 +338,9 @@ Parser::parse_def()
 	
 	t = lexer.peek_token();
 	
-	if(decl->constant){
-		if(isEqual(&t.name, &"struct"_s)){
-			decl->def_type = AST_DEF_STRUCT;
+	if(decl->constant) {
+		if(cmpsv("struct", t.name.data) == 0){
+			decl->kind = AST_DEF_STRUCT;
 			AllocateNode(Ast_List, decls);
 			lexer.eat_token();
 			decls->token = t;
@@ -271,7 +349,7 @@ Parser::parse_def()
 			register_scope(decl->token.name);
 			// TODO: Test this
 			while(true){
-				Ast_Declaration* cur = (Ast_Declaration*) CallParseCommand(parse_def);
+				Ast_Declaration* cur = (Ast_Declaration*) parse_def(true);
 				if(cur == nullptr) 
 				{
 					// What happend here???
@@ -279,20 +357,19 @@ Parser::parse_def()
 				}
 				
 				// @CleanUp: This will eventually be removed ... i think ?? ... structs inside strcuts ?? 
-				if(cur->def_type != AST_DEF_VAR) assert(false);
+				if(cur->kind != AST_DEF_VAR) assert(false);
 				arrput(decls->list, cur);
 			}
 			
 			expect_and_eat('}');
-			expect_and_eat(';');
 			exit_scope();
 			decl->body = decls;
 			goto returnDecl;
 		}
-		//@TODO: Error messages.
-		else if (isEqual(&t.name, &"proc"_s)){
+		else if (cmpsv("proc", t.name.data) == 0){
+			//@TODO: Error messages.
 			lexer.eat_token();
-			decl->def_type = AST_DEF_PROC;
+			decl->kind = AST_DEF_PROC;
 			AllocateNode(Ast_Block, block);
 			
 			register_scope(decl->token.name);
@@ -304,10 +381,10 @@ Parser::parse_def()
 			
 			// @TODO: Test this
 			while(true){
-				Ast_Node* cur = CallParseCommand(parse_def);
+				Ast_Node* cur = parse_def(false);
 				if(cur == nullptr) break;// what happened here ? 
 				arrput(block->statements, cur);
-				if (lexer.peek_token().Type == ',') lexer.eat_token();
+				if (lexer.peek_token().type == ',') lexer.eat_token();
 				else break;
 				
 			}
@@ -317,14 +394,14 @@ Parser::parse_def()
 			
 			t = lexer.peek_token();
 			
-			if (t.Type == TOKEN_ARROW){
+			if (t.type == TOKEN_ARROW){
 				lexer.eat_token();
 				t = lexer.peek_token();
 				AllocateNode(Ast_Block, return_types);
 				return_types->token = t;
 				while(true){
-					if (t.Type == TOKEN_HDTYPE || 
-						t.Type == TOKEN_IDENT)
+					if (t.type == TOKEN_HDTYPE || 
+						t.type == TOKEN_IDENT)
 					{
 						AllocateNode(Ast_Ident, ident);
 						ident->token = t;
@@ -334,46 +411,49 @@ Parser::parse_def()
 					else break;
 					
 					t = lexer.peek_token();
-					if (t.Type == '{') break;
-					else if (t.Type == ',') continue;
+					if (t.type == '{') break;
+					else if (t.type == ',') continue;
 					// LOGHERE: 
 					else assert(false && "asd");
 				}
 				
 			} 
-			exit_scope();
+			exit_scope();// header
 			// Parse directives
 			
 			//expect_and_eat('{');
-			if(lexer.peek_token().Type != '{'){
+			if(lexer.peek_token().type != '{'){
 				assert(false);
 			}
 			// Parse Body
-			decl->body = CallParseCommand(parse_block_of_statments);
-			exit_scope();
+			decl->body = parse_block_of_statments();
+			((Ast_Block*)decl->body)->enclosing_scope = decl;
+			exit_scope(); // func
+			
+			// If annotations are present, expect ";"
 			goto returnDecl;
 			
 		}
-		else if (isEqual(&t.name, &"enum"_s)){
+		else if (cmpsv("enum",t.name.data) == 0){
 			lexer.eat_token();
-			decl->def_type = AST_DEF_ENUM;
+			decl->kind = AST_DEF_ENUM;
 			assert((false && "We DO NOT support enum"));
 		}
-		else if (isEqual(&t.name, &"flag"_s)){
+		else if (cmpsv("flag",t.name.data) == 0){
 			lexer.eat_token();
-			decl->def_type = AST_DEF_FLAG;
+			decl->kind = AST_DEF_FLAG;
 			assert((false && "We DO NOT support flag"));
 		}
 		else {
-			if (t.Type == TOKEN_DIRECTIVE && 
-				(isEqual(&t.name, &"#type"_s)))
+			if (t.type == TOKEN_DIRECTIVE && 
+				(cmpsv("#type",t.name.data) == 0))
 			{
 				
-				logger.print_with_location(&lexer.peek_token(), "Type Directive is not supported yet %s\n"_s, t.name);
+				logger.print_with_location(&lexer.peek_token(), "type Directive is not supported yet %s\n"_s, t.name);
 				assert(false);
 			}
 			
-			decl->body =  CallParseCommand(parse_expression);
+			decl->body =  parse_expression();
 			expect_and_eat(';');
 			goto returnDecl;
 		}
@@ -399,14 +479,17 @@ Parser::parse_statement()
 	Token t1 = lexer.peek_token();
 	Token t2 = lexer.peek_token(1);
 	// ?? What is this 
-	if(t1.Type == 279 ) return nullptr;
+	if(t1.type == 279 ) return nullptr;
 	
-	// parse blocks
-	if (t1.Type == '{')
+	// TODO : Handle compile-time directives 
+	
+	// TODO : add names scopes 
+	// parse scope
+	if (t1.type == '{')
 	{
-		return_node = CallParseCommand(parse_block_of_statments);
+		return_node = parse_block_of_statments();
 		auto t = lexer.eat_token();
-		if (t.Type != '}') 
+		if (t.type != '}') 
 		{
 			logger.print_with_location(&t, "Expected [}] got [%s]\n"_s, t.name);
 			assert(false);
@@ -417,24 +500,24 @@ Parser::parse_statement()
 	}
 	
 	// Parse def
-	if (t1.Type == TOKEN_IDENT && t2.Type == TOKEN_COLON)
+	if (t1.type == TOKEN_IDENT && t2.type == TOKEN_COLON)
 	{
-		return CallParseCommand(parse_def);
+		return parse_def();
 	}
 	
 	
 	// parse_expression
-	return_node = CallParseCommand(parse_expression);
+	return_node = parse_expression();
 	if(return_node->type == AST_FUNCALL) return return_node;
 	
-	// Assignment ?? 
-	auto token = lexer.peek_token();
+	// Assignment of global variables ??
+	auto token = t1;
 	expect_and_eat(TOKEN_ASSIGN);
 	
 	AllocateNode(Ast_Assign, assign);
 	assign->token = token;
 	assign->left = return_node;
-	assign->right = CallParseCommand(parse_expression);
+	assign->right = parse_expression();
 	return_node = assign;
 	expect_and_eat(';');
 	return return_node;
@@ -451,11 +534,11 @@ Parser::parse_subexpression()
 	Token t1 = lexer.peek_token();
 	Token t2 = lexer.peek_token(1);
 	
-	switch(t1.Type)
+	switch(t1.type)
 	{
 		case TOKEN_IDENT:
 		{
-			if(t2.Type == '(') // Procedure call
+			if(t2.type == '(') // Procedure call
 			{
 				// eat the ident
 				lexer.eat_token();
@@ -466,27 +549,27 @@ Parser::parse_subexpression()
 				
 				auto t = lexer.peek_token();
 				funcall->token = t1;
-				if (t.Type == ')') {
+				if (t.type == ')') {
 					lexer.eat_token();
 					return funcall;
 				}
 				
 				while(true)
 				{
-					Ast_Node* node = CallParseCommand(parse_expression);
+					Ast_Node* node = parse_expression();
 					assert(node != nullptr);
 					
 					arrput(funcall->arguments, node);
 					
 					t = lexer.peek_token();
 					
-					if      (t.Type == ',') lexer.eat_token();
-					else if (t.Type == ')') { lexer.eat_token(); return funcall;}
+					if      (t.type == ',') lexer.eat_token();
+					else if (t.type == ')') { lexer.eat_token(); return funcall;}
 					else    assert(false);
 				}
 				
 			}
-			else if (t2.Type == '[') // Subscript 
+			else if (t2.type == '[') // Subscript 
 			{
 				// eat the ident
 				lexer.eat_token();
@@ -495,7 +578,7 @@ Parser::parse_subexpression()
 				
 				AllocateNode(Ast_Subscript, subscript);
 				subscript->token = t1;
-				Ast_Node* node = CallParseCommand(parse_expression);
+				Ast_Node* node = parse_expression();
 				// TODO: Report Here
 				assert(node != nullptr);
 				if(node->type == AST_IDENT || 
@@ -526,9 +609,9 @@ Parser::parse_subexpression()
 		case '-':
 		{
 			AllocateNode(Ast_Unary, unary);
-			//unary->op = token.Type;
+			//unary->op = token.type;
 			unary->token = lexer.eat_token();
-			unary->child = CallParseCommand(parse_subexpression);
+			unary->child = parse_subexpression();
 			return unary;
 		}
 		case TOKEN_LITERAL: 
@@ -545,7 +628,7 @@ Parser::parse_subexpression()
 		return nullptr;
 		case '(':
 		{
-			Ast_Node* factor = CallParseCommand(parse_factor);
+			Ast_Node* factor = parse_factor();
 			return factor;
 			
 		}
@@ -567,7 +650,7 @@ Parser::parse_factor()
 	// eat the '('
 	lexer.eat_token();
 	
-	Ast_Node* exp = CallParseCommand(parse_expression);
+	Ast_Node* exp = parse_expression();
 	Token token = lexer.peek_token();
 	
 	if (!exp){
@@ -637,21 +720,29 @@ Parser::parse_expression()
 Ast_Node*
 Parser::parse_block_of_statments()
 {
-	Token t = lexer.peek_token(); // it must be "{"
+	Token t = lexer.peek_token();
 	expect_and_eat('{');
 	AllocateNode(Ast_Block, block);
 	
+	// TODO : 
 	auto scope = get_current_scope();
 	register_scope(scope.name);
 	block->token = t;
+	
+	// TODO : Rethink this part ?? 
 	while(true){
-		if(t.Type == '}') {
+		if(t.type == '}' || t.type == 279) {
 			exit_scope();
 			lexer.eat_token();
 			break;
 		}
-		Ast_Node* node =  CallParseCommand(parse_statement);
-		if(!node) break;
+		Ast_Node* node =  parse_statement();
+		if(!node) {
+			logger.print_with_location(&t, "Token [%s] type[%d]"_s, t.name, t.type);
+			assert(false); // assert here
+		}
+		
+		if (node->type == AST_BLOCK) ((Ast_Block *)node)->enclosing_scope = block;
 		
 		arrput(block->statements, node);
 		t = lexer.peek_token();

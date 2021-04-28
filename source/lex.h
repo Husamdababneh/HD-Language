@@ -35,6 +35,16 @@ enum {
 	TOKEN_ERROR,
 };
 
+
+enum {
+	// Token Kinds 
+	TOKEN_KIND_BINARY,
+	TOKEN_KIND_UNARY,
+	TOKEN_KIND_DOT,
+	
+	//TOKEN_KIND_
+};
+
 struct Position
 {
 	union
@@ -47,8 +57,8 @@ struct Position
 
 struct Token
 {
-	u16          Type = TOKEN_NONE;
-	u16          id = 0;
+	u16          type = TOKEN_NONE;
+	u16          kind = 0;
 	Position 	start_position = {0};
 	Position 	end_position = {0};
 	meow_u128    hash;

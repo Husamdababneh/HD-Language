@@ -7,12 +7,6 @@
 #pragma once
 
 #include "Ast.h"
-/*
-struct Type {
-	String name;
-	u64 size;
-};
-*/
 
 struct Scope {
 	u64 id;
@@ -24,7 +18,7 @@ struct MySymbol {
 	Scope scope;
 };
 
-struct SymbolTableEntry{
+struct SymbolTableEntry {
 	StringView key;
 	MySymbol value;
 };
@@ -51,14 +45,14 @@ struct Parser {
 	void free() { arena_free(&ast_arena);}
 	
 	Ast parse();
-	Ast_Node* parse_expression();
 	Ast_Node* parse_factor();
-	//Ast_Node* parse_scope();
-	Ast_Node* parse_def();
+	Ast_Node* parse_proc_def();
 	Ast_Node* parse_operator();
 	Ast_Node* parse_statement();
+	Ast_Node* parse_expression();
 	Ast_Node* parse_subexpression();
 	Ast_Node* parse_block_of_statments();
+	Ast_Node* parse_def(bool semicolon = true);
 	
 	
 };

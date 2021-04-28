@@ -18,7 +18,7 @@
 
 // TODO : Remove them from reserved[]  
 StringView predefined_types [] = {
-	// Types
+	// types
 	"u8"_s , "s8"_s,
 	"u16"_s, "s16"_s,
 	"u32"_s, "s32"_s,
@@ -104,7 +104,7 @@ bool isKeyword(StringView& string)
 	return false;
 }
 
-bool isHDType(StringView& string)
+bool isHDtype(StringView& string)
 {
 	// Make this a hashmap lookup, faster...
 	for(int a = 0; a < KeywordCount; a++) if(isEqual(&string, &predefined_types[a])) return true;
@@ -228,7 +228,7 @@ Token LexerState::process_token()
 	
 	Token token = {0};
 	
-	token.id = COUTNER;
+	//token.id = COUTNER;
 	COUTNER++;
 	u8 ch = eat_until_character();
 	u64 temp = input_cursor - 1;
@@ -241,11 +241,13 @@ Token LexerState::process_token()
 			u8 next = peek_character();
 			
 			if(next  == '/'){
-				token.Type = TOKEN_COMMENT;
+				token.type = TOKEN_COMMENT;
 				while(eat_character() != '\n');
-			} else if (next == '*'){
-				token.Type = TOKEN_MULTILINE_COMMENT;
-				int nested_level = 1;			  
+			}
+			else if (next == '*'){
+				// TODO: 
+				token.type = TOKEN_MULTILINE_COMMENT;
+				int nested_level = 1;
 				while(input_cursor < input.count ){
 					u8 eaten = eat_character();
 					u8 next_to_be_eaten = peek_character();
@@ -260,10 +262,17 @@ Token LexerState::process_token()
 					}
 					if (nested_level == 0) break;	  
 				};
-				break;	  
-			} else {
+				if (nested_level != 0) {
+					// TODO : Report location where it started and 
+					
+					printf("Uncontinued Multiline comment\n");
+					exit(-1);
+				}
+				break;
+			} 
+			else {
 				// division ?? 
-				token.Type = ch;
+				token.type = ch;
 				break;	  
 			}
 			break;
@@ -275,7 +284,7 @@ Token LexerState::process_token()
 		case '~': case '!': case '$': case '%': case '^':
 		case '&': case '?': case '|': case '\'': case '\\':
 		{
-			token.Type = ch;
+			token.type = ch;
 			break;
 		}
 		// TODO: Remove the stack,, a 3Xu16 variables are enough to do the work 
@@ -284,7 +293,7 @@ Token LexerState::process_token()
 		case '(': 
 		{
 			paranthases_stack.push(ch);
-			token.Type = ch;
+			token.type = ch;
 			break;
 		}
 		case ']': 
@@ -294,7 +303,7 @@ Token LexerState::process_token()
 				logger.print_with_location(&token, "Unbalanced '['\n"_s);
 				exit(-1);
 			}
-			token.Type = ch;
+			token.type = ch;
 			break;
 		}
 		case '}':
@@ -305,7 +314,7 @@ Token LexerState::process_token()
 				exit(-1);
 			}
 			
-			token.Type = ch;
+			token.type = ch;
 			break;
 		}
 		case ')': 
@@ -316,17 +325,17 @@ Token LexerState::process_token()
 				exit(-1);
 			}
 			
-			token.Type = ch;
+			token.type = ch;
 			break;
 		}
 		case '-':
 		{
 			auto next = peek_character();
 			if (next == '>'){ 
-				token.Type = TOKEN_ARROW;
+				token.type = TOKEN_ARROW;
 				eat_character();
 			}else {
-				token.Type = ch;
+				token.type = ch;
 			}
 			break;
 			
@@ -335,14 +344,14 @@ Token LexerState::process_token()
 		case '@': 
 		{
 			//TODO : Notes
-			token.Type = TOKEN_DIRECTIVE;
+			token.type = TOKEN_DIRECTIVE;
 			eat_until_whitespace();
 			break;
 		}
 		// Compiler Directives
 		case '#':
 		{
-			token.Type = TOKEN_DIRECTIVE;
+			token.type = TOKEN_DIRECTIVE;
 			eat_until_whitespace();
 			break;
 		}
@@ -351,10 +360,10 @@ Token LexerState::process_token()
 			auto next = peek_character();
 			if (next == '='){
 				eat_character();
-				token.Type = TOKEN_EQL;
+				token.type = TOKEN_EQL;
 			}
 			else {
-				token.Type = TOKEN_ASSIGN;
+				token.type = TOKEN_ASSIGN;
 			}
 			break;
 		}
@@ -363,12 +372,12 @@ Token LexerState::process_token()
 			auto next = peek_character();
 			if (next == '='){
 				eat_character();
-				token.Type = TOKEN_LT_OR_EQL;
+				token.type = TOKEN_LT_OR_EQL;
 			} else if (next == '<'){
 				eat_character();
-				token.Type = TOKEN_SHIFT_LEFT;
+				token.type = TOKEN_SHIFT_LEFT;
 			} else {
-				token.Type = TOKEN_LT;
+				token.type = TOKEN_LT;
 			}
 			break;
 		}
@@ -377,12 +386,12 @@ Token LexerState::process_token()
 			auto next = peek_character();
 			if (next == '='){
 				eat_character();
-				token.Type = TOKEN_GT_OR_EQL;
+				token.type = TOKEN_GT_OR_EQL;
 			} else if (next == '>'){
 				eat_character();
-				token.Type = TOKEN_SHIFT_RIGHT;
+				token.type = TOKEN_SHIFT_RIGHT;
 			} else {
-				token.Type = TOKEN_GT;
+				token.type = TOKEN_GT;
 			}
 			break;
 		}
@@ -391,10 +400,10 @@ Token LexerState::process_token()
 			auto next = peek_character();
 			if (next == '.') {
 				eat_character();
-				token.Type = TOKEN_DOUBLEDOT;
+				token.type = TOKEN_DOUBLEDOT;
 			}
 			else {
-				token.Type = ch;
+				token.type = ch;
 			}
 			break;
 		}
@@ -413,13 +422,13 @@ Token LexerState::process_token()
 				if(peeked == '"')
 					break;
 			}	  
-			token.Type = TOKEN_LITERAL;
+			token.type = TOKEN_LITERAL;
 			break;	  
 		}
 		case ':':
 		{
 			// @CleanUp: Make this use it's ASCII Value instead.. i think ??
-			token.Type = TOKEN_COLON;
+			token.type = TOKEN_COLON;
 			break;
 		}
 		break;
@@ -438,17 +447,17 @@ Token LexerState::process_token()
 			};
 			token.value = StringView{ &input[temp], input_cursor  - temp};
 			if (isKeyword(token.value))
-				token.Type = TOKEN_KEYWORD;
-			else if (isHDType(token.value))
-				token.Type = TOKEN_HDTYPE;
+				token.type = TOKEN_KEYWORD;
+			else if (isHDtype(token.value))
+				token.type = TOKEN_HDTYPE;
 			else
-				token.Type = TOKEN_IDENT;
+				token.type = TOKEN_IDENT;
 		} else {
 			// We assume that this will be only numbers
 			// (0x -> hex) (0b -> binary) (0o  -> Octal)
 			// auto& pos = get_current_position();
 			assert(isDigit(ch));
-			token.Type = TOKEN_LITERAL;
+			token.type = TOKEN_LITERAL;
 			auto peeked = peek_character();
 			bool doEat  = true;
 			if(peeked == 'x' ||  peeked == 'b' ||	 peeked == 'o')  eat_character();
@@ -468,12 +477,12 @@ Token LexerState::process_token()
 		break;
 	}
 	token.end_position = get_current_position();
-	assert(token.Type != TOKEN_NONE);
+	assert(token.type != TOKEN_NONE);
 	token.value = StringView{ &input[temp], input_cursor  - temp};
 	token.hash = Hash(token);
 	//nocheckin 
-	if (token.Type == TOKEN_COMMENT ||
-		token.Type == TOKEN_MULTILINE_COMMENT)
+	if (token.type == TOKEN_COMMENT ||
+		token.type == TOKEN_MULTILINE_COMMENT)
 		return process_token();
 	else
 		return token;
