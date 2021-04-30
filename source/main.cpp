@@ -13,7 +13,7 @@ $Description: main function
 
 #include "../submodules/tracy/Tracy.hpp"
 
-#include "typer.h"
+//#include "typer.h"
 
 constexpr bool verbos = false;
 int allocation_count = 0;
@@ -68,7 +68,7 @@ int main(int argc, char ** argv)
 	
 	
 	
-	register_predefined_types();
+	Parser::register_predefined_types();
 	StringView filename = {(u8*)argv[1],  strlen(argv[1])};
 	Parser parser(filename, filename, true);
 	parser.parse();

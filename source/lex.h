@@ -18,9 +18,6 @@ enum {
 	TOKEN_OPERATOR,
 	TOKEN_DIRECTIVE,
 	TOKEN_DOUBLEDOT,
-	TOKEN_STRING_LITERAL,
-	TOKEN_INT_LITERAL,
-	TOKEN_FLOAT_LITERAL,
 	TOKEN_ARROW,
 	TOKEN_ASSIGN,
 	TOKEN_EQL,
@@ -36,6 +33,7 @@ enum {
 };
 
 
+
 enum {
 	// Token Kinds 
 	TOKEN_KIND_BINARY,
@@ -43,7 +41,11 @@ enum {
 	TOKEN_KIND_DOT,
 	
 	//TOKEN_KIND_
+	TOKEN_KIND_STRING_LITERAL,
+	TOKEN_KIND_INT_LITERAL,
+	TOKEN_KIND_FLOAT_LITERAL,
 };
+
 
 struct Position
 {
@@ -57,6 +59,7 @@ struct Position
 
 struct Token
 {
+	// TODO : Add string_in_source
 	u16          type = TOKEN_NONE;
 	u16          kind = 0;
 	Position 	start_position = {0};
@@ -87,6 +90,8 @@ struct LexerState
 	u32 current_line_number;
 	u32 current_char_index; 
 	
+	
+	Arena strings = {0};
 	Queue<Token> token_cache;
 	Stack<u8> paranthases_stack;
 	

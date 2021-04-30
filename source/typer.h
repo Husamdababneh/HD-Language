@@ -1,14 +1,14 @@
 /* ========================================================================
-   $File: typer.h
-   $Date: April 17th 2021 2:17 am
-   $Creator: Husam Dababneh
-   $Description: typer.h
-   ========================================================================*/
+$File: typer.h
+$Date: April 17th 2021 2:17 am
+$Creator: Husam Dababneh
+$Description: typer.h
+========================================================================*/
 
 #ifndef TYPER_H
 #define TYPER_H
 
-struct Alias ;
+struct Alias;
 
 struct Type {
 	u32 size;
@@ -36,13 +36,13 @@ struct Alias {
 
 
 String type {
-	 
+		 
 size = 8 + 8 // sizeof string, + sizeof pointer to string
- name = string
+name = string
 aliases = NULL
 children {
- u64 size;
- stringPtr  { data, string, str}  
+u64 size;
+stringPtr  { data, string, str}  
 }
 
 }

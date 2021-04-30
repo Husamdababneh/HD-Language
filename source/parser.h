@@ -8,20 +8,6 @@
 
 #include "Ast.h"
 
-struct Scope {
-	u64 id;
-	StringView name;
-};
-
-struct MySymbol {
-	Ast_Node* node;
-	Scope scope;
-};
-
-struct SymbolTableEntry {
-	StringView key;
-	MySymbol value;
-};
 
 struct Parser {
 	Parser() = delete;
@@ -34,14 +20,19 @@ struct Parser {
 	Logger logger;
 	LexerState lexer;
 	Arena ast_arena = { 0 };
-	Scope* scopes = nullptr;
-	SymbolTableEntry* symbolTable = NULL;
+	
+	static Predefined_Type*  predefined_types;
+	static void register_predefined_types();
 	
 	
-	inline void register_scope(const StringView& name);
-	inline Scope get_current_scope();
+	Ast_Scope* scopes = {0};
+	Ast_Scope* current_scope = nullptr;
+	
+	inline Ast_Scope* enter_scope();
 	inline void exit_scope();
-	void expect_and_eat(u64 type);
+	//inline Scope* get_current_scope();
+	
+	//void expect_and_eat(u64 type);
 	void free() { arena_free(&ast_arena);}
 	
 	Ast parse();
@@ -49,10 +40,14 @@ struct Parser {
 	Ast_Node* parse_proc_def();
 	Ast_Node* parse_operator();
 	Ast_Node* parse_statement();
-	Ast_Node* parse_expression();
-	Ast_Node* parse_subexpression();
-	Ast_Node* parse_block_of_statments();
-	Ast_Node* parse_def(bool semicolon = true);
+	Ast_Node* parse_def();
+	Ast_Type* parse_type();
+	Ast_Block* parse_block();
 	
-	
+	Ast_Block* parse_block_of_statements();
+	Ast_Var_Declaration* parse_argument_def();
+	Ast_Node* parse_expression(s8 priority = -1);
+	Ast_Node* parse_suffix_expression(Ast_Node* prev);
+	Ast_Node* parse_unary_expression();
+	Ast_Primary* parse_primary_expression();
 };

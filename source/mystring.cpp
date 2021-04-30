@@ -8,22 +8,8 @@
 #include "pch.h"
 #include "string.h"
 
-typedef myString StringView;
+//typedef myString StringView;
 
-bool isEqual(StringView* first, StringView* second)  {
-	if (first->count != second->count) return false;
-	
-	for(u32 a = 0; a < first->count; a++){
-		if((*first)[a] != (*second)[a])
-			return false;
-	}
-	return true;
-}
-
-
-
-
-myString operator "" _s(const char* a, size_t s){
+StringView operator "" _s(const char* a, size_t s){
     return { (u8*)a, s};
 }
-

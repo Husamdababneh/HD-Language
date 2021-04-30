@@ -1,8 +1,13 @@
 //#import "test.hd"
 
-main  :: proc (param_1 : u16  = 2, param_2 : u8) -> void
+main :: proc (param_1 : u16 , param_2 : u8) -> void
 {
 	a =  5 + 8;
 }
 
+
+func :: proc (param_1 : u16 , param_2 : u8) -> void
+{
+	a =  5 + 8 * 3 / 2 ;
+}
 		

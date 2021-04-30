@@ -91,60 +91,56 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 		}
 		case AST_DECLARATION:
 		{
-			Ast_Declaration* decl =  (Ast_Declaration*) node;
-			logger->print("T_%x -> { "_s, hash);
 			
-			if (decl->data_type) {
-				logger->print("T_%x "_s, decl->data_type->token.hash);
+			if (node->kind != AST_KIND_DECL_PROCEDURE)
+			{
+				// TODO:
+				assert(false);
 			}
 			
-			if (decl->params){
-				logger->print("T_%x "_s, decl->params->token.hash);
+			if (node->kind == AST_KIND_DECL_PROCEDURE)
+			{
+				Ast_Proc_Declaration * decl = (Ast_Proc_Declaration*) node; 
+				logger->print("T_%x -> { "_s, hash);
+				
+				if (decl->return_type){
+					logger->print("T_%x "_s, decl->return_type->token.hash);
+				}
+				
+				if (decl->body){
+					logger->print("T_%x "_s, decl->body->token.hash);
+				}
+				
+				logger->print("}\n"_s);
+				output_graph_v2(decl->return_type, logger);
+				output_graph_v2(decl->body, logger);
+				Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, decl->token.name };
+				arrput(labels, label);
+				break;
 			}
+			/* 
+						Ast_Declaration* decl =  (Ast_Declaration*) node;
+						logger->print("T_%x -> { "_s, hash);
+						
+						if (decl->data_type) {
+							logger->print("T_%x "_s, decl->data_type->token.hash);
+						}
+						
+						if (decl->params){
+							logger->print("T_%x "_s, decl->params->token.hash);
+						}
+						
+						
+						output_graph_v2(decl->params, logger);
+						//output_graph_v2(decl->body, logger);
+			 */
 			
-			if (decl->body){
-				logger->print("T_%x "_s, decl->body->token.hash);
-			}
-			
-			logger->print("}\n"_s);
-			
-			output_graph_v2(decl->data_type, logger);
-			output_graph_v2(decl->params, logger);
-			output_graph_v2(decl->body, logger);
-			Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, decl->token.name };
-			arrput(labels, label);
-			break;
-		}
-		case AST_IDENT:
-		{
-			Ast_Ident* ident = (Ast_Ident*) node;
-			Graph_Label label = { hash, Shape_Type::GRAPH_SQUARE, ident->token.name};
-			arrput(labels, label);
 			break;
 		}
 		case AST_LITERAL:
 		{
 			Ast_Literal * literal = (Ast_Literal*) node;
 			Graph_Label label = { hash, Shape_Type::GRAPH_BOX, literal->token.name};
-			arrput(labels, label);
-			break;
-		}
-		case AST_ASSIGN:
-		{
-			Ast_Assign* assign = (Ast_Assign*) node;
-			logger->print("T_%x -> { "_s, hash);
-			if (assign->left) {
-				logger->print("T_%x "_s, assign->left->token.hash);
-			}
-			
-			if (assign->right) {
-				logger->print("T_%x "_s, assign->right->token.hash);
-			}
-			logger->print("}\n"_s);
-			output_graph_v2(assign->left, logger);
-			output_graph_v2(assign->right, logger);
-			
-			Graph_Label label = { hash, Shape_Type::GRAPH_BOX, assign->token.name};
 			arrput(labels, label);
 			break;
 		}
@@ -163,28 +159,22 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			Ast_Block* block =  (Ast_Block*) node;
 			logger->print("T_%x -> { "_s, hash);
 			
-#if GRAPH_SHOW_BLOCK_PARENT
-			if (block->enclosing_scope) {
-				logger->print("T_%x "_s, block->enclosing_scope->token.hash);
+			
+			for(u64 i = 0; i < arrlenu(block->nodes); i++){
+				logger->print("T_%x "_s, block->nodes[i]->token.hash);
 			}
-#endif
-			for(u64 i = 0; i < arrlenu(block->statements); i++){
-				logger->print("T_%x "_s, block->statements[i]->token.hash);
-			}
+			
 			
 			logger->print("}\n"_s);
 			
-			for(u64 i = 0; i < arrlenu(block->statements); i++){
-				output_graph_v2(block->statements[i], logger);
+			
+			for(u64 i = 0; i < arrlenu(block->nodes); i++){
+				output_graph_v2(block->nodes[i], logger);
 			}
+			
 			//logger->print("Node Type AST_BLOCK is not supported yet\n"_s);
 			Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, "Block"_s };
 			arrput(labels, label);
-			break;
-		}
-		case AST_DEFINETION:
-		{
-			logger->print("Node Type AST_DEFINETION is not supported yet\n"_s);
 			break;
 		}
 		case AST_IF:
@@ -202,82 +192,11 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			logger->print("Node Type AST_UNARY_EXP is not supported yet\n"_s);
 			break;
 		}
-		case AST_FUNCALL:
+		case AST_PRIMARY:
 		{
-			logger->print("Node Type AST_FUNCALL is not supported yet\n"_s);
-			break;
-		}
-		case AST_ARGUMENT:
-		{
-			logger->print("Node Type AST_ARGUMENT is not supported yet\n"_s);
-			break;
-		}
-		case AST_PARMETER:
-		{
-			logger->print("Node Type AST_PARMETER is not supported yet\n"_s);
-			break;
-		}
-		case AST_FACTOR:
-		{
-			logger->print("Node Type AST_FACTOR is not supported yet\n"_s);
-			break;
-		}
-		case AST_PROC:
-		{
-			logger->print("Node Type AST_PROC is not supported yet\n"_s);
-			break;
-		}
-		case AST_STRUCT:
-		{
-			logger->print("Node Type AST_STRUCT is not supported yet\n"_s);
-			break;
-		}
-		case AST_SUBSCRIPT:
-		{
-			logger->print("Node Type AST_SUBSCRIPT is not supported yet\n"_s);
-			break;
-		}
-		case AST_LIST:
-		{
-			Ast_List* list = (Ast_List*)node;
-			logger->print("T_%x -> { "_s, hash);
-			
-			for(u64 a = 0; a < arrlenu(list->list); a++ )
-			{
-				logger->print("T_%x "_s,list->list[a]->token.hash);
-			}
-			
-			logger->print("}\n"_s);
-			
-			for(u64 a = 0; a < arrlenu(list->list); a++ )
-			{
-				output_graph_v2(list->list[a], logger);
-			}
-			
-			Graph_Label label = { hash, Shape_Type::GRAPH_STAR, list->token.name };
+			Ast_Primary* primary = (Ast_Primary*) node;
+			Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, primary->token.name };
 			arrput(labels, label);
-			//logger->print("Node Type AST_LIST is not supported yet\n"_s);
-			break;
-		}
-		case AST_MEBMER_ACCESS:
-		{
-			Ast_MemberAccess* ma = (Ast_MemberAccess*)node;
-			
-			logger->print("T_%x -> { "_s, hash);
-			if (ma->left) {
-				logger->print("T_%x "_s, ma->left->token.hash);
-			}
-			
-			if (ma->right) {
-				logger->print("T_%x "_s, ma->right->token.hash);
-			}
-			logger->print("}\n"_s);
-			output_graph_v2(ma->left, logger);
-			output_graph_v2(ma->right, logger);
-			
-			Graph_Label label = { hash, Shape_Type::GRAPH_BOX, ma->token.name};
-			arrput(labels, label);
-			break;
 			break;
 		}
 		default:

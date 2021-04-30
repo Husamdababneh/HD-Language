@@ -17,27 +17,16 @@ enum {
 };
 
 enum {
-	AST_IDENT,
-	AST_ASSIGN,
-	AST_MEBMER_ACCESS,
 	AST_DECLARATION,
 	AST_PORCDECLARATION,
 	AST_TYPE,
 	AST_BLOCK,
-	AST_DEFINETION,
 	AST_IF,
 	AST_WHILE,
 	AST_BINARY_EXP,
 	AST_UNARY_EXP,
 	AST_LITERAL,
-	AST_FUNCALL,
-	AST_ARGUMENT,
-	AST_PARMETER,
-	AST_FACTOR,
-	AST_PROC,
-	AST_STRUCT,
-	AST_SUBSCRIPT,
-	AST_LIST,
+	AST_PRIMARY,
 	AST_UKNOWN,
 };
 
@@ -51,18 +40,57 @@ enum {
 };
 
 
+enum {
+	AST_KIND_UNKNOWN,
+	// AST_KIND_
+	
+	
+	// Primary Expression Kinds
+	AST_KIND_PRIMARY_NUMBER,
+	AST_KIND_PRIMARY_IDENTIFIER,
+	AST_KIND_PRIMARY_STRING,
+	
+	// Declaration Kinds
+	AST_KIND_DECL_PROCEDURE,
+	AST_KIND_DECL_VARIABLE,
+	AST_KIND_DECL_STRUCT,
+	
+};
+
 struct Ast_Node;
 
 struct Ast {
 	Ast_Node** nodes;
 };
 
+struct Ast_Scope {
+	Ast_Node** variables = {0};
+	Ast_Node** procedures = {0};
+	Ast_Node** types = {0};;
+	
+	
+	//Ast_Node** nodes;
+	Ast_Scope* parent = nullptr; // One item
+	
+	Ast_Scope* children = {0}; // Array
+};
+
 
 struct Ast_Node {
-	u32 type = AST_UKNOWN; // ?? 
+	u16 type = AST_UKNOWN; // ?? 
+	u16 kind = AST_KIND_UNKNOWN;
 	Token token;
 	
 };
+
+struct Ast_Block : Ast_Node {
+	Ast_Block() {
+		type = AST_BLOCK;
+	}
+	Ast_Node** nodes;
+	Ast_Scope* scope;
+};
+
 
 struct Ast_Literal : Ast_Node
 {
@@ -72,34 +100,23 @@ struct Ast_Literal : Ast_Node
 };
 
 
-struct Ast_MemberAccess: Ast_Node
+struct Ast_Primary : Ast_Node
 {
-	Ast_MemberAccess()
-	{
-		type = AST_MEBMER_ACCESS;
+	Ast_Primary (){
+		type = AST_PRIMARY;
 	}
 	
-	Ast_Node* left;
-	Ast_Node* right;
-};
-
-struct Ast_Assign: Ast_Node
-{
-	Ast_Assign(){
-		type = AST_ASSIGN;
-	}
-	
-	Ast_Node* left;
-	Ast_Node* right;
 };
 
 
-struct Ast_Unary : public Ast_Node {
+
+
+struct Ast_Unary : Ast_Node {
 	//  <a> ? <b>
 	Ast_Unary() {
 		type = AST_UNARY_EXP;
 		op = OP_UNKOWN;
-		child= nullptr;
+		child = nullptr;
 	}
 	
 	u32       op;
@@ -117,41 +134,34 @@ struct Ast_Binary : public Ast_Node {
 		right= nullptr;
 	}
 	
-	bool isFactor = false;
+	//bool isFactor = false;
 	u32       op;
 	Ast_Node* left;
 	Ast_Node* right;
 	
 };
 
-struct Ast_Factor : public Ast_Node {
-	Ast_Factor(){
-		type = AST_FACTOR;
-	}
-	
-	Ast_Node* node;
-};
+
 
 struct Ast_Type : public Ast_Node {
 	Ast_Type() {
 		type = AST_TYPE;
 	}
 	
+	u32 size;
+	u32 alignment;
+	bool is_signed;
+	//u8* name;
 };
 
-struct Ast_Ident : public Ast_Node {
-	Ast_Ident() {
-		type = AST_IDENT;
-	}
+struct Predefined_Type {
+	char* key;
+	Ast_Type value;
 };
 
 
-struct Ast_Subscript : public Ast_Node {
-	Ast_Subscript() {
-		type = AST_SUBSCRIPT;
-	}
-	Ast_Node* exp;
-};
+
+
 
 struct Ast_Declaration : public Ast_Node {
 	// [X] name := value;
@@ -167,67 +177,33 @@ struct Ast_Declaration : public Ast_Node {
 		type = AST_DECLARATION;
 	}
 	
-	u64 kind;
-	
-	union {
-		Ast_Node*  body; // this could be a function body, expression, struct Body, enum body ... 
-		Ast_Node*  expression;
-	};
-	
 	Ast_Node*  data_type; // for now this is ident
 	Ast_Node*  params; // if this is a procedure call.. ?? 
 	bool 	  constant;
 	bool 	  inforced_type;
+	Ast_Scope*     scope;
+};
+
+struct Ast_Proc_Declaration : public Ast_Declaration {
+	
+	Ast_Proc_Declaration() {
+		Ast_Declaration();
+		kind = AST_KIND_DECL_PROCEDURE;;
+	}
+	
+	Ast_Type* return_type;
+	Ast_Block* body;
 };
 
 
-
-
-// TODO: Cleanup
-struct Ast_List : public Ast_Node {
-	Ast_List() { 
-		type = AST_LIST; 
+struct Ast_Var_Declaration : public Ast_Declaration {
+	
+	Ast_Var_Declaration() {
+		Ast_Declaration();
+		kind = AST_KIND_DECL_VARIABLE;
 	}
 	
-	Ast_Declaration** list;
-};
-
-
-
-
-// @TODO: Maybe we want this for names arguments ??
-struct Ast_Argument : public Ast_Node {
-	Ast_Argument() {
-		type = AST_ARGUMENT;
-	}
-	
-	
-	Ast_Ident* type_name;
-	Ast_Ident* name;
-	
-};
-
-struct Ast_Parmeter : public Ast_Node {
-	Ast_Parmeter() {
-		type= AST_PARMETER;
-	}
-	
-};
-
-struct Ast_FunctionCall : public Ast_Node {
-	Ast_FunctionCall() {
-		type = AST_FUNCALL;
-	}
-	
-	Ast_Node** arguments;
-};
-
-struct Ast_Block : public Ast_Node {
-	Ast_Block(){
-		type = AST_BLOCK;
-	}
-	
-	Ast_Node* enclosing_scope;
-	Ast_Node** statements;
+	Ast_Type* data_type;
+	Ast_Block* body;
 };
 

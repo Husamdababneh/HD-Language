@@ -12,7 +12,7 @@ $Description: Custom String Type
 
 struct myString
 {
-	union{
+	union {
 		u8* data;
 		u8* str;
 	};
@@ -27,36 +27,16 @@ struct myString
 		assert(i <= count);
 		return data[i];
 	}
-	
-	// @Incomplete:
-	bool compare(const myString& str){
-		if (this->count != str.count) return false;
-		
-		for(u32 a = 0; a < this->count; a++){
-			if(str[a] != data[a])
-				return false;
-		}
-		
-		return true;
-	}
-	
-	bool isEqual(const myString& str){
-		if (this->count != str.count) return false;
-		
-		for(u32 a = 0; a < this->count; a++){
-			if(str[a] != data[a])
-				return false;
-		}
-		
-		return true;
-	}
 };
 
 
 myString operator "" _s(const char* a, size_t s);
 
 typedef myString StringView;
-bool isEqual(StringView* first, StringView* second);
+
+#define cmpsv(x, y) memcmp(x, y, strlen(x))
+#define cmp2sv(x, y) memcmp(x.data, y.data, x.count)
+#define SV_PRINT(x) (int)x.count, x.data
 
 
 

@@ -40,10 +40,13 @@ This syign "<<>>" means : Optional
 struct { }
 
 
+Entity :: struct {} 
+Entity :: enum {} 
+Entity :: () ->  {} 
+Entity := <exp> 
 
 
-
-
+Entity := <exp> 
 
 + * / - % << >>  == != > < <= >= & |   [BINARY OPERATORS]
 = 									 [ASSIGN OPERATORS]

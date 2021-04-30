@@ -68,12 +68,8 @@ StringView reserved [] = {
 
 constexpr int KeywordCount = sizeof(reserved) / sizeof(StringView);
 
-static inline bool isWhitechar(u8 c){
-	if (c == '\t' ||
-		c ==  '\n' ||
-		c ==  '\r' ||
-		c ==  ' ')
-		return true;
+static inline bool isWhiteSpace(u8 c){
+	if (c == '\t' ||c ==  '\n' ||c ==  '\r' ||c ==  ' ') return true;
 	return false;
 }
 
@@ -87,29 +83,36 @@ static inline bool isDigit(u8 ch){
 	if (ch >= '0' && ch <= '9') return true;
 	return false;
 }
-static inline bool isInLireralChar(u8 ch){
+
+static inline bool isLiteralChar(u8 ch){
 	if (isAlphabet(ch)) return true;
 	if (ch == '_')  return true;
 	if (isDigit(ch)) return true;
 	return false;
 }
 
-
-
 bool isKeyword(StringView& string)
 {
-	for(int a = 0; a < KeywordCount; a++)
-		if(isEqual(&string, &reserved[a]))
-		return true;
+	// TODO: Generate Hashmap for the keywords
+	for(int a = 0; a < KeywordCount; a++){
+		if(cmp2sv(string, &reserved[a]) == 0) {
+			return true;
+		}
+	}
 	return false;
 }
 
 bool isHDtype(StringView& string)
 {
-	// Make this a hashmap lookup, faster...
-	for(int a = 0; a < KeywordCount; a++) if(isEqual(&string, &predefined_types[a])) return true;
+	// TODO: Generate Hashmap for the keywords
+	for(int a = 0; a < KeywordCount; a++){
+		if(cmp2sv(string, &predefined_types[a]) == 0) {
+			return true;
+		}
+	}
 	return false;
 }
+
 u8& LexerState::peek_next_character()
 {
 	return input[input_cursor + 1];
@@ -130,7 +133,7 @@ u8 LexerState::eat_until_character()
 {
 	for(u64 a = input_cursor;  a < input.count; a++){
 		auto ch = eat_character();
-		if (!isWhitechar(ch)) {
+		if (!isWhiteSpace(ch)) {
 			return ch;
 		}
 	}
@@ -140,9 +143,9 @@ u8 LexerState::eat_until_character()
 void LexerState::eat_until_whitespace()
 {
 	
-	for(u64 a = input_cursor;  a < input.count; a++)
+	for(u64 a = input_cursor; a < input.count; a++)
 	{
-		if (isWhitechar(peek_character())) break; 
+		if (isWhiteSpace(peek_character())) break; 
 		eat_character();
 	}
 	
@@ -158,9 +161,6 @@ u8 LexerState::eat_character()
 		current_line_number++;
 		current_char_index = 0;
 		break;
-		case '\t':
-		//current_char_index+=4;
-		//break;
 		default:
 		current_char_index++;
 		break;
@@ -363,7 +363,7 @@ Token LexerState::process_token()
 				token.type = TOKEN_EQL;
 			}
 			else {
-				token.type = TOKEN_ASSIGN;
+				token.type = ch;
 			}
 			break;
 		}
@@ -423,6 +423,7 @@ Token LexerState::process_token()
 					break;
 			}	  
 			token.type = TOKEN_LITERAL;
+			token.kind = TOKEN_KIND_STRING_LITERAL;
 			break;	  
 		}
 		case ':':
@@ -438,43 +439,38 @@ Token LexerState::process_token()
 			break;
 		}
 		default:
-		if (isAlphabet(ch) || ch == '_'){
-			while(true){
-				auto next = peek_character();
-				if (!isInLireralChar(next))
-					break;
-				eat_character();
-			};
-			token.value = StringView{ &input[temp], input_cursor  - temp};
-			if (isKeyword(token.value))
-				token.type = TOKEN_KEYWORD;
-			else if (isHDtype(token.value))
-				token.type = TOKEN_HDTYPE;
-			else
-				token.type = TOKEN_IDENT;
-		} else {
-			// We assume that this will be only numbers
-			// (0x -> hex) (0b -> binary) (0o  -> Octal)
-			// auto& pos = get_current_position();
-			assert(isDigit(ch));
-			token.type = TOKEN_LITERAL;
-			auto peeked = peek_character();
-			bool doEat  = true;
-			if(peeked == 'x' ||  peeked == 'b' ||	 peeked == 'o')  eat_character();
-			
-			peeked = peek_character();
-			
-			if (isDigit(peeked)){			  
+		{
+			if (isAlphabet(ch) || ch == '_'){
 				while(true){
-					auto next = peek_character();
-					if (!isDigit(next)){
+					if (!isLiteralChar(peek_character()))
 						break;
-					}
 					eat_character();
-				}
+				};
+				token.value = StringView{ &input[temp], input_cursor  - temp};
+				if (isKeyword(token.value))
+					token.type = TOKEN_KEYWORD;
+				else if (isHDtype(token.value))
+					token.type = TOKEN_HDTYPE;
+				else
+					token.type = TOKEN_IDENT;
 			}
+			else 
+			{
+				// TODO: Handle floating points ... 
+				// TODO: handle the real values instead of the string
+				// We assume that this will be only numbers
+				// (0x -> hex) (0b -> binary) (0c  -> Octal)
+				// auto& pos = get_current_position();
+				assert(isDigit(ch));
+				token.type = TOKEN_LITERAL;
+				token.kind = TOKEN_KIND_INT_LITERAL;
+				auto peeked = peek_character();
+				if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character();
+				while (isDigit(peek_character()))eat_character();
+				
+			}
+			break;
 		}
-		break;
 	}
 	token.end_position = get_current_position();
 	assert(token.type != TOKEN_NONE);
