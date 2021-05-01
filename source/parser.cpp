@@ -114,6 +114,18 @@ Parser::exit_scope()
 
 Predefined_Type* Parser::predefined_types = nullptr;
 
+
+#define Hash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
+// TODO: Remove this
+Token create_token(StringView name)
+{
+	Token token = {0};
+	token.name = name;
+	token.hash = Hash(token);
+	
+	return token;
+}
+
 void 
 Parser::register_predefined_types()
 {
@@ -121,48 +133,56 @@ Parser::register_predefined_types()
 	_u8.size = 1;
 	_u8.alignment = 1;
 	_u8.is_signed = false;
+	_u8.token = create_token("u8"_s);
 	hmput(predefined_types, "u8", _u8);
 	
 	Ast_Type _u16;
 	_u16.size = 2;
 	_u16.alignment = 2;
 	_u16.is_signed = false;
+	_u16.token = create_token("u16"_s);
 	hmput(predefined_types, "u16", _u16);
 	
 	Ast_Type _u32;
 	_u32.size = 4;
 	_u32.alignment = 4;
 	_u32.is_signed = false;
+	_u32.token = create_token("u32"_s);
 	hmput(predefined_types, "u32", _u32);
 	
 	Ast_Type _u64;
 	_u64.size = 8;
 	_u64.alignment = 8;
 	_u64.is_signed = false;
+	_u64.token = create_token("u64"_s);
 	hmput(predefined_types, "u64", _u64);
 	
 	Ast_Type _s8;
 	_s8.size = 1;
 	_s8.alignment = 1;
 	_s8.is_signed = true;
+	_s8.token = create_token("s8"_s);
 	hmput(predefined_types, "s8", _s8);
 	
 	Ast_Type _s16;
 	_s16.size = 2;
 	_s16.alignment = 2;
 	_s16.is_signed = true;
+	_s16.token = create_token("s16"_s);
 	hmput(predefined_types, "s16", _s16);
 	
 	Ast_Type _s32;
 	_s32.size = 4;
 	_s32.alignment = 4;
 	_s32.is_signed = true;
+	_s32.token = create_token("s32"_s);
 	hmput(predefined_types, "s32", _s32);
 	
 	Ast_Type _s64;
 	_s64.size = 8;
 	_s64.alignment = 8;
 	_s64.is_signed = true;
+	_s64.token = create_token("s64"_s);
 	hmput(predefined_types, "s64", _s64);
 	
 	/* 
@@ -350,12 +370,15 @@ Parser::parse_def()
 	{
 		// Constant 
 		if (token.type == TOKEN_COLON) {
-			lexer.eat_token();// eat ';'
+			//lexer.eat_token();// eat ':'
 			
-			token = lexer.eat_token(); 
+			token = lexer.peek_token(1); 
 			
 			// Procedure 
-			if (cmp2sv(token.name, "proc"_s) == 0){
+			if (cmp2sv(token.name, "proc"_s) == 0)
+			{
+				lexer.eat_token(); // ':'
+				lexer.eat_token(); // 'proc'
 				AllocateNode(Ast_Proc_Declaration, proc);
 				proc->token = decl_name;
 				proc->scope = enter_scope();
@@ -365,12 +388,12 @@ Parser::parse_def()
 				while(token.type != ')' && token.type != TOKEN_EOFA)
 				{
 					Ast_Var_Declaration* var = parse_argument_def();
-					//printf("Var name [%.*s]\n", SV_PRINT(var->token.name));
-					arrput(proc->scope->variables, (Ast_Node*)var);
+					arrput(proc->scope->variables, var);
 					token = lexer.peek_token();
 					if (token.type != ')') expect_and_eat(',');
 				}
-				lexer.eat_token(); // eat ')'
+				
+				expect_and_eat(')');
 				expect_and_eat(TOKEN_ARROW);
 				lexer.eat_token(); // @TEMP: 
 				
@@ -378,6 +401,17 @@ Parser::parse_def()
 				proc->body = parse_block_of_statements();
 				
 				return proc;
+			}
+			else if (cmp2sv(token.name, "struct"_s) == 0){ assert(false && "Struct Not Supported Yet");}
+			else if (cmp2sv(token.name, "enum"_s) == 0){ assert(false && "Enum Not Supported Yet");}
+			else 
+			{
+				lexer.eat_token(); // ':'
+				AllocateNode(Ast_Var_Declaration, var);
+				var->token = decl_name;
+				var->data_type = nullptr;
+				var->body = parse_expression();
+				return var;
 			}
 		}
 		
@@ -432,6 +466,7 @@ static s8 get_binary_precedence(Token token)
 			return 9;
 		}
 		case '=':
+		case ':':
 		{
 			return 1;
 		}
@@ -480,11 +515,21 @@ Parser::parse_unary_expression()
 		//expect_and_eat(';');
 		expect_and_eat(')');
 	}
+	else if (token.type== '-') // minus 
+	{
+		lexer.eat_token();
+		AllocateNode(Ast_Unary, unary);
+		unary->token = token;
+		unary->child = parse_suffix_expression((Ast_Node*)parse_primary_expression());
+		expect_and_eat(';');
+		return unary;
+	}
 	else if (token.type== '*') // addressof 
 	{
 		assert(false && "Pointers are not supported yet");
 		
 	}
+	
 	
 	return parse_suffix_expression((Ast_Node*)parse_primary_expression());
 }
@@ -520,7 +565,8 @@ Ast_Primary*
 Parser::parse_primary_expression()
 {
 	auto token = lexer.eat_token();
-	
+	//printf("token [%.*s]\n", SV_PRINT(token.name));
+	//auto token2 = lexer.eat_token();
 	AllocateNode(Ast_Primary, primary);
 	primary->token = token;
 	
@@ -541,7 +587,7 @@ Parser::parse_primary_expression()
 		}
 		default:
 		{
-			printf("line: %d, Col: %d ,%.*s", token.start_position.x,token.start_position.y ,SV_PRINT(token.name));
+			printf("line: %d, Col: %d, [%.*s]\n", token.start_position.x,token.start_position.y ,SV_PRINT(token.name));
 			printf("not a primary expression\n");
 			exit(-1);
 			break;

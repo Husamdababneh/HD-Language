@@ -18,13 +18,11 @@ enum {
 
 enum {
 	AST_DECLARATION,
-	AST_PORCDECLARATION,
 	AST_TYPE,
 	AST_BLOCK,
 	AST_IF,
 	AST_WHILE,
-	AST_BINARY_EXP,
-	AST_UNARY_EXP,
+	AST_EXPRESSION,
 	AST_LITERAL,
 	AST_PRIMARY,
 	AST_UKNOWN,
@@ -44,6 +42,10 @@ enum {
 	AST_KIND_UNKNOWN,
 	// AST_KIND_
 	
+	// Expressions Kinds
+	AST_KIND_EXP_BINARY,
+	AST_KIND_EXP_UNARY,
+	//AST_KIND_EXP_BINARY,
 	
 	// Primary Expression Kinds
 	AST_KIND_PRIMARY_NUMBER,
@@ -58,21 +60,9 @@ enum {
 };
 
 struct Ast_Node;
-
+struct Ast_Scope;
 struct Ast {
 	Ast_Node** nodes;
-};
-
-struct Ast_Scope {
-	Ast_Node** variables = {0};
-	Ast_Node** procedures = {0};
-	Ast_Node** types = {0};;
-	
-	
-	//Ast_Node** nodes;
-	Ast_Scope* parent = nullptr; // One item
-	
-	Ast_Scope* children = {0}; // Array
 };
 
 
@@ -109,33 +99,34 @@ struct Ast_Primary : Ast_Node
 };
 
 
+struct Ast_Expression : Ast_Node {
+	Ast_Expression() {
+		type = AST_EXPRESSION; 
+	}
+	u32       op;
+};
 
-
-struct Ast_Unary : Ast_Node {
+struct Ast_Unary : Ast_Expression {
 	//  <a> ? <b>
 	Ast_Unary() {
-		type = AST_UNARY_EXP;
+		kind = AST_KIND_EXP_UNARY;
 		op = OP_UNKOWN;
 		child = nullptr;
 	}
-	
-	u32       op;
 	Ast_Node* child;
 	
 };
 
 
-struct Ast_Binary : public Ast_Node {
+struct Ast_Binary : Ast_Expression {
 	//  <a> ? <b>
 	Ast_Binary() {
-		type = AST_BINARY_EXP;
+		kind = AST_KIND_EXP_BINARY;
 		op = OP_UNKOWN;
 		left = nullptr;
 		right= nullptr;
 	}
 	
-	//bool isFactor = false;
-	u32       op;
 	Ast_Node* left;
 	Ast_Node* right;
 	
@@ -188,7 +179,7 @@ struct Ast_Proc_Declaration : public Ast_Declaration {
 	
 	Ast_Proc_Declaration() {
 		Ast_Declaration();
-		kind = AST_KIND_DECL_PROCEDURE;;
+		kind = AST_KIND_DECL_PROCEDURE;
 	}
 	
 	Ast_Type* return_type;
@@ -204,6 +195,18 @@ struct Ast_Var_Declaration : public Ast_Declaration {
 	}
 	
 	Ast_Type* data_type;
-	Ast_Block* body;
+	Ast_Node* body;
+};
+
+struct Ast_Scope {
+	Ast_Var_Declaration** variables = {0};
+	Ast_Proc_Declaration** procedures = {0};
+	Ast_Node** types = {0};;
+	
+	
+	//Ast_Node** nodes;
+	Ast_Scope* parent = nullptr; // One item
+	
+	Ast_Scope* children = {0}; // Array
 };
 

@@ -2,12 +2,12 @@
 
 main :: proc (param_1 : u16 , param_2 : u8) -> void
 {
-	a =  5 + 8;
+	a =  5 + 8 / 5;
 }
 
-
+/*
 func :: proc (param_1 : u16 , param_2 : u8) -> void
 {
-	a =  5 + 8 * 3 / 2 ;
+	a := -5;
 }
-		
+*/

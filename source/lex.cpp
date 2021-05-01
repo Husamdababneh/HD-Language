@@ -334,7 +334,7 @@ Token LexerState::process_token()
 			if (next == '>'){ 
 				token.type = TOKEN_ARROW;
 				eat_character();
-			}else {
+			} else {
 				token.type = ch;
 			}
 			break;
@@ -428,7 +428,6 @@ Token LexerState::process_token()
 		}
 		case ':':
 		{
-			// @CleanUp: Make this use it's ASCII Value instead.. i think ??
 			token.type = TOKEN_COLON;
 			break;
 		}

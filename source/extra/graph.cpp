@@ -69,32 +69,58 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 	//auto hash = MeowU32From(full_hash, 3);
 	switch(node->type)
 	{
-		case AST_BINARY_EXP:
+		case AST_EXPRESSION:
 		{
-			Ast_Binary* bin = (Ast_Binary*)node;
-			logger->print("T_%x -> { "_s, hash);
 			
-			if (bin->left != nullptr){
-				logger->print("T_%x "_s, bin->left->token.hash);
+			if (node->kind == AST_KIND_EXP_BINARY){
+				
+				Ast_Binary* bin = (Ast_Binary*)node;
+				logger->print("T_%x -> { "_s, hash);
+				
+				if (bin->left != nullptr){
+					logger->print("T_%x "_s, bin->left->token.hash);
+				}
+				
+				if (bin->right!= nullptr){
+					logger->print("T_%x "_s, bin->right->token.hash);
+				}
+				logger->print("}\n"_s);
+				
+				output_graph_v2(bin->left, logger);
+				output_graph_v2(bin->right, logger);
+				
+				Graph_Label label= { hash, Shape_Type::GRAPH_DIAMOND, bin->token.name };
+				arrput(labels, label);
+				break;
 			}
 			
-			if (bin->right!= nullptr){
-				logger->print("T_%x "_s, bin->right->token.hash);
+			if (node->kind == AST_KIND_EXP_UNARY)
+			{
+				Ast_Unary* unary = (Ast_Unary*)node;
+				logger->print("T_%x -> { "_s, hash);
+				
+				if (unary->child != nullptr){
+					logger->print("T_%x "_s, unary->child->token.hash);
+				}
+				
+				logger->print("}\n"_s);
+				
+				output_graph_v2(unary->child, logger);
+				
+				Graph_Label label= { hash, Shape_Type::GRAPH_DIAMOND, unary->token.name };
+				arrput(labels, label);
 			}
-			logger->print("}\n"_s);
 			
-			output_graph_v2(bin->left, logger);
-			output_graph_v2(bin->right, logger);
-			Graph_Label label= { hash, Shape_Type::GRAPH_DIAMOND, bin->token.name };
-			arrput(labels, label);
 			break;
+			//assert(false);
 		}
 		case AST_DECLARATION:
 		{
 			
-			if (node->kind != AST_KIND_DECL_PROCEDURE)
+			if (node->kind == AST_KIND_DECL_STRUCT)
 			{
 				// TODO:
+				logger->print("AST_KIND_DECL_STRUCT is not Supported Yet\n"_s);
 				assert(false);
 			}
 			
@@ -112,28 +138,33 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				}
 				
 				logger->print("}\n"_s);
-				output_graph_v2(decl->return_type, logger);
 				output_graph_v2(decl->body, logger);
+				output_graph_v2(decl->return_type, logger);
 				Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, decl->token.name };
 				arrput(labels, label);
 				break;
 			}
-			/* 
-						Ast_Declaration* decl =  (Ast_Declaration*) node;
-						logger->print("T_%x -> { "_s, hash);
-						
-						if (decl->data_type) {
-							logger->print("T_%x "_s, decl->data_type->token.hash);
-						}
-						
-						if (decl->params){
-							logger->print("T_%x "_s, decl->params->token.hash);
-						}
-						
-						
-						output_graph_v2(decl->params, logger);
-						//output_graph_v2(decl->body, logger);
-			 */
+			
+			if (node->kind == AST_KIND_DECL_VARIABLE)
+			{
+				Ast_Var_Declaration* decl = (Ast_Var_Declaration *) node; 
+				logger->print("T_%x -> { "_s, hash);
+				
+				if (decl->data_type){
+					logger->print("T_%x "_s, decl->data_type->token.hash);
+				}
+				
+				if (decl->body){
+					logger->print("T_%x "_s, decl->body->token.hash);
+				}
+				
+				logger->print("}\n"_s);
+				output_graph_v2(decl->body, logger);
+				output_graph_v2(decl->data_type, logger);
+				Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, decl->token.name };
+				arrput(labels, label);
+				break;
+			}
 			
 			break;
 		}
@@ -144,14 +175,11 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			arrput(labels, label);
 			break;
 		}
-		case AST_PORCDECLARATION:
-		{
-			logger->print("Node Type AST_PORCDECLARATION is not supported yet\n"_s);
-			break;
-		}
 		case AST_TYPE:
 		{
-			logger->print("Node Type AST_TYPE is not supported yet\n"_s);
+			Ast_Type* type = (Ast_Type*) node;
+			Graph_Label label = { hash, Shape_Type::GRAPH_BOX, type->token.name};
+			arrput(labels, label);
 			break;
 		}
 		case AST_BLOCK:
@@ -185,11 +213,6 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 		case AST_WHILE:
 		{
 			logger->print("Node Type AST_WHILE is not supported yet\n"_s);
-			break;
-		}
-		case AST_UNARY_EXP:
-		{
-			logger->print("Node Type AST_UNARY_EXP is not supported yet\n"_s);
 			break;
 		}
 		case AST_PRIMARY:
