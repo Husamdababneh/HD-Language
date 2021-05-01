@@ -444,7 +444,9 @@ Parser::parse_statement()
 	Token t1 = lexer.peek_token();// ident 
 	Token t2 = lexer.peek_token(1);
 	
-	
+	// TODO: Add all comments, return statement , for, while, if 
+	// TODO: We need more cases to test the compiler 
+	// TODO: Type Checking, and generation.
 	// Declaration
 	if (t1.type == TOKEN_IDENT && t2.type == TOKEN_COLON)
 	{
