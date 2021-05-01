@@ -168,11 +168,9 @@ struct Ast_Declaration : public Ast_Node {
 		type = AST_DECLARATION;
 	}
 	
-	Ast_Node*  data_type; // for now this is ident
-	Ast_Node*  params; // if this is a procedure call.. ?? 
+	Ast_Scope*     scope;
 	bool 	  constant;
 	bool 	  inforced_type;
-	Ast_Scope*     scope;
 };
 
 struct Ast_Proc_Declaration : public Ast_Declaration {
@@ -180,6 +178,7 @@ struct Ast_Proc_Declaration : public Ast_Declaration {
 	Ast_Proc_Declaration() {
 		Ast_Declaration();
 		kind = AST_KIND_DECL_PROCEDURE;
+		constant = true;
 	}
 	
 	Ast_Type* return_type;
@@ -201,7 +200,7 @@ struct Ast_Var_Declaration : public Ast_Declaration {
 struct Ast_Scope {
 	Ast_Var_Declaration** variables = {0};
 	Ast_Proc_Declaration** procedures = {0};
-	Ast_Node** types = {0};;
+	Ast_Type** types = {0};;
 	
 	
 	//Ast_Node** nodes;

@@ -411,6 +411,9 @@ Parser::parse_def()
 				var->token = decl_name;
 				var->data_type = nullptr;
 				var->body = parse_expression();
+				var->constant = true;
+				arrput(current_scope->variables, var);
+				expect_and_eat(';');
 				return var;
 			}
 		}
@@ -418,7 +421,15 @@ Parser::parse_def()
 		
 		//  imutable;
 		if (token.type == '='){
-			assert(false);
+			lexer.eat_token(); // '='
+			AllocateNode(Ast_Var_Declaration, var);
+			var->token = decl_name;
+			var->data_type = nullptr;
+			var->body = parse_expression();
+			var->constant = false;
+			arrput(current_scope->variables, var);
+			expect_and_eat(';');
+			return var;
 		}
 	}
 	return nullptr;
@@ -466,7 +477,7 @@ static s8 get_binary_precedence(Token token)
 			return 9;
 		}
 		case '=':
-		case ':':
+		//case ':':
 		{
 			return 1;
 		}
@@ -479,7 +490,6 @@ static s8 get_binary_precedence(Token token)
 Ast_Node* 
 Parser::parse_expression(s8 priority /* = -1*/ )
 {
-	
 	Ast_Node* left = parse_unary_expression();
 	
 	
@@ -508,20 +518,21 @@ Parser::parse_unary_expression()
 {
 	auto token = lexer.peek_token();
 	
+	Ast_Node* result = nullptr;
 	if (token.type == '(') // factors
 	{
-		lexer.eat_token();
-		parse_expression();
-		//expect_and_eat(';');
+		lexer.eat_token(); // '('
+		Ast_Node* result = parse_expression();
 		expect_and_eat(')');
+		
+		return parse_suffix_expression(result);
 	}
-	else if (token.type== '-') // minus 
+	else if (token.type == '-' || token.type == '+' ) // minus 
 	{
-		lexer.eat_token();
+		lexer.eat_token(); //  eat the sign
 		AllocateNode(Ast_Unary, unary);
 		unary->token = token;
 		unary->child = parse_suffix_expression((Ast_Node*)parse_primary_expression());
-		expect_and_eat(';');
 		return unary;
 	}
 	else if (token.type== '*') // addressof 
@@ -565,8 +576,6 @@ Ast_Primary*
 Parser::parse_primary_expression()
 {
 	auto token = lexer.eat_token();
-	//printf("token [%.*s]\n", SV_PRINT(token.name));
-	//auto token2 = lexer.eat_token();
 	AllocateNode(Ast_Primary, primary);
 	primary->token = token;
 	
@@ -615,7 +624,8 @@ Parser::parse_block()
 	block->scope = scope;
 	
 	Token token = lexer.peek_token();
-	block->token = lexer.peek_token(2);
+	// TODO:  will this break ?? 
+	block->token = create_token(lexer.peek_token().name);
 	
 	while(token.type != TOKEN_EOFA &&
 		  token.type != '}')

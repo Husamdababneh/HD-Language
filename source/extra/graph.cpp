@@ -107,7 +107,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				
 				output_graph_v2(unary->child, logger);
 				
-				Graph_Label label= { hash, Shape_Type::GRAPH_DIAMOND, unary->token.name };
+				Graph_Label label = { hash, Shape_Type::GRAPH_DIAMOND, unary->token.name};
 				arrput(labels, label);
 			}
 			
@@ -185,6 +185,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 		case AST_BLOCK:
 		{
 			Ast_Block* block =  (Ast_Block*) node;
+			
 			logger->print("T_%x -> { "_s, hash);
 			
 			
@@ -195,12 +196,10 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			
 			logger->print("}\n"_s);
 			
-			
 			for(u64 i = 0; i < arrlenu(block->nodes); i++){
 				output_graph_v2(block->nodes[i], logger);
 			}
 			
-			//logger->print("Node Type AST_BLOCK is not supported yet\n"_s);
 			Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, "Block"_s };
 			arrput(labels, label);
 			break;
