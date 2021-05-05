@@ -1,14 +1,8 @@
 //#import "test.hd"
 
-main :: proc (param_1 : u16 , param_2 : u8) -> void
+main :: proc (param_1 : u16 = 5 , param_2 : u8) -> u64
 {
-	a = -5 * -3 / 2 + 1;
-	return;
-}
-
-
-func :: proc (param_1 : u16 , param_2 : u8) -> void
-{
-	a :: -5;
-	b := -9 *3;
+	b : s64 = 9;
+	a : s64 = 5 + 2; 
+	a = a + 5 * 3 * 96;
 }

@@ -119,4 +119,5 @@ struct LexerState
 	
 };
 
+bool isKeyword(StringView& string);
 

@@ -44,10 +44,11 @@ struct Parser {
 	Ast_Type* parse_type();
 	Ast_Block* parse_block();
 	
+	Ast_Node* parse_statement_expression();
 	Ast_Block* parse_block_of_statements();
 	Ast_Var_Declaration* parse_argument_def();
-	Ast_Node* parse_expression(s8 priority = -1);
-	Ast_Node* parse_suffix_expression(Ast_Node* prev);
-	Ast_Node* parse_unary_expression();
+	Ast_Expression* parse_expression(s8 priority = -1);
+	Ast_Expression* parse_suffix_expression(Ast_Expression* prev);
+	Ast_Expression* parse_unary_expression();
 	Ast_Primary* parse_primary_expression();
 };

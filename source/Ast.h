@@ -9,34 +9,14 @@ $Description: Ast.h
 #include "lex.h"
 
 enum {
-	AST_DEF_VAR,
-	AST_DEF_PROC,
-	AST_DEF_STRUCT,
-	AST_DEF_ENUM,
-	AST_DEF_FLAG, // do I need this ?? 
-};
-
-enum {
 	AST_DECLARATION,
-	AST_TYPE,
-	AST_BLOCK,
+	AST_EXPRESSION,
 	AST_IF,
 	AST_WHILE,
-	AST_EXPRESSION,
-	AST_LITERAL,
-	AST_PRIMARY,
+	AST_BLOCK,
+	AST_TYPE,
 	AST_UKNOWN,
 };
-
-
-enum {
-	OP_UNKOWN = -1,
-	OP_ADD = 0,
-	OP_SUB = 0,
-	OP_MUL = 1,
-	OP_DIV = 1
-};
-
 
 enum {
 	AST_KIND_UNKNOWN,
@@ -45,7 +25,10 @@ enum {
 	// Expressions Kinds
 	AST_KIND_EXP_BINARY,
 	AST_KIND_EXP_UNARY,
-	//AST_KIND_EXP_BINARY,
+	AST_KIND_EXP_PRIMARY,
+	AST_KIND_EXP_LITERAL,
+	AST_KIND_EXP_RETURN,
+	
 	
 	// Primary Expression Kinds
 	AST_KIND_PRIMARY_NUMBER,
@@ -57,6 +40,14 @@ enum {
 	AST_KIND_DECL_VARIABLE,
 	AST_KIND_DECL_STRUCT,
 	
+};
+
+enum {
+	AST_BINARY_PLUS,
+	AST_BINARY_MINUS,
+	AST_BINARY_MUL,
+	AST_BINARY_DIV,
+	AST_BINARY_ASSIGN
 };
 
 struct Ast_Node;
@@ -77,40 +68,38 @@ struct Ast_Block : Ast_Node {
 	Ast_Block() {
 		type = AST_BLOCK;
 	}
-	Ast_Node** nodes;
+	Ast_Node** statements;
 	Ast_Scope* scope;
 };
 
-
-struct Ast_Literal : Ast_Node
-{
-	Ast_Literal(){
-		type = AST_LITERAL;
-	}
-};
-
-
-struct Ast_Primary : Ast_Node
-{
-	Ast_Primary (){
-		type = AST_PRIMARY;
-	}
-	
-};
 
 
 struct Ast_Expression : Ast_Node {
 	Ast_Expression() {
 		type = AST_EXPRESSION; 
 	}
-	u32       op;
 };
+
+struct Ast_Literal : Ast_Expression {
+	Ast_Literal() {
+		kind= AST_KIND_EXP_LITERAL;
+	}
+};
+
+
+struct Ast_Primary : Ast_Expression {
+	
+	Ast_Primary (){
+		kind = AST_KIND_EXP_PRIMARY;
+	}
+	s64 priamry_kind ;
+};
+
 
 struct Ast_Unary : Ast_Expression {
 	//  <a> ? <b>
 	Ast_Unary() {
 		kind = AST_KIND_EXP_UNARY;
-		op = OP_UNKOWN;
 		child = nullptr;
 	}
 	Ast_Node* child;
@@ -122,11 +111,11 @@ struct Ast_Binary : Ast_Expression {
 	//  <a> ? <b>
 	Ast_Binary() {
 		kind = AST_KIND_EXP_BINARY;
-		op = OP_UNKOWN;
 		left = nullptr;
 		right= nullptr;
 	}
 	
+	s64 op;
 	Ast_Node* left;
 	Ast_Node* right;
 	
@@ -151,7 +140,13 @@ struct Predefined_Type {
 };
 
 
-
+struct Ast_Return : Ast_Node {
+	Ast_Return() {
+		kind = AST_KIND_EXP_RETURN;
+	}
+	
+	Ast_Expression** expressions;
+};
 
 
 struct Ast_Declaration : public Ast_Node {
@@ -181,7 +176,7 @@ struct Ast_Proc_Declaration : public Ast_Declaration {
 		constant = true;
 	}
 	
-	Ast_Type* return_type;
+	Ast_Type** return_type;
 	Ast_Block* body;
 };
 

@@ -446,6 +446,7 @@ Token LexerState::process_token()
 					eat_character();
 				};
 				token.value = StringView{ &input[temp], input_cursor  - temp};
+				token.type = TOKEN_IDENT;
 				if (isKeyword(token.value))
 					token.type = TOKEN_KEYWORD;
 				else if (isHDtype(token.value))
@@ -475,12 +476,8 @@ Token LexerState::process_token()
 	assert(token.type != TOKEN_NONE);
 	token.value = StringView{ &input[temp], input_cursor  - temp};
 	token.hash = Hash(token);
-	//nocheckin 
-	if (token.type == TOKEN_COMMENT ||
-		token.type == TOKEN_MULTILINE_COMMENT)
-		return process_token();
-	else
-		return token;
+	
+	return token;
 }
 
 Token LexerState::eat_token()
