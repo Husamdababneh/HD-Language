@@ -37,15 +37,17 @@ struct Parser {
 	
 	Ast parse();
 	Ast_Node* parse_factor();
-	Ast_Node* parse_proc_def();
 	Ast_Node* parse_operator();
 	Ast_Node* parse_statement();
-	Ast_Node* parse_def();
+	Ast_Node* parse_const_def();
 	Ast_Type* parse_type();
 	Ast_Block* parse_block();
 	
+	Ast_Struct_Declaration* parse_struct_def();
+	Ast_Proc_Declaration* parse_proc_def();
 	Ast_Node* parse_statement_expression();
 	Ast_Block* parse_block_of_statements();
+	Ast_Var_Declaration* parse_var_def();
 	Ast_Var_Declaration* parse_argument_def();
 	Ast_Expression* parse_expression(s8 priority = -1);
 	Ast_Expression* parse_suffix_expression(Ast_Expression* prev);

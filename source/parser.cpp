@@ -74,16 +74,23 @@ Parser::expect_and_eat(u64 type )
 }
 */
 
-//_CrtDbgBreak();
-#define expect_and_eat(x){\
-if(lexer.peek_token().type != x)\
-{\
-printf("expect_and_eat: %s %d\n", __FILE__ ,__LINE__);\
-printf("Expected [%c, %d] got \"%.*s\"\n", (int)x, (int)x, SV_PRINT(lexer.peek_token().name));\
-exit(-1);\
-}\
-lexer.eat_token();\
+inline 
+void _expect_and_eat(Parser* _this, u64 type, u64 line, const char* file)
+{
+	Token& token = _this->lexer.peek_token();
+	if(token.type != type)
+	{
+		printf("expect_and_eat: %s %zd\n", file ,line);
+		printf("Expected [%c, %d] got \"%.*s\"\n", (int)type, (int)type, SV_PRINT(token.name));
+		printf("Token[%.*s] Located in Line: %d, Col: %d \n", SV_PRINT(token.name), token.start_position.x, token.start_position.y);
+		exit(-1);
+	}
+	_this->lexer.eat_token();
+	
 }
+
+//_CrtDbgBreak();
+#define expect_and_eat(x) _expect_and_eat(this, x, __LINE__, __FILE__)
 
 
 inline Ast_Scope*
@@ -201,58 +208,8 @@ Ast Parser::parse()
 {
 	
 	Ast_Block* block = parse_block();
-	//for(u64 i = 0; i < arrlenu(block->nodes); i++)
 	PRINT_GRAPH(block, &logger);
 	generate(block);
-	
-	/* 	
-		for (int i=0; i < hmlen(symbolTable); ++i)
-			logger.print("%s %s\n"_s, symbolTable[i].value.node->token.name, symbolTable[i].value.scope.name );
-		*/
-	
-	/* 	
-		for (int i=0; i < arrlen(scopes); ++i){
-			auto scope = scopes[i];
-			logger.print("Scope [%s], Id: [%d]\n"_s, scope.name, scope.id);
-		}
-		*/
-	
-	/* 	
-		for(u64 i = 0; i < arrlenu(flaten_ast); i++){
-			if (flaten_ast[i]->type == AST_DECLARATION) {
-				Ast_Declaration* decl = (Ast_Declaration*)flaten_ast[i];
-				if (decl->kind == AST_KIND_DECL_PROCEDURE){
-					generate_proc((Ast_Proc_Declaration*)decl);
-				}
-				
-			}
-		}
-		 */
-	
-	/* 
-		for(u64 a = 0; a < arrlenu(ast.nodes); a++){
-			Ast_Node* node = ast.nodes[a];
-												
-			if (node->type == AST_DECLARATION){
-				Ast_Declaration* decl = (Ast_Declaration*)ast.nodes[a];
-				if (decl->data_type != nullptr){
-																				
-					StringView type_name = decl->data_type->token.name;
-					u8 name[256] = {0};
-					memcpy(name, type_name.str, type_name.count + 1);
-					name[type_name.count] = 0;
-					type type = shget(types, name);
-					printf("Size:%2d, Name[%s], Aliases[], children[]\n", 
-						(int)type.size,
-						type.name);
-																				
-					printf("type [%.*s]\n", SV_PRINT(type_name));
-				}
-			}
-		}
-		*/
-	
-	
 	
 	return {0};
 }
@@ -298,112 +255,153 @@ Parser::parse_argument_def()
 	token = lexer.peek_token();
 	if (token.type == '='){
 		lexer.eat_token();
-		decl->body= parse_expression();;
+		decl->body= parse_expression();
 	}
 	
 	return  decl;
 }
 
-Ast_Node*
-Parser::parse_def()
+Ast_Proc_Declaration* 
+Parser::parse_proc_def()
 {
 	Token decl_name = lexer.eat_token(); // Name
-	lexer.eat_token(); // eat the first ':'
+	expect_and_eat(TOKEN_DOUBLE_COLON);
+	lexer.eat_token(); // eat 'proc'
 	
-	//printf("decl name [%.*s]\n", SV_PRINT(decl_name.name));
+	AllocateNode(Ast_Proc_Declaration, proc);
+	proc->token = decl_name;
+	proc->scope = enter_scope();
+	expect_and_eat('(');
 	
 	Token token = lexer.peek_token();
-	
-	// Inferred
+	// Parse Arguments
+	while(token.type != ')' && token.type != TOKEN_EOFA)
 	{
-		// Constant 
-		if (token.type == TOKEN_COLON) {
-			//lexer.eat_token();// eat ':'
-			
-			token = lexer.peek_token(1); 
-			
-			// Procedure 
-			if (cmp2sv(token.name, "proc"_s) == 0)
-			{
-				lexer.eat_token(); // ':'
-				lexer.eat_token(); // 'proc'
-				AllocateNode(Ast_Proc_Declaration, proc);
-				proc->token = decl_name;
-				proc->scope = enter_scope();
-				lexer.eat_token(); // (
-				token = lexer.peek_token();
-				// Parse Arguments
-				while(token.type != ')' && token.type != TOKEN_EOFA)
-				{
-					Ast_Var_Declaration* var = parse_argument_def();
-					arrput(proc->scope->variables, var);
-					token = lexer.peek_token();
-					if (token.type != ')') expect_and_eat(',');
-				}
-				
-				expect_and_eat(')');
-				
-				// Parse Return Types
-				if (lexer.peek_token().type == TOKEN_ARROW){
-					lexer.eat_token(); 
-					token = lexer.peek_token();
-					while(token.type != '{') {
-						Ast_Type* type = parse_type();
-						arrput(proc->return_type, type);
-						token = lexer.peek_token();
-						if (token.type != '{') expect_and_eat(',');
-					}
-				}
-				
-				
-				// Parse Body
-				proc->body = parse_block_of_statements();
-				
-				return proc;
-			}
-			else if (cmp2sv(token.name, "struct"_s) == 0){ assert(false && "Struct Not Supported Yet");}
-			else if (cmp2sv(token.name, "enum"_s) == 0){ assert(false && "Enum Not Supported Yet");}
-			else 
-			{
-				lexer.eat_token(); // ':'
-				AllocateNode(Ast_Var_Declaration, var);
-				var->token = decl_name;
-				var->data_type = nullptr;
-				var->body = parse_expression();
-				var->constant = true;
-				arrput(current_scope->variables, var);
-				expect_and_eat(';');
-				return var;
-			}
-		}
-		
-		
-		//  imutable;
-		if (token.type == '='){
-			lexer.eat_token(); // '='
-			AllocateNode(Ast_Var_Declaration, var);
-			var->token = decl_name;
-			var->data_type = nullptr; // Todo : infered??
-			var->body = parse_expression();
-			var->constant = false;
-			arrput(current_scope->variables, var);
-			expect_and_eat(';');
-			return var;
+		Ast_Var_Declaration* var = parse_argument_def();
+		arrput(proc->scope->variables, var);
+		token = lexer.peek_token();
+		if (token.type != ')') expect_and_eat(',');
+	}
+	
+	expect_and_eat(')');
+	
+	// Parse Return Types
+	if (lexer.peek_token().type == TOKEN_ARROW){
+		lexer.eat_token(); 
+		token = lexer.peek_token();
+		while(token.type != '{') {
+			Ast_Type* type = parse_type();
+			arrput(proc->return_type, type);
+			token = lexer.peek_token();
+			if (token.type != '{') expect_and_eat(',');
 		}
 	}
 	
+	
+	// Parse Body
+	proc->body = parse_block_of_statements();
+	
+	return proc;
+}
+
+Ast_Var_Declaration*
+Parser::parse_var_def()
+{
+	Token decl_name = lexer.eat_token(); // Name
+	Token token = lexer.peek_token();
+	
+	Ast_Type* type = nullptr;
 	AllocateNode(Ast_Var_Declaration, var);
 	var->token = decl_name;
-	var->data_type = parse_type(); // Todo : infered??
-	if      (lexer.peek_token().type == TOKEN_COLON) var->constant = true;
-	else if (lexer.peek_token().type == '=') var->constant = false;
-	else    assert(false && "Expected [:] or [=]");
-	lexer.eat_token();
+	
+	if (token.type == TOKEN_COLON) // Forced Type
+	{
+		lexer.eat_token();
+		type = parse_type();
+		token = lexer.peek_token();
+		var->data_type = nullptr;
+		
+		// Immutable Variable
+		if (token.type == TOKEN_COLON){
+			var->constant = true;
+			lexer.eat_token();
+		}
+		
+		// Mutable Variable
+		if (token.type == '='){
+			var->constant = false;
+			lexer.eat_token();
+		}
+		
+	} 
+	// Inferred
+	else if (token.type == TOKEN_COLON_EQUAL) 
+	{
+		var->constant = true;
+		lexer.eat_token();
+	}
+	else if (token.type == TOKEN_DOUBLE_COLON) {
+		var->constant = false;
+		lexer.eat_token();
+	}
+	else {
+		assert(false);
+	}
+	
+	
+	
+	token = lexer.peek_token();
+	// If it's a constant it have to have a value; 
+	
+	if (!var->constant && token.type == ';')  
+		goto exit;
+	
 	var->body = parse_expression();
-	var->constant = false;
+	
+	exit:
 	arrput(current_scope->variables, var);
 	expect_and_eat(';');
 	return var;
+}
+
+
+Ast_Struct_Declaration* 
+Parser::parse_struct_def()
+{
+	Token decl_name = lexer.eat_token(); // Name
+	expect_and_eat(TOKEN_DOUBLE_COLON);
+	Token token = lexer.eat_token(); // eat 'struct'
+	
+	expect_and_eat('{');
+	
+	AllocateNode(Ast_Struct_Declaration, _struct);
+	_struct->token = decl_name;
+	_struct->scope = enter_scope();
+	
+	token = lexer.peek_token(); 
+	while(token.type != '}' && token.type != TOKEN_EOFA)
+	{
+		Ast_Var_Declaration* var = parse_var_def();
+		arrput(_struct->scope->variables, var);
+		arrput(_struct->decls, var);
+		token = lexer.peek_token();
+		if (token.type != '}') continue;
+	}
+	
+	expect_and_eat('}');
+	return _struct;
+}
+
+Ast_Node* 
+Parser::parse_const_def()
+{
+	Token token = lexer.peek_token(2); 
+	if      (cmp2sv(token.name, "proc"_s) == 0) return parse_proc_def();
+	else if (cmp2sv(token.name, "struct"_s) == 0) return parse_struct_def();
+	else if (cmp2sv(token.name, "enum"_s) == 0) assert(false && "Enum Not Supported Yet");
+	else if (cmp2sv(token.name, "flag"_s) == 0) assert(false && "Flag Not Supported Yet");
+	else    return parse_var_def();
+	return nullptr;
 }
 
 Ast_Node* 
@@ -412,10 +410,16 @@ Parser::parse_statement_expression()
 	Token t1 = lexer.peek_token();// ident 
 	Token t2 = lexer.peek_token(1);
 	
-	// Declaration
-	if (t1.type == TOKEN_IDENT && t2.type == TOKEN_COLON)
+	if (t1.type == TOKEN_IDENT && t2.type == TOKEN_DOUBLE_COLON)
 	{
-		return parse_def();
+		// Constant Variables, Structs, Procs, Flags, Enums
+		return parse_const_def();
+	}
+	
+	if (t1.type == TOKEN_IDENT && (t2.type == TOKEN_COLON ||  t2.type == TOKEN_COLON_EQUAL))
+	{
+		// Variable Declarations 
+		return parse_var_def();
 	}
 	
 	
@@ -441,6 +445,10 @@ Parser::parse_statement()
 	}
 	
 	// TODO: Handle Compile-time directives
+	if (t1.type == TOKEN_DIRECTIVE){
+		lexer.eat_token();
+		return nullptr;
+	}
 	
 	// Scopes
 	if (t1.type == '{'){
@@ -625,8 +633,7 @@ Parser::parse_primary_expression()
 		}
 		default:
 		{
-			printf("line: %d, Col: %d, [%.*s]\n", token.start_position.x,token.start_position.y ,SV_PRINT(token.name));
-			printf("not a primary expression\n");
+			printf("Token [%.*s] At [Line: %d, Col: %d], Is not a primary expression \n",SV_PRINT(token.name), token.start_position.x,token.start_position.y);
 			exit(-1);
 			break;
 		}

@@ -197,7 +197,7 @@ void generate_decl(Ast_Declaration* decl)
 	}
 	
 	if (decl->kind == AST_KIND_DECL_STRUCT){
-		assert(false && "AST_KIND_DECL_STRUCT Not handled yet");
+		//assert(false && "AST_KIND_DECL_STRUCT Not handled yet");
 		return ;
 	}
 }
@@ -316,7 +316,10 @@ generate(Ast_Node* node)
 	fprintf(file, "segment .data\n");
 	for(u64 i = 0; i < arrlenu(vars); i++){
 		printf("Adding [%.*s] \n", SV_PRINT(vars[i]->token.name));
-		fprintf(file, "\t%.*s dq %.*s\n", SV_PRINT(vars[i]->token.name), SV_PRINT(vars[i]->body->token.name));
+		if (vars[i]->body)
+			fprintf(file, "\t%.*s dq %.*s\n", SV_PRINT(vars[i]->token.name), SV_PRINT(vars[i]->body->token.name));
+		else
+			fprintf(file, "\t%.*s resq 1\n", SV_PRINT(vars[i]->token.name));
 	}
 	arrfree(vars);
 	// TEMP: @Cleanup

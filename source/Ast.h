@@ -192,6 +192,14 @@ struct Ast_Var_Declaration : public Ast_Declaration {
 	Ast_Node* body;
 };
 
+struct Ast_Struct_Declaration : public Ast_Declaration {
+	Ast_Struct_Declaration() {
+		Ast_Declaration();
+		kind = AST_KIND_DECL_STRUCT;
+	}
+	Ast_Declaration** decls;
+};
+
 struct Ast_Scope {
 	Ast_Var_Declaration** variables = {0};
 	Ast_Proc_Declaration** procedures = {0};

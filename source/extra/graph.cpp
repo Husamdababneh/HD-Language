@@ -60,7 +60,7 @@ output_labels(Logger* logger)
 	
 }
 static void
-output_graph_v2(Ast_Node* node, Logger* logger)
+output_graph(Ast_Node* node, Logger* logger)
 {
 	if (node == nullptr) return; 
 	if (node->type == AST_UKNOWN) return;
@@ -86,8 +86,8 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				}
 				logger->print("}\n"_s);
 				
-				output_graph_v2(bin->left, logger);
-				output_graph_v2(bin->right, logger);
+				output_graph(bin->left, logger);
+				output_graph(bin->right, logger);
 				
 				Graph_Label label= { hash, Shape_Type::GRAPH_DIAMOND, bin->token.name };
 				arrput(labels, label);
@@ -105,7 +105,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				
 				logger->print("}\n"_s);
 				
-				output_graph_v2(unary->child, logger);
+				output_graph(unary->child, logger);
 				
 				Graph_Label label = { hash, Shape_Type::GRAPH_DIAMOND, unary->token.name};
 				arrput(labels, label);
@@ -138,7 +138,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				logger->print("}\n"_s);
 				
 				for(u64 i = 0; i < arrlenu(_return->expressions); i++){
-					output_graph_v2(_return->expressions[i], logger);
+					output_graph(_return->expressions[i], logger);
 				}
 				
 				Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, node->token.name };
@@ -154,9 +154,24 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			
 			if (node->kind == AST_KIND_DECL_STRUCT)
 			{
-				// TODO:
-				logger->print("AST_KIND_DECL_STRUCT is not Supported Yet\n"_s);
-				assert(false);
+				Ast_Struct_Declaration* _struct = (Ast_Struct_Declaration*)node;
+				logger->print("T_%x -> { "_s, hash);
+				
+				if (_struct->decls != nullptr && arrlenu(_struct->decls) > 0){
+					for (u64 i = 0; i < arrlenu(_struct->decls); i++)
+						logger->print("T_%x "_s, _struct->decls[i]->token.hash);
+				}
+				
+				logger->print("}\n"_s);
+				
+				if (_struct->decls != nullptr && arrlenu(_struct->decls) > 0){
+					for (u64 i = 0; i < arrlenu(_struct->decls); i++)
+						output_graph(_struct->decls[i], logger);
+				}
+				
+				Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, _struct->token.name };
+				arrput(labels, label);
+				break;
 			}
 			
 			if (node->kind == AST_KIND_DECL_PROCEDURE)
@@ -175,9 +190,11 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				
 				logger->print("}\n"_s);
 				
-				output_graph_v2(decl->body, logger);
-				for (u64 i = 0; i < arrlenu(decl->return_type); i++)
-					output_graph_v2(decl->return_type[i], logger);
+				output_graph(decl->body, logger);
+				if (decl->return_type != nullptr && arrlenu(decl->return_type) > 0){
+					for (u64 i = 0; i < arrlenu(decl->return_type); i++)
+						output_graph(decl->return_type[i], logger);
+				}
 				
 				Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, decl->token.name };
 				arrput(labels, label);
@@ -198,8 +215,8 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 				}
 				
 				logger->print("}\n"_s);
-				output_graph_v2(decl->body, logger);
-				output_graph_v2(decl->data_type, logger);
+				output_graph(decl->body, logger);
+				output_graph(decl->data_type, logger);
 				Graph_Label label = { hash, Shape_Type::GRAPH_PENTAGON, decl->token.name };
 				arrput(labels, label);
 				break;
@@ -229,7 +246,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 			logger->print("}\n"_s);
 			
 			for(u64 i = 0; i < arrlenu(block->statements); i++){
-				output_graph_v2(block->statements[i], logger);
+				output_graph(block->statements[i], logger);
 			}
 			
 			Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, "Block"_s };
@@ -248,7 +265,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 		}
 		default:
 		{
-			//output_graph_v2(node, logger);
+			//output_graph(node, logger);
 			printf("[Graph] Unhandled Node Type %d Token name [%.*s]\n", node->type, SV_PRINT(node->token.name));
 			break;
 		}
@@ -256,7 +273,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 	return;
 }
 
-#define PRINT_GRAPH(node, logger)  output_graph_v2(node, logger); output_labels(logger);
+#define PRINT_GRAPH(node, logger)  output_graph(node, logger); output_labels(logger);
 #else
 #define PRINT_GRAPH(node, logger)
 #endif

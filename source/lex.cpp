@@ -63,7 +63,7 @@ StringView reserved [] = {
 	"false"_s,
 	
 	// not used
-	"no_inline"_s
+	"no_inline"_s,
 };
 
 constexpr int KeywordCount = sizeof(reserved) / sizeof(StringView);
@@ -428,7 +428,18 @@ Token LexerState::process_token()
 		}
 		case ':':
 		{
-			token.type = TOKEN_COLON;
+			if (peek_character() == ':')
+			{
+				eat_character();
+				token.type = TOKEN_DOUBLE_COLON;
+			}
+			else if (peek_character() == '='){
+				token.type = TOKEN_COLON_EQUAL;
+				eat_character();
+			}
+			else {
+				token.type = TOKEN_COLON;
+			}
 			break;
 		}
 		break;

@@ -1,15 +1,30 @@
 //#import "test.hd"
 
+//#externproc printf
+/*
+
+*/
+
 
 func :: proc () -> s64 
 {
 	return 5;
 }
 
+Entity :: struct {
+	a : s64 = 0;
+}
+
 main :: proc (param_1 : u16 = 5 , param_2 : u8) -> u64
 {
-	b : s64 = 9;
+	
+	
 	a : s64 = 5; 
-	a = 5 * b - a * a * b;
+	b : s64 : 9;
+	c :: 4;
+	d := 4;
+	e : u64;
+	e = 58;
+	a = (6 * b - a * a * b) + 180 + e;
 	return a;
 }
