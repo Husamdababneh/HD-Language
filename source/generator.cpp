@@ -6,7 +6,7 @@
 static FILE* _outfile;
 
 static StringView* funcs = NULL;
-static StringView* vars  = NULL;
+static Ast_Var_Declaration** vars  = NULL;
 
 inline
 FILE* getFile()
@@ -62,9 +62,12 @@ inline void pop_register(const StringView& str) {
 // Forward declerations 
 void generate_expression(Ast_Expression* exp);
 void generate_binary_expression(Ast_Binary* binary);
+void generate_block(Ast_Block* block);
 
-
-
+void generate_address(Ast_Expression* exp)
+{
+	fprintf(getFile(), "\tlea rax, [%.*s]\n", SV_PRINT(exp->token.name));
+}
 
 void generate_binary_expression(Ast_Binary* binary)
 {
@@ -82,12 +85,13 @@ void generate_binary_expression(Ast_Binary* binary)
 	
 	if (binary->op == AST_BINARY_ASSIGN)
 	{
-		generate_expression((Ast_Expression*)binary->left);
+		//generate_expression((Ast_Expression*)binary->left);
+		generate_address((Ast_Expression*)binary->left);
         push_rax();
         
         generate_expression((Ast_Expression*)binary->right);
         pop_rdi();
-		fprintf(file, "\tmov rdi, rax\n");
+		fprintf(file, "\tmov [rdi], rax\n");
         //store_to_rdi(expression->type);
 		return;
 	}
@@ -132,14 +136,9 @@ void generate_binary_expression(Ast_Binary* binary)
 
 void generate_expression(Ast_Expression* exp) {
 	assert(exp); 
-	//printf("Type = %d AST_EXPRESSION = %d\n" , exp->type, AST_EXPRESSION );
 	assert(exp->type == AST_EXPRESSION); 
 	
 	if (exp->kind == AST_KIND_EXP_UNARY){
-		
-		//Ast_Unary* unary = (Ast_Unary*)exp;
-		//unary->token == '-';
-		//fprintf(file, "func.%.*s:\n", SV_PRINT(funcName));
 		assert(false && "Unary Operations are not supported yet");
 		return;
 	}
@@ -154,13 +153,13 @@ void generate_expression(Ast_Expression* exp) {
 	{
 		Ast_Primary* primary = (Ast_Primary*)exp;
 		if (primary->priamry_kind == AST_KIND_PRIMARY_IDENTIFIER){
-			fprintf(getFile(), "\tlea rax, [%.*s] ; primary:\n", SV_PRINT(exp->token.name));
+			fprintf(getFile(), "\tmov rax, [%.*s] ; [Ident]\n", SV_PRINT(exp->token.name));
 			// TODO: Add the ident to stack ?? 
 		}
 		// TODO handle strings ?? 
 		else
 		{
-			fprintf(getFile(), "\tmov rax, %.*s ; primary:\n", SV_PRINT(exp->token.name));
+			fprintf(getFile(), "\tmov rax, %.*s ; [Literal]\n", SV_PRINT(exp->token.name));
 		}
 		return;
 	}
@@ -171,8 +170,11 @@ void generate_expression(Ast_Expression* exp) {
 	}
 	if (exp->kind == AST_KIND_EXP_RETURN)
 	{
-		// TODO: 
-		assert(false && "Return exp is not implemented yet!!");
+		auto _return = (Ast_Return*)exp;
+		assert(arrlenu(_return->expressions) == 1 && "Multiple Return expressions are not implemented yet");
+		//assert(arrlenu(_return->expressions) == 0 && "Proc Must return an expression ");
+		generate_expression(_return->expressions[0]);
+		//push_rax();
 		return;
 	}
 	
@@ -187,9 +189,10 @@ void generate_decl(Ast_Declaration* decl)
 		return ;
 	}
 	
+	
+	// Can we ignore this and add all local variables in current scope to stack ?? 
 	if (decl->kind == AST_KIND_DECL_VARIABLE) {
-		arrput(vars, decl->token.name);
-		//assert(false && "AST_KIND_DECL_VARIABLE Not handled yet");
+		arrput(vars, (Ast_Var_Declaration*)decl);
 		return ;
 	}
 	
@@ -200,6 +203,7 @@ void generate_decl(Ast_Declaration* decl)
 }
 
 void generate_node(Ast_Node* node){
+	
 	switch(node->type)
 	{
 		case AST_EXPRESSION:
@@ -214,12 +218,12 @@ void generate_node(Ast_Node* node){
 		}
 		case AST_TYPE:
 		{
-			
+			printf("Node Type AST_IF is not supported yet\n");
 			break;
 		}
 		case AST_BLOCK:
 		{
-			
+			generate_block((Ast_Block*) node);
 			break;
 		}
 		case AST_IF:
@@ -235,7 +239,7 @@ void generate_node(Ast_Node* node){
 		default:
 		{
 			
-			printf("Unhandled Node Type %d \n", node->type);
+			printf("[Generator] Unhandled Node Type %d Token name [%.*s]\n", node->type, SV_PRINT(node->token.name));
 			break;
 		}
 		
@@ -245,18 +249,14 @@ void generate_node(Ast_Node* node){
 
 void generate_block(Ast_Block* block)
 {
-	printf("#Of Statements = %zd\n", arrlenu(block->statements));
+	//printf("#Of Statements = %zd\n", arrlenu(block->statements));
 	for(u64 i = 0; i < arrlenu(block->statements); i++)
 	{
 		generate_node(block->statements[i]);
 	}
 	
-	FILE* file = getFile();
-	fprintf(file, "\n");
-	for(u64 i = 0; i < arrlenu(funcs); i++){
-		fprintf(file, "global func.%.*s\n", SV_PRINT(funcs[i]));
-	}
-	arrfree(funcs);
+	//FILE* file = getFile();
+	
 }
 
 void generate_proc(Ast_Proc_Declaration* decl)
@@ -288,20 +288,39 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	fprintf(file, "\tpop rbp\n");
 	fprintf(file, "\tret\n\n\n");
 	
-	//FILE* file = getFile();
-	fprintf(file, "segment .data\n");
-	
-	for(u64 i = 0; i < arrlenu(vars); i++){
-		fprintf(file, "\t%.*s dq 0\n", SV_PRINT(vars[i]));
-	}
-	// TEMP: @Cleanup
-	fprintf(_outfile, "\tmessage db \'result = %%d\', 10, 13, 0\n");
+	//
 	
 	
 	
-	arrfree(vars);
+	
+	
+	
 	
 	//close_file();
+}
+
+void 
+generate(Ast_Node* node) 
+{
+	
+	generate_node(node);
+	FILE* file = getFile();
+	
+	fprintf(file, "\n");
+	for(u64 i = 0; i < arrlenu(funcs); i++){
+		fprintf(file, "global func.%.*s\n", SV_PRINT(funcs[i]));
+	}
+	arrfree(funcs);
+	
+	
+	fprintf(file, "segment .data\n");
+	for(u64 i = 0; i < arrlenu(vars); i++){
+		printf("Adding [%.*s] \n", SV_PRINT(vars[i]->token.name));
+		fprintf(file, "\t%.*s dq %.*s\n", SV_PRINT(vars[i]->token.name), SV_PRINT(vars[i]->body->token.name));
+	}
+	arrfree(vars);
+	// TEMP: @Cleanup
+	fprintf(file, "\tmessage db \'result = %%d\', 10, 13, 0\n");
 }
 
 /*

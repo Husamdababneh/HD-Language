@@ -249,7 +249,7 @@ output_graph_v2(Ast_Node* node, Logger* logger)
 		default:
 		{
 			//output_graph_v2(node, logger);
-			logger->print("Unhandled Node Type %d \n"_s, node->type);
+			printf("[Graph] Unhandled Node Type %d Token name [%.*s]\n", node->type, SV_PRINT(node->token.name));
 			break;
 		}
 	}

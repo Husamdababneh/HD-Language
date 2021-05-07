@@ -1,8 +1,15 @@
 //#import "test.hd"
 
+
+func :: proc () -> s64 
+{
+	return 5;
+}
+
 main :: proc (param_1 : u16 = 5 , param_2 : u8) -> u64
 {
 	b : s64 = 9;
-	a : s64 = 5 + 2; 
-	a = a + 5 * 3 * 96;
+	a : s64 = 5; 
+	a = 5 * b - a * a * b;
+	return a;
 }

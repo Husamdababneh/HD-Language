@@ -203,7 +203,7 @@ Ast Parser::parse()
 	Ast_Block* block = parse_block();
 	//for(u64 i = 0; i < arrlenu(block->nodes); i++)
 	PRINT_GRAPH(block, &logger);
-	generate_block(block);
+	generate(block);
 	
 	/* 	
 		for (int i=0; i < hmlen(symbolTable); ++i)
@@ -330,8 +330,8 @@ Parser::parse_def()
 				AllocateNode(Ast_Proc_Declaration, proc);
 				proc->token = decl_name;
 				proc->scope = enter_scope();
-				
-				token = lexer.eat_token(); // (
+				lexer.eat_token(); // (
+				token = lexer.peek_token();
 				// Parse Arguments
 				while(token.type != ')' && token.type != TOKEN_EOFA)
 				{

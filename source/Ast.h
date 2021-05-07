@@ -122,7 +122,7 @@ struct Ast_Binary : Ast_Expression {
 };
 
 
-
+// @Incomplete: Is this really an AST node ?? 
 struct Ast_Type : public Ast_Node {
 	Ast_Type() {
 		type = AST_TYPE;
@@ -140,7 +140,7 @@ struct Predefined_Type {
 };
 
 
-struct Ast_Return : Ast_Node {
+struct Ast_Return : Ast_Expression{
 	Ast_Return() {
 		kind = AST_KIND_EXP_RETURN;
 	}
@@ -195,7 +195,7 @@ struct Ast_Var_Declaration : public Ast_Declaration {
 struct Ast_Scope {
 	Ast_Var_Declaration** variables = {0};
 	Ast_Proc_Declaration** procedures = {0};
-	Ast_Type** types = {0};;
+	Ast_Type** types = {0};
 	
 	
 	//Ast_Node** nodes;
