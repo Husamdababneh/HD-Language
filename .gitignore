@@ -2,6 +2,9 @@ helper.hd
 text.txt
 test.txt
 4coder.helper
+first.asm
+first.exe
+first.pdb
 
 /bin-int/
 /generated-source/
