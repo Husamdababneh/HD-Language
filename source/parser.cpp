@@ -116,7 +116,7 @@ inline void
 Parser::exit_scope()
 {
 	assert(current_scope);
-	current_scope->parent;
+	current_scope = current_scope->parent;
 }
 
 Predefined_Type* Parser::predefined_types = nullptr;
@@ -126,8 +126,11 @@ Predefined_Type* Parser::predefined_types = nullptr;
 // TODO: Remove this
 Token create_token(StringView name)
 {
+	static u32 id = 0;
+	id = (id + 3772) % 1000;
 	Token token = {0};
 	token.name = name;
+	token.start_position = {id+22, id+9};
 	token.hash = Hash(token);
 	
 	return token;
@@ -204,12 +207,50 @@ Parser::register_predefined_types()
 	//auto type = hmget(predefined_types, "u8");
 }
 
+
+void print_scopes(Ast_Scope* scope);
+
+void print_struct_decl(Ast_Struct_Declaration* decl) 
+{
+	if (decl == nullptr) return;
+	STBARRFOR(decl->decls, {
+				  printf("\t%.*s: [%.*s]\n", SV_PRINT(decl->token.name),SV_PRINT(it_data->token.name));
+			  });
+}
+
+void print_decls(Ast_Scope* scope)
+{
+	STBARRFOR(scope->procedures , {
+				  printf("Func: [%.*s]\n", SV_PRINT(it_data->token.name)); //print_scopes(it_data->self_scope); 
+				  print_scopes(it_data->body->scope);
+			  } );
+	
+	STBARRFOR(scope->variables, {printf("\tVar: [%.*s]\n", SV_PRINT(it_data->token.name));});
+	STBARRFOR(scope->structs, {
+				  printf("Struct: [%.*s]\n", SV_PRINT(it_data->token.name));
+				  print_struct_decl(it_data);});
+}
+
+void print_scopes(Ast_Scope* scope)
+{
+	if (scope == nullptr) return;
+	static int i = 0;
+	print_decls(scope);
+	for(u64 it = 0; it < arrlenu(scope->children); it++)
+	{
+		print_scopes(&scope->children[it]);
+	}
+	//printf("---------\n");
+	
+}
+
 Ast Parser::parse()
 {
 	
 	Ast_Block* block = parse_block();
-	PRINT_GRAPH(block, &logger);
-	generate(block);
+	print_scopes(block->scope);
+	//PRINT_GRAPH(block, &logger);
+	//generate(block);
 	
 	return {0};
 }
@@ -258,6 +299,8 @@ Parser::parse_argument_def()
 		decl->body= parse_expression();
 	}
 	
+	
+	arrput(current_scope->variables, decl);
 	return  decl;
 }
 
@@ -270,7 +313,8 @@ Parser::parse_proc_def()
 	
 	AllocateNode(Ast_Proc_Declaration, proc);
 	proc->token = decl_name;
-	proc->scope = enter_scope();
+	proc->scope = enter_scope();//current_scope;
+	//proc->self_scope = 
 	expect_and_eat('(');
 	
 	Token token = lexer.peek_token();
@@ -297,10 +341,12 @@ Parser::parse_proc_def()
 		}
 	}
 	
-	
+	exit_scope();
 	// Parse Body
 	proc->body = parse_block_of_statements();
 	
+	// Add method to current scope
+	arrput(current_scope->procedures, proc);
 	return proc;
 }
 
@@ -372,23 +418,30 @@ Parser::parse_struct_def()
 	expect_and_eat(TOKEN_DOUBLE_COLON);
 	Token token = lexer.eat_token(); // eat 'struct'
 	
-	expect_and_eat('{');
 	
 	AllocateNode(Ast_Struct_Declaration, _struct);
 	_struct->token = decl_name;
-	_struct->scope = enter_scope();
+	_struct->scope = enter_scope();//current_scope;
+	//_struct->self_scope = 
+	
+	expect_and_eat('{');
+	
 	
 	token = lexer.peek_token(); 
 	while(token.type != '}' && token.type != TOKEN_EOFA)
 	{
 		Ast_Var_Declaration* var = parse_var_def();
-		arrput(_struct->scope->variables, var);
 		arrput(_struct->decls, var);
 		token = lexer.peek_token();
 		if (token.type != '}') continue;
 	}
 	
 	expect_and_eat('}');
+	exit_scope();
+	
+	// Add the new type to current scope
+	arrput(current_scope->structs, _struct);
+	
 	return _struct;
 }
 

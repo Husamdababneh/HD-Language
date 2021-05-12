@@ -163,6 +163,9 @@ struct Ast_Declaration : public Ast_Node {
 		type = AST_DECLARATION;
 	}
 	
+	
+	
+	// In What scope this decl is 
 	Ast_Scope*     scope;
 	bool 	  constant;
 	bool 	  inforced_type;
@@ -175,7 +178,7 @@ struct Ast_Proc_Declaration : public Ast_Declaration {
 		kind = AST_KIND_DECL_PROCEDURE;
 		constant = true;
 	}
-	
+	Ast_Scope*     self_scope;
 	Ast_Type** return_type;
 	Ast_Block* body;
 };
@@ -197,18 +200,33 @@ struct Ast_Struct_Declaration : public Ast_Declaration {
 		Ast_Declaration();
 		kind = AST_KIND_DECL_STRUCT;
 	}
+	
+	Ast_Scope*     self_scope;
 	Ast_Declaration** decls;
 };
 
 struct Ast_Scope {
-	Ast_Var_Declaration** variables = {0};
-	Ast_Proc_Declaration** procedures = {0};
-	Ast_Type** types = {0};
+	Ast_Var_Declaration** variables = nullptr;
+	Ast_Proc_Declaration** procedures = nullptr;
+	Ast_Struct_Declaration** structs = nullptr;
+	Ast_Type** types = nullptr;
 	
 	
 	//Ast_Node** nodes;
 	Ast_Scope* parent = nullptr; // One item
 	
-	Ast_Scope* children = {0}; // Array
+	Ast_Scope* children = nullptr; // Array
 };
+
+
+bool is_variable(Ast_Expression* node);
+
+
+
+
+
+
+
+
+
 

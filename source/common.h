@@ -24,3 +24,6 @@ typedef double  f64;
 typedef float  float32;
 typedef double float64;
 
+
+
+#define STBARRFOR(x,y) for (u64 it = 0; it < arrlenu(x); it++) { auto& it_data = x[it]; y} 

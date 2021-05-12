@@ -6,25 +6,32 @@
 */
 
 
-func :: proc () -> s64 
+func :: proc (func_param : s64) -> s64 
 {
+	a :: 3;
 	return 5;
 }
 
 Entity :: struct {
-	a : s64 = 0;
+	Entitya : s64 = 0;
+	Entityb : s64 = 0;
+	Entityc : s64 = 0;
+	Entityd : s64 = 0;
+
 }
 
 main :: proc (param_1 : u16 = 5 , param_2 : u8) -> u64
 {
-	
+	ENtyty :: struct {
+		asd :: 3;
+	}
 	
 	a : s64 = 5; 
-	b : s64 : 9;
+	/*b : s64 : 9;
 	c :: 4;
 	d := 4;
 	e : u64;
 	e = 58;
-	a = (6 * b - a * a * b) + 180 + e;
+	a = (6 * b - a * a * b) + 180 + e;*/
 	return a;
 }

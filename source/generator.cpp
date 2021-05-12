@@ -66,7 +66,12 @@ void generate_block(Ast_Block* block);
 
 void generate_address(Ast_Expression* exp)
 {
-	fprintf(getFile(), "\tlea rax, [%.*s]\n", SV_PRINT(exp->token.name));
+	if (is_variable(exp))
+	{
+		// Global Variable
+		fprintf(getFile(), "\tlea rax, [%.*s]\n", SV_PRINT(exp->token.name));
+		
+	}
 }
 
 void generate_binary_expression(Ast_Binary* binary)
@@ -275,7 +280,8 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	fprintf(file, "\tsub rsp, %d\n", frame_size );
 	
 	// TODO: CleanUp
-	fprintf(file, "\tcall _CRT_INIT\n");
+	if (cmp2sv("main"_s, funcName) == 0)
+		fprintf(file, "\tcall _CRT_INIT\n");
 	generate_block(decl->body);
 	// Generate Work
 	
