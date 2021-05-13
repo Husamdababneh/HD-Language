@@ -38,11 +38,14 @@ project "HDLang"
 		"source"
 	}
 
-	--links { "MetaProgram" }	
 
 	filter  "system:windows" 
 		editandcontinue "on"
+		--buildoptions {
+		--	"/GF"
+		--}
 	
+
 	filter "system:linux"
 		links { "pthread", "dl" }
 		buildoptions {

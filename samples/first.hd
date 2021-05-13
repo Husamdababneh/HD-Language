@@ -3,35 +3,48 @@
 //#externproc printf
 /*
 
-*/
 
 
-func :: proc (func_param : s64) -> s64 
-{
-	a :: 3;
-	return 5;
-}
+
 
 Entity :: struct {
 	Entitya : s64 = 0;
 	Entityb : s64 = 0;
 	Entityc : s64 = 0;
 	Entityd : s64 = 0;
-
+	Entityd : s64 = 0;
+	Entityd : s64 = 0;
 }
 
+
+func :: proc (func_param : s64) -> s64 
+{
+	func(1, 2);
+	a2 : s64 = 5; 
+	
+	e : Entity;
+	//e : Entity;
+	//e.asd = asd;
+
+	//e : Entity;
+	return a;
+	return a;
+	return a;
+}
+
+*/
 main :: proc (param_1 : u16 = 5 , param_2 : u8) -> u64
 {
-	ENtyty :: struct {
-		asd :: 3;
-	}
+	func(1, 2).df;
+	//a2 : s64 = 5; 
 	
-	a : s64 = 5; 
-	/*b : s64 : 9;
-	c :: 4;
-	d := 4;
-	e : u64;
-	e = 58;
-	a = (6 * b - a * a * b) + 180 + e;*/
-	return a;
+	//e : Entity;
+	//e : Entity;
+	e.asd.count = asd;
+	A[5/5 + 5];
+	//e : Entity;
+	//return a;
+	//return a;
+	//return a;
+
 }

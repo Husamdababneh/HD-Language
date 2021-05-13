@@ -131,30 +131,22 @@ void LexerState::eat_characters(u64 count)
 
 u8 LexerState::eat_until_character()
 {
-	for(u64 a = input_cursor;  a < input.count; a++){
-		auto ch = eat_character();
-		if (!isWhiteSpace(ch)) {
-			return ch;
-		}
-	}
-	return 0;
+	
+	while(isWhiteSpace(peek_character())) eat_character();
+	return eat_character();
 }
 
+inline 
 void LexerState::eat_until_whitespace()
 {
-	
-	for(u64 a = input_cursor; a < input.count; a++)
-	{
-		if (isWhiteSpace(peek_character())) break; 
-		eat_character();
-	}
-	
+	while(!isWhiteSpace(peek_character())) eat_character();
 }
 
 
 u8 LexerState::eat_character()
 {
 	
+	// TODO: Check for end of file
 	switch(input[input_cursor])
 	{
 		case '\n':
@@ -166,6 +158,8 @@ u8 LexerState::eat_character()
 		break;
 	}
 	input_cursor++;
+	if (input_cursor >= input.count) return 0;
+	
 	return input[input_cursor - 1];
 }
 
@@ -235,11 +229,15 @@ Token LexerState::process_token()
 	token.start_position = get_current_position();
 	switch(ch)
 	{
-		// @Todo(Husam):Handle nested multiline comments.
+		/* 
+				case '\r':
+				case '\n':
+				case '\t':
+				return process_token();
+		 */
 		case '/':
 		{
 			u8 next = peek_character();
-			
 			if(next  == '/'){
 				token.type = TOKEN_COMMENT;
 				while(eat_character() != '\n');
@@ -264,7 +262,6 @@ Token LexerState::process_token()
 				};
 				if (nested_level != 0) {
 					// TODO : Report location where it started and 
-					
 					printf("Uncontinued Multiline comment\n");
 					exit(-1);
 				}
@@ -412,15 +409,15 @@ Token LexerState::process_token()
 			// @Cleanup: We could check the prev instead ?? wont it be easer ??
 			// @TODO: Make sure this works ?? 
 			// u8 escape = 0;
-			while(true){
+			
+			while(true) {
 				auto peeked = peek_character();
 				auto ahead =  peek_character(1);
 				if (peeked == '\\' && ahead == '"'){
 					eat_characters(2);
 				}
 				eat_character();
-				if(peeked == '"')
-					break;
+				if(peeked == '"') break;
 			}	  
 			token.type = TOKEN_LITERAL;
 			token.kind = TOKEN_KIND_STRING_LITERAL;
@@ -465,21 +462,20 @@ Token LexerState::process_token()
 				else
 					token.type = TOKEN_IDENT;
 			}
-			else 
+			else if (isDigit(ch))
 			{
 				// TODO: Handle floating points ... 
 				// TODO: handle the real values instead of the string
 				// We assume that this will be only numbers
 				// (0x -> hex) (0b -> binary) (0c  -> Octal)
 				// auto& pos = get_current_position();
-				assert(isDigit(ch));
 				token.type = TOKEN_LITERAL;
 				token.kind = TOKEN_KIND_INT_LITERAL;
 				auto peeked = peek_character();
 				if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character();
 				while (isDigit(peek_character()))eat_character();
 				
-			}
+			} 
 			break;
 		}
 	}

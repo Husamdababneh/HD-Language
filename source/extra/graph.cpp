@@ -94,7 +94,7 @@ output_graph(Ast_Node* node, Logger* logger)
 				break;
 			}
 			
-			if (node->kind == AST_KIND_EXP_UNARY)
+			else if (node->kind == AST_KIND_EXP_UNARY)
 			{
 				Ast_Unary* unary = (Ast_Unary*)node;
 				logger->print("T_%x -> { "_s, hash);
@@ -112,21 +112,22 @@ output_graph(Ast_Node* node, Logger* logger)
 				break;
 			}
 			
-			if (node->kind == AST_KIND_EXP_PRIMARY)
+			else if (node->kind == AST_KIND_EXP_PRIMARY)
 			{
 				Ast_Primary* primary = (Ast_Primary*) node;
 				Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, primary->token.name };
 				arrput(labels, label);
 				break;
 			}
-			if (node->kind == AST_KIND_EXP_LITERAL)
+			else if (node->kind == AST_KIND_EXP_LITERAL)
 			{
 				Ast_Literal * literal = (Ast_Literal*) node;
+				// TODO : if AST_KIND_LITERAL_STRING escape charachters 
 				Graph_Label label = { hash, Shape_Type::GRAPH_BOX, literal->token.name};
 				arrput(labels, label);
 				break;
 			}
-			if (node->kind == AST_KIND_EXP_RETURN)
+			else if (node->kind == AST_KIND_EXP_RETURN)
 			{
 				Ast_Return* _return =  (Ast_Return*) node;
 				logger->print("T_%x -> { "_s, hash);
@@ -145,6 +146,66 @@ output_graph(Ast_Node* node, Logger* logger)
 				arrput(labels, label);
 				
 				break;
+			}
+			else if (node->kind == AST_KIND_EXP_PROC_CALL)
+			{
+				Ast_Proc_Call* call =  (Ast_Proc_Call*) node;
+				logger->print("T_%x -> { "_s, hash);
+				
+				for(u64 i = 0; i < arrlenu(call->arguments); i++){
+					logger->print("T_%x "_s, call->arguments[i]->token.hash);
+				}
+				
+				logger->print("T_%x "_s, call->procedure->token.hash);
+				
+				
+				logger->print("}\n"_s);
+				
+				for(u64 i = 0; i < arrlenu(call->arguments); i++){
+					output_graph(call->arguments[i], logger);
+				}
+				output_graph(call->procedure, logger);
+				
+				Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, node->token.name };
+				arrput(labels, label);
+				
+			}
+			else if (node->kind == AST_KIND_EXP_MEM_ACC)
+			{
+				auto mem = (Ast_Member_Access*) node;
+				logger->print("T_%x -> { "_s, hash);
+				
+				logger->print("T_%x "_s, mem->_struct->token.hash);
+				
+				logger->print("T_%x "_s, mem->member.hash);
+				
+				logger->print("}\n"_s);
+				
+				//logger->print("T_%x -> T_%x\n"_s, mem->_struct->token.hash, mem->member.hash);
+				
+				output_graph(mem->_struct, logger);
+				Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, node->token.name };
+				Graph_Label label2= { mem->member.hash, Shape_Type::GRAPH_INVTRIANGLE, mem->member.name };
+				arrput(labels, label);
+				arrput(labels, label2);
+			}
+			else if (node->kind == AST_KIND_EXP_SUBSCRIPT)
+			{
+				auto sub = (Ast_Subscript* )node;
+				logger->print("T_%x -> { "_s, hash);
+				
+				logger->print("T_%x "_s, sub->exp->token.hash);
+				logger->print("T_%x "_s, sub->value->token.hash);
+				logger->print("}\n"_s);
+				
+				output_graph(sub->exp, logger);
+				output_graph(sub->value, logger);
+				Graph_Label label = { hash, Shape_Type::GRAPH_INVTRIANGLE, node->token.name };
+				arrput(labels, label);
+			}
+			else {
+				
+				assert(false && "Not supported Expression type");
 			}
 			break;
 			//assert(false);

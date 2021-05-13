@@ -88,7 +88,7 @@ struct LexerState
 	~LexerState();
 	
 	void* data; // hack for string;
-	StringView input;				// Data
+	StringView input = {0};				// Data
 	Logger logger = Logger("Lexer"_s);
 	u64 input_cursor;			// to keep track were we are
 	

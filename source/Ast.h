@@ -28,12 +28,17 @@ enum {
 	AST_KIND_EXP_PRIMARY,
 	AST_KIND_EXP_LITERAL,
 	AST_KIND_EXP_RETURN,
+	AST_KIND_EXP_PROC_CALL,
+	AST_KIND_EXP_MEM_ACC,
+	AST_KIND_EXP_SUBSCRIPT,
 	
 	
 	// Primary Expression Kinds
-	AST_KIND_PRIMARY_NUMBER,
 	AST_KIND_PRIMARY_IDENTIFIER,
-	AST_KIND_PRIMARY_STRING,
+	
+	// Primary Literal Kinds
+	AST_KIND_LITERAL_NUMBER,
+	AST_KIND_LITERAL_STRING,
 	
 	// Declaration Kinds
 	AST_KIND_DECL_PROCEDURE,
@@ -84,6 +89,8 @@ struct Ast_Literal : Ast_Expression {
 	Ast_Literal() {
 		kind= AST_KIND_EXP_LITERAL;
 	}
+	
+	s64 literal_kind;
 };
 
 
@@ -97,13 +104,38 @@ struct Ast_Primary : Ast_Expression {
 
 
 struct Ast_Unary : Ast_Expression {
-	//  <a> ? <b>
 	Ast_Unary() {
 		kind = AST_KIND_EXP_UNARY;
 		child = nullptr;
 	}
 	Ast_Node* child;
 	
+};
+
+struct Ast_Proc_Call : Ast_Expression {
+	Ast_Proc_Call() {
+		kind = AST_KIND_EXP_PROC_CALL;
+		arguments = nullptr;
+	}
+	Ast_Expression** arguments;
+	Ast_Expression*  procedure;
+};
+
+struct Ast_Member_Access: Ast_Expression {
+	Ast_Member_Access() {
+		kind = AST_KIND_EXP_MEM_ACC;
+	}
+	Token            member;
+	Ast_Primary*     _struct;
+};
+
+struct Ast_Subscript : Ast_Expression {
+	Ast_Subscript () {
+		kind = AST_KIND_EXP_SUBSCRIPT;
+	}
+	
+	Ast_Expression* exp;
+	Ast_Expression* value;
 };
 
 
@@ -150,21 +182,9 @@ struct Ast_Return : Ast_Expression{
 
 
 struct Ast_Declaration : public Ast_Node {
-	// [X] name := value;
-	// [X] name :  type  = value;
-	// [X] name :: value;   // constant
-	// [X] name :  type  : value; // constant
-	// [X] name ::  ( <arguments>  ) -> ( <return types> )   { ... } 
-	// [ ] name :: enum { ... }
-	// [ ] name :: struct { ... }
-	// [ ] name :: struct (   ) { ... }
-	
 	Ast_Declaration(){
 		type = AST_DECLARATION;
 	}
-	
-	
-	
 	// In What scope this decl is 
 	Ast_Scope*     scope;
 	bool 	  constant;
@@ -178,7 +198,6 @@ struct Ast_Proc_Declaration : public Ast_Declaration {
 		kind = AST_KIND_DECL_PROCEDURE;
 		constant = true;
 	}
-	Ast_Scope*     self_scope;
 	Ast_Type** return_type;
 	Ast_Block* body;
 };
@@ -201,7 +220,6 @@ struct Ast_Struct_Declaration : public Ast_Declaration {
 		kind = AST_KIND_DECL_STRUCT;
 	}
 	
-	Ast_Scope*     self_scope;
 	Ast_Declaration** decls;
 };
 
@@ -215,7 +233,16 @@ struct Ast_Scope {
 	//Ast_Node** nodes;
 	Ast_Scope* parent = nullptr; // One item
 	
-	Ast_Scope* children = nullptr; // Array
+	Ast_Scope** children = nullptr; // Array
+};
+
+
+// TODO: Basic data for any Note
+struct Ast_Note : Ast_Node {
+};
+
+// TODO: Basic data for any directive 
+struct Ast_Directive : Ast_Node {
 };
 
 

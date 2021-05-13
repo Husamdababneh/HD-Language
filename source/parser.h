@@ -52,5 +52,5 @@ struct Parser {
 	Ast_Expression* parse_expression(s8 priority = -1);
 	Ast_Expression* parse_suffix_expression(Ast_Expression* prev);
 	Ast_Expression* parse_unary_expression();
-	Ast_Primary* parse_primary_expression();
+	Ast_Expression* parse_primary_expression();
 };

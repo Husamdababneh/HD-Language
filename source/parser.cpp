@@ -97,17 +97,17 @@ inline Ast_Scope*
 Parser::enter_scope()
 {
 	Ast_Scope* prev = current_scope;
-	Ast_Scope _scope = {0}; 
-	arrput(scopes, _scope);
+	Ast_Scope ss = {0};
+	arrput(scopes, ss);
 	Ast_Scope* scope = &arrlast(scopes);
 	
 	
 	if (prev != nullptr){
-		arrput(prev->children, *scope);
+		arrput(prev->children, scope);
 	}
 	
 	scope->parent = prev;
-	current_scope = &arrlast(scopes);
+	current_scope = scope;
 	return scope;
 }
 
@@ -209,37 +209,52 @@ Parser::register_predefined_types()
 
 
 void print_scopes(Ast_Scope* scope);
-
 void print_struct_decl(Ast_Struct_Declaration* decl) 
 {
 	if (decl == nullptr) return;
-	STBARRFOR(decl->decls, {
-				  printf("\t%.*s: [%.*s]\n", SV_PRINT(decl->token.name),SV_PRINT(it_data->token.name));
-			  });
+	
+	for (u64 it = 0; it < arrlenu(decl->decls); it++) 
+	{
+		auto& it_data = decl->decls[it]; 
+		printf("%.*s: [%.*s]\n", SV_PRINT(decl->token.name),SV_PRINT(it_data->token.name));
+	} 
 }
 
 void print_decls(Ast_Scope* scope)
 {
-	STBARRFOR(scope->procedures , {
-				  printf("Func: [%.*s]\n", SV_PRINT(it_data->token.name)); //print_scopes(it_data->self_scope); 
-				  print_scopes(it_data->body->scope);
-			  } );
+	for (u64 it = 0; it < arrlenu(scope->procedures); it++) 
+	{
+		auto& it_data = scope->procedures[it];
+		printf("\tFunc: [%.*s]\n", SV_PRINT(it_data->token.name));
+	}
 	
-	STBARRFOR(scope->variables, {printf("\tVar: [%.*s]\n", SV_PRINT(it_data->token.name));});
-	STBARRFOR(scope->structs, {
-				  printf("Struct: [%.*s]\n", SV_PRINT(it_data->token.name));
-				  print_struct_decl(it_data);});
+	for (u64 it = 0; it < arrlenu(scope->variables); it++) 
+	{
+		auto& it_data = scope->variables[it];
+		printf("\tVar: [%.*s]\n", SV_PRINT(it_data->token.name));
+	}
+	
+	for (u64 it = 0; it < arrlenu(scope->structs); it++) 
+	{
+		auto& it_data = scope->structs[it];
+		printf("\tStruct: [%.*s]\n", SV_PRINT(it_data->token.name));
+		//print_struct_decl(it_data);
+	}
 }
 
 void print_scopes(Ast_Scope* scope)
 {
 	if (scope == nullptr) return;
-	static int i = 0;
+	
+	printf("Start Scope #%p--------------------------------------------\n", scope);
+	
 	print_decls(scope);
 	for(u64 it = 0; it < arrlenu(scope->children); it++)
 	{
-		print_scopes(&scope->children[it]);
+		print_scopes(scope->children[it]);
 	}
+	
+	printf("End Scope #%p----------------------------------------------\n", scope);
 	//printf("---------\n");
 	
 }
@@ -247,9 +262,12 @@ void print_scopes(Ast_Scope* scope)
 Ast Parser::parse()
 {
 	
+	bool still_parsing = true;
+	
 	Ast_Block* block = parse_block();
-	print_scopes(block->scope);
-	//PRINT_GRAPH(block, &logger);
+	
+	//print_scopes(block->scope);
+	PRINT_GRAPH(block, &logger);
 	//generate(block);
 	
 	return {0};
@@ -307,14 +325,15 @@ Parser::parse_argument_def()
 Ast_Proc_Declaration* 
 Parser::parse_proc_def()
 {
+	enter_scope();
+	
 	Token decl_name = lexer.eat_token(); // Name
 	expect_and_eat(TOKEN_DOUBLE_COLON);
 	lexer.eat_token(); // eat 'proc'
 	
 	AllocateNode(Ast_Proc_Declaration, proc);
 	proc->token = decl_name;
-	proc->scope = enter_scope();//current_scope;
-	//proc->self_scope = 
+	proc->scope = current_scope;
 	expect_and_eat('(');
 	
 	Token token = lexer.peek_token();
@@ -322,7 +341,6 @@ Parser::parse_proc_def()
 	while(token.type != ')' && token.type != TOKEN_EOFA)
 	{
 		Ast_Var_Declaration* var = parse_argument_def();
-		arrput(proc->scope->variables, var);
 		token = lexer.peek_token();
 		if (token.type != ')') expect_and_eat(',');
 	}
@@ -341,9 +359,10 @@ Parser::parse_proc_def()
 		}
 	}
 	
-	exit_scope();
 	// Parse Body
 	proc->body = parse_block_of_statements();
+	
+	exit_scope();
 	
 	// Add method to current scope
 	arrput(current_scope->procedures, proc);
@@ -418,11 +437,10 @@ Parser::parse_struct_def()
 	expect_and_eat(TOKEN_DOUBLE_COLON);
 	Token token = lexer.eat_token(); // eat 'struct'
 	
-	
+	enter_scope();
 	AllocateNode(Ast_Struct_Declaration, _struct);
 	_struct->token = decl_name;
-	_struct->scope = enter_scope();//current_scope;
-	//_struct->self_scope = 
+	_struct->scope = current_scope;
 	
 	expect_and_eat('{');
 	
@@ -498,7 +516,8 @@ Parser::parse_statement()
 	}
 	
 	// TODO: Handle Compile-time directives
-	if (t1.type == TOKEN_DIRECTIVE){
+	if (t1.type == TOKEN_DIRECTIVE) {
+		lexer.eat_token();
 		lexer.eat_token();
 		return nullptr;
 	}
@@ -646,42 +665,87 @@ Parser::parse_suffix_expression(Ast_Expression* prev)
 	}
 	
 	if (token.type == '('){
-		// funccall // 
-		assert(false && "Function Calls are not supported yet");
+		lexer.eat_token();
+		
+		
+		AllocateNode(Ast_Proc_Call, proc_call);
+		proc_call->token = token;
+		
+		Token next = lexer.peek_token();
+		while(next.type != ')')
+		{
+			Ast_Expression* exp = parse_expression();
+			arrput(proc_call->arguments, exp);
+			next = lexer.peek_token();
+			if (next.type != ')') expect_and_eat(',');
+		}
+		
+		expect_and_eat(')');
+		proc_call->procedure = prev;
+		
+		return parse_suffix_expression(proc_call);
+		// funccall //
+		//assert(false && "Function Calls are not supported yet");
 	}
 	
 	if (token.type == '['){
-		assert(false && "Array Subscripts are not supported yet");
+		lexer.eat_token();
+		AllocateNode(Ast_Subscript, sub);
+		sub->token = token;
+		sub->value= parse_expression();
+		sub->exp= prev;
+		
+		expect_and_eat(']');
+		
+		return parse_suffix_expression(sub);
+		//assert(false && "Array Subscripts are not supported yet");
 	}
 	
 	if (token.type == '.'){
-		assert(false && "Access Operator is not supported yet");
+		lexer.eat_token();
+		AllocateNode(Ast_Member_Access, mem_acc);
+		mem_acc->token = token;
+		
+		if (lexer.peek_token().type != TOKEN_IDENT) {
+			printf("Identifer Must be.. \n");
+			exit(-1);
+		}
+		
+		mem_acc->_struct = (Ast_Primary*)prev;
+		mem_acc->member = lexer.eat_token();
+		return parse_suffix_expression(mem_acc);
+		//assert(false && "Access Operator is not supported yet");
 	}
 	
 	
 	return prev; 
 }
 
-Ast_Primary* 
+Ast_Expression* 
 Parser::parse_primary_expression()
 {
 	auto token = lexer.eat_token();
-	AllocateNode(Ast_Primary, primary);
-	primary->token = token;
 	
 	switch(token.type)
 	{
 		case TOKEN_IDENT: 
 		{
+			AllocateNode(Ast_Primary, primary);
+			primary->token = token;
 			primary->priamry_kind = AST_KIND_PRIMARY_IDENTIFIER;
+			return primary;
 			break;
 		}
 		case TOKEN_LITERAL: 
 		{
+			AllocateNode(Ast_Literal, literal);
+			
 			if (token.kind == TOKEN_KIND_STRING_LITERAL) 
-				primary->priamry_kind = AST_KIND_PRIMARY_STRING;
+				literal->literal_kind = AST_KIND_LITERAL_STRING;
 			else 
-				primary->priamry_kind = AST_KIND_PRIMARY_NUMBER;
+				literal->literal_kind = AST_KIND_LITERAL_NUMBER;
+			literal->token = token;
+			return literal;
 			break;
 		}
 		default:
@@ -692,7 +756,7 @@ Parser::parse_primary_expression()
 		}
 	}
 	
-	return primary;
+	return nullptr;
 }
 
 Ast_Block*
@@ -707,17 +771,15 @@ Parser::parse_block_of_statements()
 Ast_Block*
 Parser::parse_block()
 {
-	Ast_Scope* scope = enter_scope();
-	
+	enter_scope();
 	AllocateNode(Ast_Block, block);
-	block->scope = scope;
+	block->scope = current_scope; 
 	
 	Token token = lexer.peek_token();
 	// TODO:  will this break ?? 
 	block->token = create_token(lexer.peek_token().name);
 	
-	while(token.type != TOKEN_EOFA &&
-		  token.type != '}')
+	while(token.type != TOKEN_EOFA && token.type != '}')
 	{
 		Ast_Node* statement = parse_statement();
 		
