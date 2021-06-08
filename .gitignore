@@ -5,6 +5,7 @@ test.txt
 first.asm
 first.exe
 first.pdb
+/**/generated.cpp
 
 /bin-int/
 /generated-source/
