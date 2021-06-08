@@ -8,17 +8,18 @@ $Description: Ast.h
 
 #include "lex.h"
 
-enum {
+enum Note(GenerateStrings, ast_type) {
 	AST_DECLARATION,
 	AST_EXPRESSION,
 	AST_IF,
 	AST_WHILE,
 	AST_BLOCK,
 	AST_TYPE,
+	AST_DIRECTIVE,
 	AST_UKNOWN,
 };
 
-enum {
+enum Note(GenerateStrings, ast_kind) {
 	AST_KIND_UNKNOWN,
 	// AST_KIND_
 	
@@ -44,6 +45,9 @@ enum {
 	AST_KIND_DECL_PROCEDURE,
 	AST_KIND_DECL_VARIABLE,
 	AST_KIND_DECL_STRUCT,
+	
+	// Directive Kinds
+	AST_KIND_DIR_IMPORT,
 	
 };
 
@@ -227,7 +231,7 @@ struct Ast_Scope {
 	Ast_Var_Declaration** variables = nullptr;
 	Ast_Proc_Declaration** procedures = nullptr;
 	Ast_Struct_Declaration** structs = nullptr;
-	Ast_Type** types = nullptr;
+	//Ast_Type** types = nullptr;
 	
 	
 	//Ast_Node** nodes;
@@ -236,13 +240,31 @@ struct Ast_Scope {
 	Ast_Scope** children = nullptr; // Array
 };
 
-
 // TODO: Basic data for any Note
 struct Ast_Note : Ast_Node {
 };
 
 // TODO: Basic data for any directive 
 struct Ast_Directive : Ast_Node {
+	Ast_Directive() {
+		type = AST_DIRECTIVE;
+	}
+	
+	
+	
+};
+
+struct Ast_Directive_Import : Ast_Node {
+	Ast_Directive_Import() {
+		kind = AST_KIND_DIR_IMPORT;
+		isAs = false;
+	}
+	
+	// Token have the location in file 
+	
+	Token filename; 
+	bool isAs; 
+	Token as;
 };
 
 

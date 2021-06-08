@@ -2,10 +2,6 @@
 
 #pragma once
 
-
-#include <windows.h>
-
-
 #ifdef _MSC_VER
 
 

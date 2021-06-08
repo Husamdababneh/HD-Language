@@ -7,14 +7,13 @@ $Description: Custom String Type
 #pragma once
 
 #include "common.h"
-#include <assert.h>
-// @Cleanup: do we need this ?
-
-struct myString
+#include "arena.h"
+struct StringView
 {
+	static Arena string_arena;
 	union {
 		u8* data;
-		u8* str;
+		char* str;
 	};
 	u64 count;
 	
@@ -30,9 +29,27 @@ struct myString
 };
 
 
-myString operator "" _s(const char* a, size_t s);
+struct String {
+	union {
+		StringView string;
+		struct { 
+			union {
+				u8* data;
+				char* str;
+			};
+			u64 count;
+		};
+	};
+	
+	~String() {
+		delete string.data;
+	}
+};
 
-typedef myString StringView;
+char* operator*(const StringView& string);
+
+StringView operator "" _s(const char* a, size_t s);
+StringView new_string(char* data, u64 count);
 
 #define cmpsv(x, y) memcmp(x, y, strlen(x))
 #define cmp2sv(x, y) memcmp(x.data, y.data, x.count)

@@ -5,17 +5,16 @@ $Creator: Husam Dababneh
 $Description: main function
 ========================================================================*/
 
-#include "pch.h"
-
-
 #include "main.h"
-#include "parser.h"
+#include "base.h"
 
-#include "../submodules/tracy/Tracy.hpp"
 
-//#include "typer.h"
+#include "lex.cpp"
+#include "generated.cpp"
+// TODO: Add all "Compiler-Specific files"
+#include "parser.cpp"
 
-constexpr bool verbos = false;
+
 int allocation_count = 0;
 
 
@@ -67,7 +66,7 @@ int main(int argc, char ** argv)
 	//FrameMarkStart (sl_Parsing );
 	
 	
-	
+	//__debugbreak();
 	Parser::register_predefined_types();
 	StringView filename = {(u8*)argv[1],  strlen(argv[1])};
 	Parser parser(filename, filename, true);

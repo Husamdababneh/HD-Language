@@ -1,12 +1,35 @@
 /* ========================================================================
-   $File: parser.h
-   $Date: 2020-10-16
-   $Creator: Husam Dababneh
-   $Description: parser
-   ========================================================================*/
+$File: parser.h
+$Date: 2020-10-16
+$Creator: Husam Dababneh
+$Description: parser
+========================================================================*/
 #pragma once
 
 #include "Ast.h"
+#include "lex.h"
+#include "typer.h"
+
+struct SourceFile {
+	StringView name;
+	u64 size;
+	Ast_Block* tree;
+};
+
+struct SourceCode {
+	StringView code;
+	u64 size;
+	Ast_Block* tree;
+};
+
+struct SourceUnit {
+	bool isFile;
+	
+	union {
+		SourceFile file;
+		SourceCode code;
+	};
+};
 
 
 struct Parser {
@@ -16,6 +39,14 @@ struct Parser {
 		:logger(loggerName), lexer(code, isFile)
 	{
 	}
+	
+	/* 
+		Parser(SourceUnit unit)
+		{
+			logger(unit.file);
+			lexer(unit.code, unit.isFile)
+		}
+		 */
 	
 	Logger logger;
 	LexerState lexer;
@@ -36,13 +67,13 @@ struct Parser {
 	void free() { arena_free(&ast_arena);}
 	
 	Ast parse();
-	Ast_Node* parse_factor();
-	Ast_Node* parse_operator();
 	Ast_Node* parse_statement();
 	Ast_Node* parse_const_def();
 	Ast_Type* parse_type();
 	Ast_Block* parse_block();
 	
+	
+	Ast_Node* parse_directive();
 	Ast_Struct_Declaration* parse_struct_def();
 	Ast_Proc_Declaration* parse_proc_def();
 	Ast_Node* parse_statement_expression();

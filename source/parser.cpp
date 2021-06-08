@@ -5,26 +5,18 @@ $Creator: Husam Dababneh
 $Description: parser.cpp
 ========================================================================*/
 
-#include "pch.h"
-#include "lex.h"
-#include "Ast.h"
 #include "parser.h"
 
-
-#include "typer.h"
-
-// @TEMP @CLEANUP This may break the premake generated files
 #define ENABLE_GRAPH_PRINTING 1
 #define GRAPH_SHOW_BLOCK_PARENT 0
 #include <extra/graph.cpp>
-
-#include "../submodules/tracy/Tracy.hpp"
-
 
 // :nocheckin
 #include "generator.cpp"
 
 
+// TODO: Re-read the Tracy documentation to use this in the right way
+#include "../submodules/tracy/Tracy.hpp"
 
 Ast_Node** flaten_ast = NULL;
 
@@ -41,38 +33,17 @@ arrput(flaten_ast,(Ast_Node*)name);
 #endif
 
 
-#if 0
-void 
-print_simple_c_struct(Logger* logger, Ast_Struct* node) 
-{
-	logger.print("struct %s {\n"_s, node->ident->token.name);
-	for(u64 i = 0; i < node->fields.occupied; i++){
-		logger.print("\t%s %s; \n"_s,
-					 node->fields[i]->data_type->token.name,
-					 node->fields[i]->ident->token.name);
-	}
-	logger.print("};\n"_s, node->ident->token.name);
-}
-#endif
+#define RED   "\033[0;31m"
+#define CYAN  "\033[0;36m"
+#define RESET "\033[0m"
 
-
-// TODO: make this a marco 
-/* 
-inline void 
-Parser::expect_and_eat(u64 type )
+static void SyntaxError(const Token& token, const StringView& message) 
 {
-	if(lexer.peek_token().type != type)
-	{
-		//logger.parse
-		// TODO loghere : 
-		printf("expect_and_eat:\n");
-		printf("Expected [%c, %d] got \"%.*s\"\n", (int)type, (int)type, SV_PRINT(lexer.peek_token().name));
-		//_CrtDbgBreak();
-		assert(false);
-	}
-	lexer.eat_token();
+	printf(RED"Error");
+	printf(CYAN"[%d, %d]: ", token.start_position.line, token.start_position.index);
+	printf(RESET"%s\n", *message);
+	exit(-1);
 }
-*/
 
 inline 
 void _expect_and_eat(Parser* _this, u64 type, u64 line, const char* file)
@@ -81,15 +52,15 @@ void _expect_and_eat(Parser* _this, u64 type, u64 line, const char* file)
 	if(token.type != type)
 	{
 		printf("expect_and_eat: %s %zd\n", file ,line);
-		printf("Expected [%c, %d] got \"%.*s\"\n", (int)type, (int)type, SV_PRINT(token.name));
-		printf("Token[%.*s] Located in Line: %d, Col: %d \n", SV_PRINT(token.name), token.start_position.x, token.start_position.y);
+		printf("Expected [%c, %d] got %.*s \n", (char)type, (int)type, SV_PRINT(token.name));
+		printf("Token[%.*s] Located in Line: %d, Col: %d \n", SV_PRINT(token.name), token.start_position.line, token.start_position.index);
+		
+		SyntaxError(token, "Expected Another Token Here"_s);
 		exit(-1);
 	}
 	_this->lexer.eat_token();
 	
 }
-
-//_CrtDbgBreak();
 #define expect_and_eat(x) _expect_and_eat(this, x, __LINE__, __FILE__)
 
 
@@ -122,7 +93,7 @@ Parser::exit_scope()
 Predefined_Type* Parser::predefined_types = nullptr;
 
 
-#define Hash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
+#define MHash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
 // TODO: Remove this
 Token create_token(StringView name)
 {
@@ -131,78 +102,80 @@ Token create_token(StringView name)
 	Token token = {0};
 	token.name = name;
 	token.start_position = {id+22, id+9};
-	token.hash = Hash(token);
+	token.hash = MHash(token);
 	
 	return token;
 }
 
+inline 
+Ast_Type create_type(const u32 size, 
+					 const u32 alignment, 
+					 const bool is_signed, 
+					 const StringView& name)
+{
+	Ast_Type type;
+	type.size = size;
+	type.alignment = alignment;
+	type.is_signed = is_signed;
+	type.token = create_token(name);
+	
+	return type;
+}
+
+
+inline 
+Ast_Type create_type(const u32 size, 
+					 const u32 alignment, 
+					 const bool is_signed, 
+					 const Token& token)
+{
+	Ast_Type type;
+	type.size = size;
+	type.alignment = alignment;
+	type.is_signed = is_signed;
+	type.token = token;
+	
+	return type;
+}
+
+
 void 
 Parser::register_predefined_types()
 {
-	Ast_Type _u8;
-	_u8.size = 1;
-	_u8.alignment = 1;
-	_u8.is_signed = false;
-	_u8.token = create_token("u8"_s);
-	hmput(predefined_types, "u8", _u8);
+	Ast_Type _u8 = create_type(1, 1, false, "u8"_s);
+	hmput(predefined_types, _u8.token.name.str, _u8);
 	
-	Ast_Type _u16;
-	_u16.size = 2;
-	_u16.alignment = 2;
-	_u16.is_signed = false;
-	_u16.token = create_token("u16"_s);
-	hmput(predefined_types, "u16", _u16);
+	Ast_Type _u16 = create_type(2, 2, false, "u16"_s);
+	hmput(predefined_types, _u16.token.name.str, _u16);
 	
-	Ast_Type _u32;
-	_u32.size = 4;
-	_u32.alignment = 4;
-	_u32.is_signed = false;
-	_u32.token = create_token("u32"_s);
-	hmput(predefined_types, "u32", _u32);
+	Ast_Type _u32 = create_type(4, 4, false, "u32"_s);
+	hmput(predefined_types, _u32.token.name.str, _u32);
 	
-	Ast_Type _u64;
-	_u64.size = 8;
-	_u64.alignment = 8;
-	_u64.is_signed = false;
-	_u64.token = create_token("u64"_s);
-	hmput(predefined_types, "u64", _u64);
+	Ast_Type _u64 = create_type(8, 8, false, "u64"_s);
+	hmput(predefined_types, _u64.token.name.str, _u64);
 	
-	Ast_Type _s8;
-	_s8.size = 1;
-	_s8.alignment = 1;
-	_s8.is_signed = true;
-	_s8.token = create_token("s8"_s);
-	hmput(predefined_types, "s8", _s8);
+	Ast_Type _s8 = create_type(1, 1, true, "s8"_s);
+	hmput(predefined_types, _s8.token.name.str, _s8);
 	
-	Ast_Type _s16;
-	_s16.size = 2;
-	_s16.alignment = 2;
-	_s16.is_signed = true;
-	_s16.token = create_token("s16"_s);
-	hmput(predefined_types, "s16", _s16);
+	Ast_Type _s16 = create_type(2, 2, true, "s16"_s);
+	hmput(predefined_types, _s16.token.name.str, _s16);
 	
-	Ast_Type _s32;
-	_s32.size = 4;
-	_s32.alignment = 4;
-	_s32.is_signed = true;
-	_s32.token = create_token("s32"_s);
-	hmput(predefined_types, "s32", _s32);
+	Ast_Type _s32 = create_type(4, 4, true, "s32"_s);
+	hmput(predefined_types, _s32.token.name.str, _s32);
 	
-	Ast_Type _s64;
-	_s64.size = 8;
-	_s64.alignment = 8;
-	_s64.is_signed = true;
-	_s64.token = create_token("s64"_s);
-	hmput(predefined_types, "s64", _s64);
+	Ast_Type _s64 = create_type(8, 8, true, "s64"_s);
+	hmput(predefined_types, _s64.token.name.str, _s64);
 	
-	/* 
+	
+	/* 	
 		for(u64 i = 0; i < hmlenu(predefined_types); i++)
 		{
 			Predefined_Type type = predefined_types[i];
-			printf("Name [%s]\n", type.key);
+			//printf("Name [%s]\n", type.key);
+			//printf("Name [%s]\n", *type.value.token.value);
 			//Ast_Type* hmget(predefined_types, type_name);
 		}
-	*/
+		*/
 	
 	//auto type = hmget(predefined_types, "u8");
 }
@@ -259,16 +232,32 @@ void print_scopes(Ast_Scope* scope)
 	
 }
 
+
+
+static Queue<StringView> files = make_queue<StringView>(10);
+
 Ast Parser::parse()
 {
 	
 	bool still_parsing = true;
 	
-	Ast_Block* block = parse_block();
 	
-	//print_scopes(block->scope);
-	PRINT_GRAPH(block, &logger);
+	Ast_Block* block = parse_block();
+	//PRINT_GRAPH(block, &logger);
+	print_scopes(block->scope);
 	//generate(block);
+	
+	
+	
+	/* 
+		for(u64 i = 0; i < hmlenu(predefined_types); i++)
+		{
+			Predefined_Type type = predefined_types[i];
+			printf("Name [%s]\n", type.key);
+			//printf("Name [%s]\n", *type.value.token.value);
+			//Ast_Type* hmget(predefined_types, type_name);
+		}
+		 */
 	
 	return {0};
 }
@@ -280,10 +269,7 @@ Parser::parse_type()
 	
 	expect_and_eat(TOKEN_IDENT);
 	
-	char type_name[256] = {0};
-	memcpy(type_name, token.name.data, token.name.count);
-	
-	s64 type_index = hmgeti(predefined_types, "u8");
+	s64 type_index = hmgeti(predefined_types, token.name.str);
 	
 	if (type_index == -1) {
 		AllocateNode(Ast_Type, type);
@@ -418,14 +404,14 @@ Parser::parse_var_def()
 	token = lexer.peek_token();
 	// If it's a constant it have to have a value; 
 	
-	if (!var->constant && token.type == ';')  
+	if (!var->constant && token.type == TOKEN_SEMI_COLON)  
 		goto exit;
 	
 	var->body = parse_expression();
 	
 	exit:
 	arrput(current_scope->variables, var);
-	expect_and_eat(';');
+	expect_and_eat(TOKEN_SEMI_COLON);
 	return var;
 }
 
@@ -460,8 +446,16 @@ Parser::parse_struct_def()
 	// Add the new type to current scope
 	arrput(current_scope->structs, _struct);
 	
+	// Add Struct to types
+	
+	hmput(predefined_types, decl_name.name.str, create_type(0,0,0,decl_name));
+	
+	//arrput(current_scope->types, type);
+	
 	return _struct;
 }
+
+
 
 Ast_Node* 
 Parser::parse_const_def()
@@ -496,7 +490,7 @@ Parser::parse_statement_expression()
 	
 	// Statements
 	Ast_Node* exp = parse_expression();
-	expect_and_eat(';');
+	expect_and_eat(TOKEN_SEMI_COLON);
 	return exp;
 }
 
@@ -517,9 +511,7 @@ Parser::parse_statement()
 	
 	// TODO: Handle Compile-time directives
 	if (t1.type == TOKEN_DIRECTIVE) {
-		lexer.eat_token();
-		lexer.eat_token();
-		return nullptr;
+		return parse_directive();
 	}
 	
 	// Scopes
@@ -533,12 +525,12 @@ Parser::parse_statement()
 		_return->token = lexer.eat_token();
 		
 		t1 = lexer.peek_token();
-		while (t1.type != ';'){
+		while (t1.type != TOKEN_SEMI_COLON){
 			arrput(_return->expressions, (Ast_Expression*)parse_expression()); 
 			t1 = lexer.peek_token();
-			if (t1.type != ';') expect_and_eat(',');
+			if (t1.type != TOKEN_SEMI_COLON) expect_and_eat(',');
 		}
-		expect_and_eat(';');
+		expect_and_eat(TOKEN_SEMI_COLON);
 		return _return;
 		//assert(false && "Return Statements are not supported yet");
 	}
@@ -660,7 +652,7 @@ Parser::parse_suffix_expression(Ast_Expression* prev)
 	Token token = lexer.peek_token();
 	
 	// early exit 
-	if (token.type == ';'){
+	if (token.type == TOKEN_SEMI_COLON){
 		return prev; 
 	}
 	
@@ -750,7 +742,7 @@ Parser::parse_primary_expression()
 		}
 		default:
 		{
-			printf("Token [%.*s] At [Line: %d, Col: %d], Is not a primary expression \n",SV_PRINT(token.name), token.start_position.x,token.start_position.y);
+			printf("Token [%.*s] At [Line: %d, Col: %d], Is not a primary expression \n",SV_PRINT(token.name), token.start_position.line,token.start_position.index);
 			exit(-1);
 			break;
 		}
@@ -792,4 +784,44 @@ Parser::parse_block()
 	return block;
 }
 
+
+Ast_Node* 
+Parser::parse_directive()
+{
+	Token directive = lexer.eat_token();
+	if (cmp2sv(directive.name, "#import"_s) == 0)
+	{
+		Token filename = lexer.eat_token();
+		
+		if (filename.type != TOKEN_LITERAL ||
+			filename.kind != TOKEN_KIND_STRING_LITERAL)
+		{
+			SyntaxError(filename, "\"Import\" Directive Expect a string literal"_s);
+		}
+		
+		Token next = lexer.peek_token();
+		
+		AllocateNode(Ast_Directive_Import, import);
+		import->token = directive;
+		import->filename = filename;
+		
+		if (cmp2sv(next.name, "as"_s) == 0)
+		{
+			lexer.eat_token();
+			import->isAs = true;
+			import->as = next;
+		}
+		
+		// Add filename to parsing queue :) 
+		return import;
+	}
+	
+	
+	
+	
+	printf("%s Directive is not Supported Yet\n", *directive.name );
+	assert(false);
+	
+	return nullptr;
+}
 

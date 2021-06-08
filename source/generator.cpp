@@ -1,7 +1,6 @@
-#include "pch.h"
 
+#include "base.h"
 #include "ast.h"
-
 
 static FILE* _outfile;
 
@@ -264,6 +263,8 @@ void generate_block(Ast_Block* block)
 	
 }
 
+
+
 void generate_proc(Ast_Proc_Declaration* decl)
 {
 	
@@ -279,9 +280,23 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	fprintf(file, "\tmov rbp, rsp\n");
 	fprintf(file, "\tsub rsp, %d\n", frame_size );
 	
+	
+	// Generate Local Variables
+	Ast_Scope* current_scope = decl->scope;
+	for(u64 it = 0; it < arrlenu(current_scope->variables); it++)
+	{
+		
+		fprintf(file, "[%.*s] with type [%.*s] size: [%d]\n", SV_PRINT(current_scope->variables[it]->token.name),
+				SV_PRINT(current_scope->variables[it]->data_type->token.name),
+				current_scope->variables[it]->data_type->size
+				);
+	}
+	
+	
 	// TODO: CleanUp
 	if (cmp2sv("main"_s, funcName) == 0)
 		fprintf(file, "\tcall _CRT_INIT\n");
+	
 	generate_block(decl->body);
 	// Generate Work
 	

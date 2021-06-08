@@ -5,9 +5,9 @@
    $Description: Defines Lexer functionality & Data Structures
    ========================================================================*/ 
 
-
-#include "pch.h"
 #include "lex.h"
+
+
 
 #include "common.h"
 #include "auxiliary.h"
@@ -61,6 +61,9 @@ StringView reserved [] = {
 	"null"_s,
 	"true"_s,
 	"false"_s,
+	
+	// Compiler Stuff
+	"as"_s,
 	
 	// not used
 	"no_inline"_s,
@@ -133,6 +136,13 @@ u8 LexerState::eat_until_character()
 {
 	
 	while(isWhiteSpace(peek_character())) eat_character();
+	return eat_character();
+}
+
+u8 LexerState::eat_until(u8 charr)
+{
+	
+	while(peek_character() != charr) eat_character();
 	return eat_character();
 }
 
@@ -240,7 +250,8 @@ Token LexerState::process_token()
 			u8 next = peek_character();
 			if(next  == '/'){
 				token.type = TOKEN_COMMENT;
-				while(eat_character() != '\n');
+				while(peek_character() != '\r' && 
+					  peek_character() != '\n'){eat_character();}
 			}
 			else if (next == '*'){
 				// TODO: 
@@ -481,8 +492,13 @@ Token LexerState::process_token()
 	}
 	token.end_position = get_current_position();
 	assert(token.type != TOKEN_NONE);
-	token.value = StringView{ &input[temp], input_cursor  - temp};
+	token.value = new_string((char*)&input[temp], input_cursor  - temp);
 	token.hash = Hash(token);
+	
+	if (config.ignore_comments && token.type == TOKEN_COMMENT)
+	{
+		return process_token();
+	}
 	
 	return token;
 }
@@ -493,6 +509,7 @@ Token LexerState::eat_token()
 		return process_token();
 	return *pop(&token_cache);
 }
+
 
 
 Token LexerState::peek_token(u64 lookAhead /* = 0*/ )

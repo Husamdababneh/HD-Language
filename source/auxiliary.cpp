@@ -5,8 +5,6 @@
    $Description: see auxiliary.h
    ========================================================================*/
 
-#include "pch.h"
-
 #include "platform/platform.h"
 
 

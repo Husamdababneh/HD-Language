@@ -7,8 +7,10 @@
 
 #pragma once
 
-enum {
-	
+enum Note(GenerateStrings, token_type)
+{
+	TOKEN_SEMI_COLON = ';',
+	TOKEN_COMMA = ',',
 	TOKEN_EQUAL = '=',
 	
 	TOKEN_IDENT = 256,
@@ -54,12 +56,7 @@ enum {
 
 struct Position
 {
-	union
-	{
-		// Do we need bigger size ??
-		struct {u32 line, index;};
-		struct {u32 x, y;};
-	};
+	u32 line, index;
 };
 
 struct Token
@@ -82,6 +79,10 @@ struct Token
 	};
 };
 
+struct LexerStateConfigs {
+	bool ignore_comments = false;
+};
+
 struct LexerState
 {
 	LexerState(const StringView& str, bool isfile = true);
@@ -99,17 +100,21 @@ struct LexerState
 	Arena strings = {0};
 	Queue<Token> token_cache;
 	Stack<u8> paranthases_stack;
-	
+	LexerStateConfigs config;
 	Token eat_token();
 	Token process_token();
 	Token eat_token_cache();
 	Token peek_token(u64 lookAhead = 0);
-	Token peek_next_token();
 	Token peek_forward(u64 lookahead);
+	Token eat_until_token_by_type(u64 token_type);
 	
+	Position get_current_position() { return {current_line_number, current_char_index}; }
+	
+	//private:
 	inline u8& peek_next_character();
 	inline u8& peek_character(u64 lookAhead = 0);
 	
+	inline u8 eat_until(u8 charr);
 	inline u8  eat_character();
 	inline u8 eat_until_character();
 	inline void eat_characters(u64 count = 1);
@@ -117,7 +122,6 @@ struct LexerState
 	
 	void preprosses();
 	
-	Position get_current_position() { return {current_line_number, current_char_index}; }
 	
 	//LexerState() = delete;					 // copy constructor
 	LexerState(const LexerState& ) = delete; // copy constructor

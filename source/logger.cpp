@@ -5,7 +5,6 @@
    $Description: Logger.cpp
    ========================================================================*/
 
-#include "pch.h"
 #include "logger.h"
 #include "lex.h"
 
@@ -13,9 +12,9 @@ void Logger::print_token_pos(Token * token ) {
 	putchar('[');
 	for(size_t i = 0; i < prefix.count; i++) putchar(prefix[i]);
 	putchar('(');
-	printf("%d", token->start_position.x);
+	printf("%d", token->start_position.line);
 	putchar(',');
-	printf("%d", token->start_position.y);
+	printf("%d", token->start_position.index);
 	putchar(')');
 	putchar(']');
 	putchar(':');

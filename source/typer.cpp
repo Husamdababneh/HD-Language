@@ -5,8 +5,6 @@
    $Description: typer.cpp
    ========================================================================*/
 
-
-#include "pch.h"
 #include "typer.h"
 
 //Type * types;

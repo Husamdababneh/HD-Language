@@ -5,11 +5,8 @@ $Creator: Husam
 $Desc:  
 =========================================================================*/
 
-#include "pch.h" 
+
 #include "arena.h"
-
-
-
 
 Region *region_create(u64 capacity)
 {

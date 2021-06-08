@@ -5,6 +5,5 @@
    $Description: common.cpp
    ========================================================================*/
 
-#include "pch.h"
 #include "common.h"
 

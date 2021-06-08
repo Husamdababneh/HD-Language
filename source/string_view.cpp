@@ -5,11 +5,29 @@
    $Description: Custom String Type
    ========================================================================*/
 
-#include "pch.h"
-#include "string.h"
+#include "string_view.h"
 
-//typedef myString StringView;
+
+Arena StringView::string_arena = {0};
 
 StringView operator "" _s(const char* a, size_t s){
     return { (u8*)a, s};
+}
+
+
+
+StringView new_string(char* data, u64 count)
+{
+	char* d = (char*)arena_alloc(&StringView::string_arena, count + 1);
+	
+	memcpy(d, data, count);
+	d[count+1] = 0;
+	
+    return {(u8*)d, count};
+}
+
+
+char* operator*(const StringView& string)
+{
+	return string.str;
 }
