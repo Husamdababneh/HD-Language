@@ -119,7 +119,7 @@
 #define MEOW_HASH_VERSION 5
 #define MEOW_HASH_VERSION_NAME "0.5/calico"
 
-#if !defined(meow_u8)
+#if !defined(meow_U8)
 
 #if _MSC_VER
 #if !defined(__clang__)
@@ -131,8 +131,8 @@
 #include <x86intrin.h>
 #endif
 
-#define meow_u8 char unsigned
-#define meow_u64 long long unsigned
+#define meow_U8 char unsigned
+#define meow_U64 long long unsigned
 #define meow_u128 __m128i
 
 #if __x86_64__ || _M_AMD64
@@ -140,7 +140,7 @@
 #define MeowU64From(A, I) (_mm_extract_epi64((A), (I)))
 #elif __i386__  || _M_IX86
 #define meow_umm int unsigned
-#define MeowU64From(A, I) (*(meow_u64 *)&(A))
+#define MeowU64From(A, I) (*(meow_U64 *)&(A))
 #else
 #error Cannot determine architecture to use!
 #endif
@@ -211,27 +211,27 @@ meow_dump *MeowDumpTo;
 #define MEOW_DUMP_STATE(T, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, ptr) \
 if(MeowDumpTo) \
 { \
-    MeowDumpTo->xmm[0] = xmm0; \
-    MeowDumpTo->xmm[1] = xmm1; \
-    MeowDumpTo->xmm[2] = xmm2; \
-    MeowDumpTo->xmm[3] = xmm3; \
-    MeowDumpTo->xmm[4] = xmm4; \
-    MeowDumpTo->xmm[5] = xmm5; \
-    MeowDumpTo->xmm[6] = xmm6; \
-    MeowDumpTo->xmm[7] = xmm7; \
-    MeowDumpTo->Ptr = ptr; \
-    MeowDumpTo->Title = T; \
-    ++MeowDumpTo; \
+MeowDumpTo->xmm[0] = xmm0; \
+MeowDumpTo->xmm[1] = xmm1; \
+MeowDumpTo->xmm[2] = xmm2; \
+MeowDumpTo->xmm[3] = xmm3; \
+MeowDumpTo->xmm[4] = xmm4; \
+MeowDumpTo->xmm[5] = xmm5; \
+MeowDumpTo->xmm[6] = xmm6; \
+MeowDumpTo->xmm[7] = xmm7; \
+MeowDumpTo->Ptr = ptr; \
+MeowDumpTo->Title = T; \
+++MeowDumpTo; \
 }
 #else
 #define MEOW_DUMP_STATE(...)
 #endif
 
-static meow_u8 MeowShiftAdjust[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-static meow_u8 MeowMaskLen[32] = {255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
+static meow_U8 MeowShiftAdjust[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+static meow_U8 MeowMaskLen[32] = {255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
 
 // NOTE(casey): The default seed is now a "nothing-up-our-sleeves" number for good measure.  You may verify that it is just an encoding of Pi.
-static meow_u8 MeowDefaultSeed[128] =
+static meow_U8 MeowDefaultSeed[128] =
 {
     0x32, 0x43, 0xF6, 0xA8, 0x88, 0x5A, 0x30, 0x8D,
 	0x31, 0x31, 0x98, 0xA2, 0xE0, 0x37, 0x07, 0x34,
@@ -261,8 +261,8 @@ MeowHash(void *Seed128Init, meow_umm Len, void *SourceInit)
     meow_u128 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7; // NOTE(casey): xmm0-xmm7 are the hash accumulation lanes
     meow_u128 xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15; // NOTE(casey): xmm8-xmm15 hold values to be appended (residual, length)
     
-    meow_u8 *rax = (meow_u8 *)SourceInit;
-    meow_u8 *rcx = (meow_u8 *)Seed128Init;
+    meow_U8 *rax = (meow_U8 *)SourceInit;
+    meow_U8 *rcx = (meow_U8 *)Seed128Init;
     
     //
 	// NOTE(casey): Seed the eight hash registers
@@ -342,14 +342,14 @@ MeowHash(void *Seed128Init, meow_umm Len, void *SourceInit)
     //
     
     // NOTE(casey): First, we have to load the part that is _not_ 16-byte aligned
-    meow_u8 *Last = (meow_u8 *)SourceInit + (Len & ~0xf);
+    meow_U8 *Last = (meow_U8 *)SourceInit + (Len & ~0xf);
     int unsigned Len8 = (Len & 0xf);
     if(Len8)
     {
         // NOTE(casey): Load the mask early
         movdqu(xmm8, &MeowMaskLen[0x10 - Len8]);
         
-        meow_u8 *LastOk = (meow_u8*)((((meow_umm)(((meow_u8 *)SourceInit)+Len - 1)) | (MEOW_PAGESIZE - 1)) - 16);
+        meow_U8 *LastOk = (meow_U8*)((((meow_umm)(((meow_U8 *)SourceInit)+Len - 1)) | (MEOW_PAGESIZE - 1)) - 16);
         int Align = (Last > LastOk) ? ((int)(meow_umm)Last) & 0xf : 0;
         movdqu(xmm10, &MeowShiftAdjust[Align]);
         movdqu(xmm9, Last - Align);
@@ -450,18 +450,18 @@ MeowHash(void *Seed128Init, meow_umm Len, void *SourceInit)
 typedef struct meow_state
 {
     meow_u128 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
-    meow_u64 TotalLengthInBytes;
+    meow_U64 TotalLengthInBytes;
     
     int unsigned BufferLen;
     
-    meow_u8 Buffer[256];
+    meow_U8 Buffer[256];
     meow_u128 Pad[2]; // NOTE(casey): So we know we can over-read Buffer as necessary
 } meow_state;
 
 static void
 MeowBegin(meow_state *State, void *Seed128)
 {
-    meow_u8 *rcx = (meow_u8 *)Seed128;
+    meow_U8 *rcx = (meow_U8 *)Seed128;
     
     movdqu(State->xmm0, rcx + 0x00);
     movdqu(State->xmm1, rcx + 0x10);
@@ -479,7 +479,7 @@ MeowBegin(meow_state *State, void *Seed128)
 }
 
 static void
-MeowAbsorbBlocks(meow_state *State, meow_umm BlockCount, meow_u8 *rax)
+MeowAbsorbBlocks(meow_state *State, meow_umm BlockCount, meow_U8 *rax)
 {
     meow_u128 xmm0 = State->xmm0;
     meow_u128 xmm1 = State->xmm1;
@@ -542,7 +542,7 @@ static void
 MeowAbsorb(meow_state *State, meow_umm Len, void *SourceInit)
 {
     State->TotalLengthInBytes += Len;
-    meow_u8 *Source = (meow_u8 *)SourceInit;
+    meow_U8 *Source = (meow_U8 *)SourceInit;
     
     // NOTE(casey): Handle any buffered residual
     if(State->BufferLen)
@@ -567,8 +567,8 @@ MeowAbsorb(meow_state *State, meow_umm Len, void *SourceInit)
     }
     
     // NOTE(casey): Handle any full blocks
-    meow_u64 BlockCount = (Len >> 8);
-    meow_u64 Advance = (BlockCount << 8);
+    meow_U64 BlockCount = (Len >> 8);
+    meow_U64 Advance = (BlockCount << 8);
     MeowAbsorbBlocks(State, BlockCount, Source);
     
     Len -= Advance;
@@ -582,7 +582,7 @@ MeowAbsorb(meow_state *State, meow_umm Len, void *SourceInit)
 }
 
 static meow_u128
-MeowEnd(meow_state *State, meow_u8 *Store128)
+MeowEnd(meow_state *State, meow_U8 *Store128)
 {
     meow_umm Len = State->TotalLengthInBytes;
     
@@ -597,12 +597,12 @@ MeowEnd(meow_state *State, meow_u8 *Store128)
     
     meow_u128 xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
     
-    meow_u8 *rax = State->Buffer;
+    meow_U8 *rax = State->Buffer;
     
     pxor_clear(xmm9, xmm9);
     pxor_clear(xmm11, xmm11);
     
-    meow_u8 *Last = (meow_u8 *)rax + (Len & 0xf0);
+    meow_U8 *Last = (meow_U8 *)rax + (Len & 0xf0);
     int unsigned Len8 = (Len & 0xf);
     if(Len8)
     {
@@ -725,10 +725,10 @@ MeowEnd(meow_state *State, meow_u8 *Store128)
 //
 
 static void
-MeowExpandSeed(meow_umm InputLen, void *Input, meow_u8 *SeedResult)
+MeowExpandSeed(meow_umm InputLen, void *Input, meow_U8 *SeedResult)
 {
     meow_state State;
-    meow_u64 LengthTab = (meow_u64)InputLen; // NOTE(casey): We need to always injest 8-byte lengths exactly, even on 32-bit builds, to ensure identical results
+    meow_U64 LengthTab = (meow_U64)InputLen; // NOTE(casey): We need to always injest 8-byte lengths exactly, even on 32-bit builds, to ensure identical results
     meow_umm InjestCount = (256 / InputLen) + 2;
     
     MeowBegin(&State, MeowDefaultSeed);

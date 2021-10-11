@@ -5,30 +5,32 @@
    $Description: Meta-Program to generate some data
    ========================================================================*/
 
-#include "base.h"
+#include "base.cpp"
+
+#define LEXER_ENABLE_C_CHAR_TOKEN 1
 #include "lex.cpp"
-#define FOR(x) for (u64 it = 0; it < x; it++)
+#define FOR(x) for (U64 it = 0; it < x; it++)
 #define ArraySize(x) sizeof(x)/sizeof(x[0])
 
 FILE* file ;
 
 inline 
-void _expect_and_eat(LexerState& lexer , u64 type, u64 line, const char* file)
+void _expect_and_eat_2(LexerState& lexer , U64 type, U64 line, const char* _file)
 {
-	Token token = lexer.peek_token();
+	Token token = peek_token(lexer);
 	if(token.type != type)
 	{
-		printf("expect_and_eat: %s %zd\n", file ,line);
+		printf("expect_and_eat: %s %zd\n", _file ,line);
 		printf("Expected [%c, %d] got %.*s \n", (char)type, (int)type, SV_PRINT(token.name));
 		printf("Token[%.*s] Located in Line: %d, Col: %d \n", SV_PRINT(token.name), token.start_position.line, token.start_position.index);
 		exit(-1);
 	}
-	lexer.eat_token();
+	eat_token(lexer);
 	
 }
 
 //_CrtDbgBreak();
-#define expect_and_eat(x) _expect_and_eat(lex, x, __LINE__, __FILE__)
+#define expect_and_eat(x) _expect_and_eat_2(lex, x, __LINE__, __FILE__)
 
 
 StringView NoteTypes[] {
@@ -38,10 +40,10 @@ StringView NoteTypes[] {
 };
 
 
-s64 NoteToInt(const StringView& str) 
+S64 NoteToInt(const StringView& str) 
 {
 	FOR(ArraySize(NoteTypes)){
-		if (cmp2sv(str, NoteTypes[it]) == 0){
+		if (EqualStrings(str, NoteTypes[it])){
 			return it;
 		}
 	}
@@ -49,17 +51,17 @@ s64 NoteToInt(const StringView& str)
 }
 
 struct GenerateStringsCommand {
-	StringView  name;
-	StringView* array;
+	String name;
+	String* array;
 };
 
-static StringView current_filename = {0};
+static String current_filename = {0};
 
 void enums_handler(LexerState& lex)
 {
 	
-	Token token = lex.eat_token();
-	s64 type = NoteToInt(token.name);
+	Token token = eat_token(lex);
+	S64 type = NoteToInt(token.name);
 	
 	GenerateStringsCommand command;
 	command.array = NULL;
@@ -74,38 +76,38 @@ void enums_handler(LexerState& lex)
 		//  NOTE:
 		case 1:
 		{
+			//printf("Filename %.*s\n", SV_PRINT(current_filename));
+			//printf("Token is [%.*s]\n", SV_PRINT(token.name));
 			expect_and_eat('(');
-			if (cmp2sv(lex.peek_token().name, "GenerateStrings"_s) != 0){
+			if (!EqualStrings(peek_token(lex).name, "GenerateStrings"_s)){
 				// TODO : Better error message
 				assert(false);
 			}
 			
-			lex.eat_token().name; // Eat Argument (GenerateStrings")
+			eat_token(lex).name; // Eat Argument (GenerateStrings")
 			expect_and_eat(',');
-			command.name = lex.eat_token().name;
+			command.name = eat_token(lex).name;
 			expect_and_eat(')'); // Eat (
 			
 			
 			expect_and_eat('{'); // Eat {
 			
-			token = lex.eat_token();
+			token = eat_token(lex);
 			while(token.type == TOKEN_IDENT) {
 				//printf("%s \n", *token.name);
 				
 				arrput(command.array, token.name);
 				
-				if (lex.peek_token().type == '='){
-					while (lex.peek_token().type != ','){
-						auto a = lex.eat_token(); // eat = 
-						if (a.type == '\'') {
-							lex.eat_until('\'');
-						}
-						
-					}
+				if (peek_token(lex).type == '=')
+				{
+					auto equal = eat_token(lex); // eat '='
+					
+					// TODO: Handle Shift operations ? 
+					auto value = eat_token(lex); // eat value 
 				}
 				
 				expect_and_eat(',');
-				token = lex.eat_token();
+				token = eat_token(lex);
 				if (token.type == '}') break;
 			}
 			
@@ -123,27 +125,29 @@ void enums_handler(LexerState& lex)
 		}
 		default: 
 		{
+			return;
 			assert(false);
 			exit(-1);
 		}
 		
 	}
 	
-	char* buffer = new char[MB(0.5)];
 	int size = MB(0.5);
+	char* buffer = new char[size];
 	int writen= 0;
-	printf("%zd ......... \n", arrlenu(command.array));
 	
-	writen += sprintf_s(buffer+ writen, size - writen, "#include \"%s\"\n", *current_filename);
-	writen += sprintf_s(buffer+writen, size - writen, "const StringView %s_to_string(u64 c){\n", *command.name);
+	writen += sprintf_s(buffer+ writen, size - writen, "#include \"%.*s\"\n", SV_PRINT(current_filename));
+	writen += sprintf_s(buffer+writen, size - writen, "const StringView %.*s_to_string(U64 c){\n", SV_PRINT(command.name));
 	writen += sprintf_s(buffer+ writen, size - writen, "\tswitch(c){\n");
 	FOR(arrlenu(command.array)){
-		writen += sprintf_s(buffer+ writen, size- writen, "\t\tcase %s: return \"%s\"_s;  \n", *command.array[it], *command.array[it]);
+		writen += sprintf_s(buffer+ writen, size- writen, "\t\tcase %.*s: return \"%.*s\"_s;  \n", SV_PRINT(command.array[it]), SV_PRINT(command.array[it]));
 	}
+	
+	//writen += sprintf_s(buffer+ writen, size - writen, "\t\tdefault: return \"UNKNOWN_STRING\"_s;\n\t}\n}\n");
 	
 	writen += sprintf_s(buffer+ writen, size - writen, "\t\tdefault: return \"\"_s;\n\t}\n}\n");
 	
-	printf("%s", buffer);
+	//printf("%s", buffer);
 	//open_file(file, "./generated.cpp", "w");
 	fprintf(file, buffer);
 	
@@ -151,21 +155,58 @@ void enums_handler(LexerState& lex)
 }
 
 
+void parse_struct_members(LexerState& lex, StringView struct_name)
+{
+	while(peek_token(lex).type != '}'){
+		Token type = eat_token(lex);
+		Token name = eat_token(lex);
+		eat_until_token_by_type(lex, TOKEN_SEMI_COLON);
+		printf("\t{ offsetof(%.*s, %.*s), member_size(%.*s, %.*s) },\n", 
+			   SV_PRINT(struct_name), SV_PRINT(name.name),
+			   SV_PRINT(struct_name), SV_PRINT(name.name));
+	}
+	eat_token(lex);// eat '}'
+}
+
 [[nodiscard]]
 bool parse_file (const StringView& filename) {
 	current_filename = filename;
-	LexerState lex(filename); 
+	
+	LexerState lex = {};//(filename); 
+	lex.input = readEntireFileToStringView(filename);
 	lex.config.ignore_comments = true;
-	Token token = lex.eat_token();
+	Token token = eat_token(lex);
 	while(token.type != TOKEN_EOFA)
 	{
-		if (cmp2sv(token.name, "enum"_s) == 0)
+		if (EqualStrings(token.name, "enum"_s))
 		{
 			enums_handler(lex);
 		}
 		
+		if (EqualStrings(token.name, "introspect"_s))
+		{
+			// TODO(Husam Dababneh): Unimplemented yet ?? 
+			//printf("--- Kawabanga\n");
+		}
 		
-		token = lex.eat_token();
+		
+		
+		/* 		
+				if (EqualStrings(token.name, "padding_check"_s))
+				{
+					eat_token(lex);// eat 'struct'
+					Token struct_name = eat_token(lex);
+					printf("Name: %.*s\n", SV_PRINT(struct_name.name)); 
+					expect_and_eat('{');
+					parse_struct_members(lex, struct_name.name);
+					
+				}
+				
+				 */
+		
+		
+		token = eat_token(lex);
+		
 	}
 	
 	return true;
@@ -182,15 +223,14 @@ int main (int argc, char** argv){
 	open_file(outfile, "./generated.cpp", "w");
 	file = outfile;
 	FOR(ArraySize(filenames)) {
-		printf("[Meta]: Parsing %s Started\n", *filenames[it]);
+		printf("[Meta]: Parsing %.*s Started\n", SV_PRINT(filenames[it]));
 		bool success = parse_file(filenames[it]);
 		
 		if (!success) {
-			printf("[Meta]: Failed to parse %s\n", *filenames[it]);
+			printf("[Meta]: Failed to parse %.*s\n", SV_PRINT(filenames[it]));
 		}
-		
+		//printf("\n\n\n\n\n\n\n");
 	}
 	
 	fclose(file);
-	
 }

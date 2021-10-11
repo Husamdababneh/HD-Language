@@ -8,19 +8,21 @@ $Desc:
 
 #include "arena.h"
 
-Region *region_create(u64 capacity)
+// nocheckin
+#include "memory"
+Region *region_create(U64 capacity)
 {
-	const u64 region_size = sizeof(Region) + capacity;
-	Region *region = (Region*)new u8[region_size];
+	const U64 region_size = sizeof(Region) + capacity;
+	Region *region = (Region*)new U8[region_size];
     memset(region, 0, region_size);
     region->capacity = capacity;
     return region;
 }
 
-void *arena_alloc(Arena *arena, u64 size)
+void *arena_alloc(Arena *arena, U64 size)
 {
     if (arena->last == NULL) {
-        assert(arena->first == NULL);
+        //assert(arena->first == NULL); // nocheckin
 		
         Region *region = region_create(size > ARENA_DEFAULT_CAPACITY ? size : ARENA_DEFAULT_CAPACITY);
 		

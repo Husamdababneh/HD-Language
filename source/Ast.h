@@ -56,19 +56,22 @@ enum {
 	AST_BINARY_MINUS,
 	AST_BINARY_MUL,
 	AST_BINARY_DIV,
-	AST_BINARY_ASSIGN
+	AST_BINARY_ASSIGN,
+	
+	AST_BINARY_IS_EQL
 };
 
 struct Ast_Node;
 struct Ast_Scope;
+
 struct Ast {
 	Ast_Node** nodes;
 };
 
 
 struct Ast_Node {
-	u16 type = AST_UKNOWN; // ?? 
-	u16 kind = AST_KIND_UNKNOWN;
+	U16 type = AST_UKNOWN; // ?? 
+	U16 kind = AST_KIND_UNKNOWN;
 	Token token;
 	
 };
@@ -91,10 +94,10 @@ struct Ast_Expression : Ast_Node {
 
 struct Ast_Literal : Ast_Expression {
 	Ast_Literal() {
-		kind= AST_KIND_EXP_LITERAL;
+		kind = AST_KIND_EXP_LITERAL;
 	}
 	
-	s64 literal_kind;
+	S64 literal_kind;
 };
 
 
@@ -103,7 +106,7 @@ struct Ast_Primary : Ast_Expression {
 	Ast_Primary (){
 		kind = AST_KIND_EXP_PRIMARY;
 	}
-	s64 priamry_kind ;
+	S64 priamry_kind ;
 };
 
 
@@ -151,7 +154,7 @@ struct Ast_Binary : Ast_Expression {
 		right= nullptr;
 	}
 	
-	s64 op;
+	S64 op;
 	Ast_Node* left;
 	Ast_Node* right;
 	
@@ -164,10 +167,9 @@ struct Ast_Type : public Ast_Node {
 		type = AST_TYPE;
 	}
 	
-	u32 size;
-	u32 alignment;
+	U32 size;
+	U32 alignment;
 	bool is_signed;
-	//u8* name;
 };
 
 struct Predefined_Type {
@@ -191,8 +193,8 @@ struct Ast_Declaration : public Ast_Node {
 	}
 	// In What scope this decl is 
 	Ast_Scope*     scope;
-	bool 	  constant;
-	bool 	  inforced_type;
+	bool 	      constant;
+	bool 	      inforced_type;
 };
 
 struct Ast_Proc_Declaration : public Ast_Declaration {
@@ -227,6 +229,18 @@ struct Ast_Struct_Declaration : public Ast_Declaration {
 	Ast_Declaration** decls;
 };
 
+struct Ast_If : public Ast_Node {
+	Ast_If() {
+		type = AST_IF;
+		//kind = AST_KIND_IF;
+	}
+	
+	Ast_Expression* exp;
+	Ast_Node* statement;
+	Ast_Node** next;
+	
+};
+
 struct Ast_Scope {
 	Ast_Var_Declaration** variables = nullptr;
 	Ast_Proc_Declaration** procedures = nullptr;
@@ -250,9 +264,9 @@ struct Ast_Directive : Ast_Node {
 		type = AST_DIRECTIVE;
 	}
 	
-	
-	
 };
+
+
 
 struct Ast_Directive_Import : Ast_Node {
 	Ast_Directive_Import() {
@@ -263,6 +277,8 @@ struct Ast_Directive_Import : Ast_Node {
 	// Token have the location in file 
 	
 	Token filename; 
+	// NOTE(Husam Dababneh): I think we only need as, and check if it has a value
+	// otherwise we didn't find the 'as' keyword
 	bool isAs; 
 	Token as;
 };

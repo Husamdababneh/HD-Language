@@ -26,6 +26,16 @@ StringView new_string(char* data, u64 count)
     return {(u8*)d, count};
 }
 
+StringView new_string(char data)
+{
+	char* d = (char*)arena_alloc(&StringView::string_arena, 2);
+	
+	d[0] = data;
+	d[1] = 0;
+	
+    return {(u8*)d, 1};
+}
+
 
 char* operator*(const StringView& string)
 {

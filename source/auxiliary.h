@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "string_view.h"
+//#include "string_view.h"
 
 
 //extern constexpr int MAX_ARG_COUNT = 5 + 1; // + 1 for executable call string
@@ -28,9 +28,9 @@ struct Arguments
 };
 
 //Arguments ParseArguments(int argc, char** argv);
-u64 read_entire_file(FILE* file, void** data_return);
-u64 read_entire_file(const char* file, void** data_return);
-u64 read_entire_file(const StringView& filename, void** data_return);
+U64 read_entire_file(FILE* file, void** data_return);
+U64 read_entire_file(const char* file, void** data_return);
+U64 read_entire_file(const StringView& filename, void** data_return);
 
 template <typename F>
 struct Defer
@@ -45,19 +45,21 @@ struct Defer
 #define defer(body) Defer CONCAT(defer, __LINE__)([&]() { body; })
 
 
+/* 
 
 struct Memory {
-	u64 size;
-	u64 count;
-	u8* data;
+	U64 size;
+	U64 count;
+	U8* data;
 };
 
 
 struct MemorySlot {
-	u64 size;
-	u8* data;
+	U64 size;
+	U8* data;
 	Memory* parent;
 };
 
 
 
+ */

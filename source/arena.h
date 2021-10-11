@@ -15,7 +15,7 @@ struct Region {
     Region* next;
     size_t  capacity;
     size_t  size;
-    u8      buffer[];
+    U8      buffer[];
 };
 #ifdef _MSC_VER
 #pragma warning(default: 4200)

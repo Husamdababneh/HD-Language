@@ -11,6 +11,9 @@
 #define open_file(handle, path, mode) FILE* handle; fopen_s(&handle, path,mode);
 #define open_file_handle(handle, path, mode) fopen_s(&handle, path,mode);
 
+#include <windows.h>
+#include <memoryapi.h>
+
 #else 
 #error("We only support MSVC compiler on windows");"
 #endif

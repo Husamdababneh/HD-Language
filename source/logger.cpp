@@ -5,12 +5,14 @@
    $Description: Logger.cpp
    ========================================================================*/
 
+#include "hdbase.h"
 #include "logger.h"
 #include "lex.h"
 
+/* 
 void Logger::print_token_pos(Token * token ) {
 	putchar('[');
-	for(size_t i = 0; i < prefix.count; i++) putchar(prefix[i]);
+	for(size_t i = 0; i < prefix.length; i++) putchar(prefix[i]);
 	putchar('(');
 	printf("%d", token->start_position.line);
 	putchar(',');
@@ -33,6 +35,7 @@ void Logger::print_with_location(Token * token , StringView str, ...) {
 	va_end(args);
 	return;
 }
+ */
 
 
 void Logger::print(StringView str, ...) {
@@ -52,7 +55,7 @@ void Logger::vprint(StringView str, va_list args) {
 	vprintf((const char*)str.data, args);
 #else
 	// print body
-	for(size_t i = 0; i < str.count; i++) {
+	for(size_t i = 0; i < str.length; i++) {
 		if (str[i] == '%'){
 			i++;
 			switch (str[i]){
@@ -65,7 +68,7 @@ void Logger::vprint(StringView str, va_list args) {
 				case 'x':
 				{
 					meow_u128 hash = va_arg(args, meow_u128);
-					u32 x = MeowU32From(hash, 3);
+					U32 x = MeowU32From(hash, 3);
 					printf("%08X", x);
 					break;
 				}
@@ -85,7 +88,7 @@ void Logger::vprint(StringView str, va_list args) {
 				{
 					StringView string = va_arg(args, StringView);
 					
-					for(int a = 0; a < string.count; a++)
+					for(int a = 0; a < string.length; a++)
 						putc(string[a], out);
 					
 					break;
@@ -93,7 +96,7 @@ void Logger::vprint(StringView str, va_list args) {
 				default:
 				{
 					if (str[i] == '%'){
-						if (i + 1 < str.count && str[i+1] != '%')
+						if (i + 1 < str.length && str[i+1] != '%')
 							continue;
 					}
 					putchar(str[i]);
@@ -112,7 +115,7 @@ void Logger::vprint(StringView str, va_list args) {
 
 inline void Logger::print_prefix() {
 	putchar('[');
-	for(size_t i = 0; i < prefix.count; i++) putchar(prefix[i]);
+	for(size_t i = 0; i < prefix.length; i++) putchar(prefix[i]);
 	putchar(']');
 	putchar(':');
 	putchar(' ');		

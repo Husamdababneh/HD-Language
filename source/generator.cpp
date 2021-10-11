@@ -254,7 +254,7 @@ void generate_node(Ast_Node* node){
 void generate_block(Ast_Block* block)
 {
 	//printf("#Of Statements = %zd\n", arrlenu(block->statements));
-	for(u64 i = 0; i < arrlenu(block->statements); i++)
+	for(U64 i = 0; i < arrlenu(block->statements); i++)
 	{
 		generate_node(block->statements[i]);
 	}
@@ -271,7 +271,7 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	FILE * file = getFile();
 	
 	
-	u32 frame_size = 32;
+	U32 frame_size = 32;
 	StringView funcName = decl->token.name;
 	// Generate Prework
 	fprintf(file, "segment .code\n");
@@ -283,7 +283,7 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	
 	// Generate Local Variables
 	Ast_Scope* current_scope = decl->scope;
-	for(u64 it = 0; it < arrlenu(current_scope->variables); it++)
+	for(U64 it = 0; it < arrlenu(current_scope->variables); it++)
 	{
 		
 		fprintf(file, "[%.*s] with type [%.*s] size: [%d]\n", SV_PRINT(current_scope->variables[it]->token.name),
@@ -294,7 +294,7 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	
 	
 	// TODO: CleanUp
-	if (cmp2sv("main"_s, funcName) == 0)
+	if (EqualStrings("main"_s, funcName))
 		fprintf(file, "\tcall _CRT_INIT\n");
 	
 	generate_block(decl->body);
@@ -328,14 +328,14 @@ generate(Ast_Node* node)
 	FILE* file = getFile();
 	
 	fprintf(file, "\n");
-	for(u64 i = 0; i < arrlenu(funcs); i++){
+	for(U64 i = 0; i < arrlenu(funcs); i++){
 		fprintf(file, "global func.%.*s\n", SV_PRINT(funcs[i]));
 	}
 	arrfree(funcs);
 	
 	
 	fprintf(file, "segment .data\n");
-	for(u64 i = 0; i < arrlenu(vars); i++){
+	for(U64 i = 0; i < arrlenu(vars); i++){
 		printf("Adding [%.*s] \n", SV_PRINT(vars[i]->token.name));
 		if (vars[i]->body)
 			fprintf(file, "\t%.*s dq %.*s\n", SV_PRINT(vars[i]->token.name), SV_PRINT(vars[i]->body->token.name));

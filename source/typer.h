@@ -11,15 +11,15 @@ $Description: typer.h
 struct Alias;
 
 struct Type {
-	u32 size;
-	u32 alignment;
-	u8* name;
+	U32 size;
+	U32 alignment;
+	U8* name;
 	Alias* aliases;
 	Type* children;
 };
 
 struct Type_Map {
-	u8* key;
+	U8* key;
 	Type value;
 };
 
@@ -41,7 +41,7 @@ size = 8 + 8 // sizeof string, + sizeof pointer to string
 name = string
 aliases = NULL
 children {
-u64 size;
+U64 size;
 stringPtr  { data, string, str}  
 }
 

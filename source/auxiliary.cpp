@@ -8,21 +8,21 @@
 #include "platform/platform.h"
 
 
-u64 read_entire_file(FILE* file, void** data_return)
+U64 read_entire_file(FILE* file, void** data_return)
 {
-	assert(file);
+	// assert(file); // nocheckin
 	int descriptor = fileno(file);
 	
 	struct stat file_stats;
 	int result = fstat(descriptor, &file_stats);
 	if (result == -1) return -1;
 	
-	u64 length = file_stats.st_size;
+	U64 length = file_stats.st_size;
 	
 	unsigned char* data = new unsigned char[length];
 	
 	fseek(file, 0, SEEK_SET);
-	u64 success = fread((void*)data, length, 1, file);
+	U64 success = fread((void*)data, length, 1, file);
 	if (success < 1) {
 		delete[] data;
 		return -1;
@@ -32,7 +32,7 @@ u64 read_entire_file(FILE* file, void** data_return)
 	return length;
 }
 
-u64 read_entire_file(const char* filepath, void** data_return)
+U64 read_entire_file(const char* filepath, void** data_return)
 {
 	open_file(file, filepath, "rb");
 	
@@ -42,18 +42,28 @@ u64 read_entire_file(const char* filepath, void** data_return)
 		return false;
 	}
 	
-	u64 result = read_entire_file(file, data_return);
+	U64 result = read_entire_file(file, data_return);
 	fclose(file);
 	return result;
 }
 
-u64 read_entire_file(const StringView& filename, void** data_return)
+U64 read_entire_file(const StringView& filename, void** data_return)
 {
-	assert(filename.count <= 255);
+	// assert(filename.count <= 255); // nocheckin
 	char name[256];
 	
-	memcpy((void*)name, (void*)filename.data, filename.count);
-	name[filename.count] = '\0';
+	memcpy((void*)name, (void*)filename.str, filename.length);
+	name[filename.length] = '\0';
 	return read_entire_file(name, data_return);
 	
 }
+
+StringView readEntireFileToStringView(const StringView& filename)
+{
+	S8* data = nullptr;
+	auto size = read_entire_file(filename, (void**)&data);
+	StringView d = {size, data};
+	return d;
+}
+
+//StringView readEntireFile()

@@ -28,7 +28,7 @@ $Desc:
 
 
 
-add :: (a : u64 = b, b : u64 = 55, hh : int) -> (u64) {
+add :: (a : U64 = b, b : U64 = 55, hh : int) -> (U64) {
 	return a + b;
 }
 

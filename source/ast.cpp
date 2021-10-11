@@ -3,7 +3,7 @@
 
 bool 
 is_variable(Ast_Expression* node) {
-	assert(node);
+	// assert(node); // :nocheckin
 	
 	if (node->kind == AST_KIND_EXP_PRIMARY && 
 		((Ast_Primary *)node)->priamry_kind == AST_KIND_PRIMARY_IDENTIFIER) return true;

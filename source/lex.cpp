@@ -1,28 +1,53 @@
 /* ========================================================================
-   $File: lex.cpp
-   $Date: 2020-04-04
-   $Creator: Husam Dababneh
-   $Description: Defines Lexer functionality & Data Structures
-   ========================================================================*/ 
+$File: cpp
+$Date: 2020-04-04
+$Creator: Husam Dababneh
+$Description: Defines Lexer functionality & Data Structures
+========================================================================*/ 
 
 #include "lex.h"
 
-
+#ifndef LEXER_ENABLE_C_CHAR_TOKEN
+#define LEXER_ENABLE_C_CHAR_TOKEN 0
+#endif
 
 #include "common.h"
 #include "auxiliary.h"
 #include "stack.h"
 
 
-#define FOR_RANGE(x) for(u64 it = 0; it < x; it++)
+// NOTE(Husam Dababneh): Forward Declaration of basic procedures
+Token eat_token(LexerState&);
+Token process_token(LexerState&);
+Token peek_token(LexerState&, U64 lookAhead = 0);
+Token peek_forward(LexerState&, U64 lookahead);
+Token eat_until_token_by_type(LexerState&, U64 token_type);
+
+S8  eat_character(LexerState&);
+S8  peek_character(LexerState&, U64 count = 0);
+void eat_characters(LexerState&, U64 count = 0);
+
+[[nodiscard]] 
+Position 
+get_current_position(LexerState& lex) 
+{ 
+	return {lex.current_line_number + 1, lex.current_char_index}; 
+}
+/*
+TODO(Husam Dababneh): I want to change the way the lexer works, but just after finishing the base
+*/
+
+#define FOR_RANGE(x) for(U64 it = 0; it < x; it++)
 
 // TODO : Remove them from reserved[]  
 StringView predefined_types [] = {
+	
+	// TODO(Husam Dababneh): Do I need Uppercase version of these ?? 
 	// types
-	"u8"_s , "s8"_s,
+	"U8"_s , "S8"_s,
 	"u16"_s, "s16"_s,
-	"u32"_s, "s32"_s,
-	"u64"_s, "s64"_s,	
+	"U32"_s, "s32"_s,
+	"U64"_s, "S64"_s,	
 	"float32"_s,
 	"float64"_s,
 	"string"_s,
@@ -30,8 +55,8 @@ StringView predefined_types [] = {
 	"void"_s
 };
 
-StringView reserved [] = {
-    // loop
+StringView keywords[] = {
+	// loop
 	"for"_s,
 	
 	// memory related
@@ -69,25 +94,30 @@ StringView reserved [] = {
 	"no_inline"_s,
 };
 
-constexpr int KeywordCount = sizeof(reserved) / sizeof(StringView);
+constexpr int PREDEFINED_TYPES_COUNT = sizeof(predefined_types) / sizeof(predefined_types[0]);
+constexpr int KEYWORDS_COUNT = sizeof(keywords) / sizeof(keywords[0]);
 
-static inline bool isWhiteSpace(u8 c){
-	if (c == '\t' ||c ==  '\n' ||c ==  '\r' ||c ==  ' ') return true;
-	return false;
+static inline bool isWhiteSpace(U8 c){
+	return (c ==  '\t' || 
+			c ==  '\n' ||
+			c ==  '\r' || 
+			c ==  ' '  || 
+			c ==  '\f' ||
+			c ==  '\v' );
 }
 
-static inline bool isAlphabet(u8 ch){
+static inline bool isAlphabet(U8 ch){
 	if (ch >= 'a' && ch <= 'z') return true;
 	if (ch >= 'A' && ch <= 'Z') return true;
 	return false;
 }
 
-static inline bool isDigit(u8 ch){
+static inline bool isDigit(U8 ch){
 	if (ch >= '0' && ch <= '9') return true;
 	return false;
 }
 
-static inline bool isLiteralChar(u8 ch){
+static inline bool isLiteralChar(U8 ch){
 	if (isAlphabet(ch)) return true;
 	if (ch == '_')  return true;
 	if (isDigit(ch)) return true;
@@ -97,10 +127,8 @@ static inline bool isLiteralChar(u8 ch){
 bool isKeyword(StringView& string)
 {
 	// TODO: Generate Hashmap for the keywords
-	for(int a = 0; a < KeywordCount; a++){
-		if(cmp2sv(string, &reserved[a]) == 0) {
-			return true;
-		}
+	for(int a = 0; a < KEYWORDS_COUNT; a++){
+		if (EqualStrings(string, keywords[a])) return true;
 	}
 	return false;
 }
@@ -108,164 +136,116 @@ bool isKeyword(StringView& string)
 bool isHDtype(StringView& string)
 {
 	// TODO: Generate Hashmap for the keywords
-	for(int a = 0; a < KeywordCount; a++){
-		if(cmp2sv(string, &predefined_types[a]) == 0) {
+	for(int a = 0; a < PREDEFINED_TYPES_COUNT; a++){
+		if(EqualStrings(string, predefined_types[a])) {
 			return true;
 		}
 	}
 	return false;
 }
 
-u8& LexerState::peek_next_character()
+S8 peek_next_character(LexerState& lex)
 {
-	return input[input_cursor + 1];
+	return lex.input[lex.input_cursor + 1];
 }
 
-u8& LexerState::peek_character(u64 lookAhead /* = 0 */)
+S8 peek_character(LexerState& lex, U64 lookAhead /* = 0 */)
 {
-	return input[input_cursor + lookAhead];
+	return lex.input[lex.input_cursor + lookAhead];
 }
 
-void LexerState::eat_characters(u64 count)
+// TODO(Husam Dababneh): Merge this with the basic one
+void eat_characters(LexerState& lex, U64 count)
 {
 	for(int a = 0; a < count; a++)
-		eat_character();
+		eat_character(lex);
 }
 
-u8 LexerState::eat_until_character()
+S8 eat_until_character(LexerState& lex)
 {
 	
-	while(isWhiteSpace(peek_character())) eat_character();
-	return eat_character();
+	while(isWhiteSpace(peek_character(lex))) eat_character(lex);
+	return eat_character(lex);
 }
 
-u8 LexerState::eat_until(u8 charr)
+S8 eat_until(LexerState& lex, S8 charr)
 {
 	
-	while(peek_character() != charr) eat_character();
-	return eat_character();
+	while(peek_character(lex) != charr) eat_character(lex);
+	return eat_character(lex);
+}
+
+
+inline 
+void eat_until_whitespace(LexerState& lex)
+{
+	while(!isWhiteSpace(peek_character(lex))) eat_character(lex);
 }
 
 inline 
-void LexerState::eat_until_whitespace()
+void eat_ident(LexerState& lex)
 {
-	while(!isWhiteSpace(peek_character())) eat_character();
+	while(isLiteralChar(peek_character(lex)))
+		eat_character(lex);
 }
 
 
-u8 LexerState::eat_character()
+S8 eat_character(LexerState& lex)
 {
-	
 	// TODO: Check for end of file
-	switch(input[input_cursor])
+	switch(lex.input[lex.input_cursor])
 	{
 		case '\n':
-		current_line_number++;
-		current_char_index = 0;
+		lex.current_line_number++;
+		lex.current_char_index = 0;
 		break;
 		default:
-		current_char_index++;
+		lex.current_char_index++;
 		break;
 	}
-	input_cursor++;
-	if (input_cursor >= input.count) return 0;
+	lex.input_cursor++;
+	if (lex.input_cursor >= lex.input.length) return 0;
 	
-	return input[input_cursor - 1];
+	return lex.input[lex.input_cursor - 1];
 }
 
-LexerState::LexerState(const StringView& str, bool isfile /* = true*/)
-{
-	if (isfile){
-		u64 length = read_entire_file(str, (void**)&input.data);
-		if (length < 0)
-		{
-			logger.print("Couldn't read file %s\n"_s, str);
-			exit(1);
-		}
-		input.count = length;
-		input_cursor = 0;
-		data = input.data;
-	}else {
-		data = nullptr;
-		input.data = str.data;
-		input.count = str.count;
-		input_cursor = 0;
-	}
-	
-	current_line_number = 1;
-	current_char_index = 0;	
-	
-	
-	//// Cache
-	token_cache = make_queue<Token>(100);
-	// This stack can be very small since i don't think one will write so deep scopes 
-	paranthases_stack = make_stack<u8>(26);
-	this->preprosses();
-}
-
-LexerState::~LexerState()
-{
-	printf("Getting Out\n");
-	free_queue(&token_cache);
-	//string_free(input);
-	if (data){
-		delete[] data;
-	}
-}
-
-void LexerState::preprosses() 
-{
-#if ENABLE_LEX_PREPROSSES == 1
-	// TODO: Is there anything usefull we can do here? or it's just a waste of time ?? 
-#else
-	
-#endif
-	
-}
 #define Hash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
-Token LexerState::process_token()
+Token process_token(LexerState& lex)
 {
 	// @TODO: init a token and return it.
-	static int COUTNER = 1;
-	if(input_cursor >= input.count)
+	//static int COUTNER = 1;
+	if(lex.input_cursor >= lex.input.length)
 		return { TOKEN_EOFA , 0, 0 , 0 };
 	
 	Token token = {0};
+	//COUTNER++;
 	
-	//token.id = COUTNER;
-	COUTNER++;
-	u8 ch = eat_until_character();
-	u64 temp = input_cursor - 1;
-	token.start_position = get_current_position();
+	U8 ch = eat_until_character(lex);
+	U64 temp = lex.input_cursor - 1;
+	token.start_position = get_current_position(lex);
 	switch(ch)
 	{
-		/* 
-				case '\r':
-				case '\n':
-				case '\t':
-				return process_token();
-		 */
 		case '/':
 		{
-			u8 next = peek_character();
+			U8 next = peek_character(lex);
 			if(next  == '/'){
 				token.type = TOKEN_COMMENT;
-				while(peek_character() != '\r' && 
-					  peek_character() != '\n'){eat_character();}
+				while(peek_character(lex) != '\r' && 
+					  peek_character(lex) != '\n'){eat_character(lex);}
 			}
 			else if (next == '*'){
 				// TODO: 
 				token.type = TOKEN_MULTILINE_COMMENT;
 				int nested_level = 1;
-				while(input_cursor < input.count ){
-					u8 eaten = eat_character();
-					u8 next_to_be_eaten = peek_character();
+				while(lex.input_cursor < lex.input.length){
+					U8 eaten = eat_character(lex);
+					U8 next_to_be_eaten = peek_character(lex);
 					if (eaten == '/' && next_to_be_eaten == '*'){
-						eat_character();
+						eat_character(lex);
 						nested_level++;
 					}
 					if(eaten == '*' && next_to_be_eaten == '/'){
-						eat_character();
+						eat_character(lex);
 						nested_level--;
 						continue;
 					}
@@ -286,62 +266,52 @@ Token LexerState::process_token()
 			break;
 		}
 		break;
-		case '+': case '*': 
-		case ';': case '`':
-		case ',': 
-		case '~': case '!': case '$': case '%': case '^':
-		case '&': case '?': case '|': case '\'': case '\\':
+		case '+': case '*': case ';': 
+		case '`': case '|': case '$':
+		case ',': case '%': case '^':
+		case '~': case '!': case '\\':
+		case '&': case '?': 
 		{
 			token.type = ch;
 			break;
 		}
-		// TODO: Remove the stack,, a 3Xu16 variables are enough to do the work 
+		
+#if LEXER_ENABLE_C_CHAR_TOKEN == 0
+		case '\'':
+		{
+			token.type = ch;
+			break;
+		}
+#endif
 		case '[': 
 		case '{': 
 		case '(': 
 		{
-			paranthases_stack.push(ch);
+			
 			token.type = ch;
 			break;
 		}
 		case ']': 
 		{
-			if (paranthases_stack.top() == '[') paranthases_stack.pop();
-			else {
-				logger.print_with_location(&token, "Unbalanced '['\n"_s);
-				exit(-1);
-			}
 			token.type = ch;
 			break;
 		}
 		case '}':
 		{
-			if (paranthases_stack.top() == '{') paranthases_stack.pop();
-			else {
-				logger.print_with_location(&token, "Unbalanced '{'\n"_s);
-				exit(-1);
-			}
-			
 			token.type = ch;
 			break;
 		}
 		case ')': 
 		{
-			if (paranthases_stack.top() == '(') paranthases_stack.pop();
-			else {
-				logger.print_with_location(&token, "Unbalanced '('\n"_s);
-				exit(-1);
-			}
-			
 			token.type = ch;
 			break;
 		}
 		case '-':
 		{
-			auto next = peek_character();
+			auto next = peek_character(lex);
 			if (next == '>'){ 
 				token.type = TOKEN_ARROW;
-				eat_character();
+				eat_character(lex);
 			} else {
 				token.type = ch;
 			}
@@ -353,21 +323,21 @@ Token LexerState::process_token()
 		{
 			//TODO : Notes
 			token.type = TOKEN_DIRECTIVE;
-			eat_until_whitespace();
+			eat_until_whitespace(lex);
 			break;
 		}
 		// Compiler Directives
 		case '#':
 		{
 			token.type = TOKEN_DIRECTIVE;
-			eat_until_whitespace();
+			eat_until_whitespace(lex);
 			break;
 		}
 		case '=':
 		{
-			auto next = peek_character();
+			auto next = peek_character(lex);
 			if (next == '='){
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_EQL;
 			}
 			else {
@@ -377,12 +347,12 @@ Token LexerState::process_token()
 		}
 		case '<':
 		{
-			auto next = peek_character();
+			auto next = peek_character(lex);
 			if (next == '='){
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_LT_OR_EQL;
 			} else if (next == '<'){
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_SHIFT_LEFT;
 			} else {
 				token.type = TOKEN_LT;
@@ -391,12 +361,12 @@ Token LexerState::process_token()
 		}
 		case '>':
 		{
-			auto next = peek_character();
+			auto next = peek_character(lex);
 			if (next == '='){
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_GT_OR_EQL;
 			} else if (next == '>'){
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_SHIFT_RIGHT;
 			} else {
 				token.type = TOKEN_GT;
@@ -405,9 +375,9 @@ Token LexerState::process_token()
 		}
 		case '.':
 		{
-			auto next = peek_character();
+			auto next = peek_character(lex);
 			if (next == '.') {
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_DOUBLEDOT;
 			}
 			else {
@@ -415,20 +385,23 @@ Token LexerState::process_token()
 			}
 			break;
 		}
+#if LEXER_ENABLE_C_CHAR_TOKEN == 1
+		case '\'':
+#endif
 		case '"':
 		{
 			// @Cleanup: We could check the prev instead ?? wont it be easer ??
 			// @TODO: Make sure this works ?? 
-			// u8 escape = 0;
-			
+			// U8 escape = 0;
+			const U8& cu = ch;
 			while(true) {
-				auto peeked = peek_character();
-				auto ahead =  peek_character(1);
-				if (peeked == '\\' && ahead == '"'){
-					eat_characters(2);
+				auto peeked = peek_character(lex);
+				auto ahead =  peek_character(lex, 1);
+				if (peeked == '\\' && ahead == cu){
+					eat_characters(lex, 2);
 				}
-				eat_character();
-				if(peeked == '"') break;
+				eat_character(lex);
+				if(peeked == cu) break;
 			}	  
 			token.type = TOKEN_LITERAL;
 			token.kind = TOKEN_KIND_STRING_LITERAL;
@@ -436,14 +409,14 @@ Token LexerState::process_token()
 		}
 		case ':':
 		{
-			if (peek_character() == ':')
+			if (peek_character(lex) == ':')
 			{
-				eat_character();
+				eat_character(lex);
 				token.type = TOKEN_DOUBLE_COLON;
 			}
-			else if (peek_character() == '='){
+			else if (peek_character(lex) == '='){
 				token.type = TOKEN_COLON_EQUAL;
-				eat_character();
+				eat_character(lex);
 			}
 			else {
 				token.type = TOKEN_COLON;
@@ -459,19 +432,12 @@ Token LexerState::process_token()
 		default:
 		{
 			if (isAlphabet(ch) || ch == '_'){
-				while(true){
-					if (!isLiteralChar(peek_character()))
-						break;
-					eat_character();
-				};
-				token.value = StringView{ &input[temp], input_cursor  - temp};
+				//eat_until_whitespace();
+				eat_ident(lex);
+				token.value = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
 				token.type = TOKEN_IDENT;
 				if (isKeyword(token.value))
 					token.type = TOKEN_KEYWORD;
-				else if (isHDtype(token.value))
-					token.type = TOKEN_HDTYPE;
-				else
-					token.type = TOKEN_IDENT;
 			}
 			else if (isDigit(ch))
 			{
@@ -482,52 +448,50 @@ Token LexerState::process_token()
 				// auto& pos = get_current_position();
 				token.type = TOKEN_LITERAL;
 				token.kind = TOKEN_KIND_INT_LITERAL;
-				auto peeked = peek_character();
-				if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character();
-				while (isDigit(peek_character()))eat_character();
+				auto peeked = peek_character(lex);
+				if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character(lex);
+				while (isDigit(peek_character(lex))) eat_character(lex);
 				
 			} 
 			break;
 		}
 	}
-	token.end_position = get_current_position();
+	token.end_position = get_current_position(lex);
 	assert(token.type != TOKEN_NONE);
-	token.value = new_string((char*)&input[temp], input_cursor  - temp);
+	token.value = CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
 	token.hash = Hash(token);
 	
-	if (config.ignore_comments && token.type == TOKEN_COMMENT)
+	// Do we need a mechanesim to bundle the comment with statments ? 
+	// or we just ignore them altogather
+	if (lex.config.ignore_comments && token.type == TOKEN_COMMENT)
 	{
-		return process_token();
+		return process_token(lex);
 	}
 	
 	return token;
 }
 
-Token LexerState::eat_token()
+
+Token eat_token(LexerState& lex)
 {
-	if (token_cache.count == 0)
-		return process_token();
-	return *pop(&token_cache);
+	return process_token(lex);
 }
 
-
-
-Token LexerState::peek_token(u64 lookAhead /* = 0*/ )
+Token peek_token(LexerState& lex, U64 lookAhead)
 {
-	if (token_cache.count == 0) {
-		if (lookAhead == 0) return *push(&token_cache, process_token());
-		
-	}
-	
-	if (token_cache.count <= lookAhead)
-	{
-		u64 range = lookAhead - token_cache.count + 1;
-		FOR_RANGE(range){
-			push(&token_cache, process_token());
-		}
-	}
-	
-	return *top_plus(&token_cache, lookAhead);
+	LexerState oldLex = lex;
+	Token token = {};
+	do { token = eat_token(lex);} while(lookAhead--);
+	lex = oldLex;
+	return token;
+}
+
+Token 
+eat_until_token_by_type(LexerState& lex, U64 token_type)
+{
+	Token tok = eat_token(lex);
+	while(tok.type != token_type) tok = eat_token(lex);
+	return tok;
 }
 
 #undef FOR_RANGE

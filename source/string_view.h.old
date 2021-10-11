@@ -8,6 +8,7 @@ $Description: Custom String Type
 
 #include "common.h"
 #include "arena.h"
+/*
 struct StringView
 {
 	static Arena string_arena;
@@ -50,12 +51,14 @@ char* operator*(const StringView& string);
 
 StringView operator "" _s(const char* a, size_t s);
 StringView new_string(char* data, u64 count);
+StringView new_string(u8 data);
 
-#define cmpsv(x, y) memcmp(x, y, strlen(x))
-#define cmp2sv(x, y) memcmp(x.data, y.data, x.count)
+//#define cmp2sv(x, y) strcmp((const char*)x.str, (const char*)y.str)
+#define cmp2sv(x, y) ((x.count == y.count) && memcmp(x.str, y.str, x.count) == 0)
 #define SV_PRINT(x) (int)x.count, x.data
 
 
 
 
 
+*/

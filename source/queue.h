@@ -18,17 +18,17 @@ TODO(Husam) : safty checks here would be nice i think !!.. -_-.
 
 template<typename T>
 struct Queue {
-	T* data;
-	u64 cap;
-	u64 start;
-	u64 end;
-	u64 count;
+	T* data = nullptr;
+	U64 cap = 0;
+	U64 start = 0;
+	U64 end = 0;
+	U64 count = 0;
 };
 
 
 template<typename T> 
 Queue<T> 
-make_queue(u64 size)
+make_queue(U64 size)
 {
 	Queue<T> result;
 	result.data = new T[size];
@@ -41,12 +41,13 @@ template<typename T>
 void
 free_queue(Queue<T>* queue)
 {
-	delete queue->data;
+	if (queue->data != nullptr)
+		delete[] queue->data;
 	
 }
 
 template<typename T> T*
-top_plus(Queue<T>* queue, u64 plus)
+top_plus(Queue<T>* queue, U64 plus)
 {
 	//assert(queue->start + plus < queue->end);
 	return &queue->data[queue->start + plus];

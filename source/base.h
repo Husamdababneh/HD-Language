@@ -12,26 +12,19 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <assert.h>
+
+
 // TODO: Add Platform macros
-
-
+//#include "hdbase.h"
 #include "platform/platform.h"
-#include "string_view.h"
-#include "logger.h"
+#include "logger.h"        // is this really needed?? 
 #include "common.h"
-#include "stack.h"
-#include "queue.h"
+#include "stack.h"         // is this really needed?? 
+#include "queue.h"         // is this really needed?? 
 #include "arena.h"
-#include "vendor/stb_ds.h"
-#include <meow_hash\meow_hash.h>
+#include "vendor/stb_ds.h"  // Do i need this or i should create my own ?? 
+#include <meow_hash\meow_hash.h> 
 
 
-#define Note(...) 
-#define Todo(x)
-#define Incomplete(x)
 
-#define BYTE 1
-#define KB(x) (u64)(x * 1024)
-#define MB(x) (u64)(KB(x) * 1024)
-#define GB(x) (u64)(MB(x) * 1024)
 #endif //BASE_H
