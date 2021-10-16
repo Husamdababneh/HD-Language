@@ -7,15 +7,18 @@
 
 #include "platform/platform.h"
 
+// NOTE(Husam): HD-Specific read_entire_file, 
+//              usually when reading a file we should return a pointer to the data not an object 
+// NOTE(Husam): In this case "String" is a light wieght object "Length and Pointer"
 
-U64 read_entire_file(FILE* file, void** data_return)
+String read_entire_file(FILE* file)
 {
 	// assert(file); // nocheckin
 	int descriptor = fileno(file);
 	
 	struct stat file_stats;
 	int result = fstat(descriptor, &file_stats);
-	if (result == -1) return -1;
+	if (result == -1) return {0};
 	
 	U64 length = file_stats.st_size;
 	
@@ -25,45 +28,42 @@ U64 read_entire_file(FILE* file, void** data_return)
 	U64 success = fread((void*)data, length, 1, file);
 	if (success < 1) {
 		delete[] data;
-		return -1;
+		return {0};
 	}
 	
-	*data_return = data;
-	return length;
+	
+	return CStringToString((char*)data, length);
 }
 
-U64 read_entire_file(const char* filepath, void** data_return)
+String read_entire_file(const char* filepath)
 {
 	open_file(file, filepath, "rb");
 	
 	if (!file)
 	{
 		printf("Couldn't find file [%s]\n", filepath);
-		return false;
+		return {};
 	}
 	
-	U64 result = read_entire_file(file, data_return);
+	String data = read_entire_file(file);
 	fclose(file);
-	return result;
+	return data;
 }
 
-U64 read_entire_file(const StringView& filename, void** data_return)
+String read_entire_file(const StringView& filename)
 {
 	// assert(filename.count <= 255); // nocheckin
 	char name[256];
 	
 	memcpy((void*)name, (void*)filename.str, filename.length);
 	name[filename.length] = '\0';
-	return read_entire_file(name, data_return);
+	return read_entire_file(name);
 	
 }
 
 StringView readEntireFileToStringView(const StringView& filename)
 {
-	S8* data = nullptr;
-	auto size = read_entire_file(filename, (void**)&data);
-	StringView d = {size, data};
-	return d;
+	return read_entire_file(filename);
 }
 
 //StringView readEntireFile()

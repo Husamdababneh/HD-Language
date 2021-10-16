@@ -13,7 +13,7 @@ set outputs=/Fp"%bin_int%\hd.pch" /Fo%bin_int%\ /Fd"%bin_int%\vc142.pdb"
 
 set common_flags=/nologo  /diagnostics:caret /D _UNICODE /D UNICODE 
 rem /GF
-set debug_flags=/Z7 /JMC /W4 /WX- /Od /TP /FC /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 
+set debug_flags=/Z7 /JMC /W3 /WX- /Od /TP /FC /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 
 rem /d1reportAllClassLayout
 
 REM Once we get rid of all c/c++ headers, we will enable this to see the layout of the struct

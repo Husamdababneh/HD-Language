@@ -17,12 +17,15 @@ $Description: TODO
 #define padding_check
 #include "hdbase.h"
 #include "base.h"
+
 #include "arena.cpp"
-#include "auxiliary.cpp"
 #include "logger.cpp"
+#include "auxiliary.cpp"
 #include "Ast.cpp"
 
 // TODO: Remove this ?? 
 #define STB_DS_IMPLEMENTATION
 #include "vendor/stb_ds.h"
 
+
+#include "hdarena.cpp"

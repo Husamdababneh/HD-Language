@@ -5,6 +5,11 @@
    $Description: Meta-Program to generate some data
    ========================================================================*/
 
+#pragma warning( disable : 4505 )
+#pragma warning( disable : 4324 )
+#pragma warning( disable : 4456 )
+
+
 #include "base.cpp"
 
 #define LEXER_ENABLE_C_CHAR_TOKEN 1
@@ -126,8 +131,8 @@ void enums_handler(LexerState& lex)
 		default: 
 		{
 			return;
-			assert(false);
-			exit(-1);
+			//assert(false);
+			//exit(-1);
 		}
 		
 	}
@@ -213,6 +218,10 @@ bool parse_file (const StringView& filename) {
 }
 
 int main (int argc, char** argv){
+	
+	// C-Style .. turn off warning C4100 :) 
+	(void)argv;
+	(void)argc;
 	
 	StringView filenames[] = {
 		"lex.h"_s,

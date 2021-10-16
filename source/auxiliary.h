@@ -28,9 +28,9 @@ struct Arguments
 };
 
 //Arguments ParseArguments(int argc, char** argv);
-U64 read_entire_file(FILE* file, void** data_return);
-U64 read_entire_file(const char* file, void** data_return);
-U64 read_entire_file(const StringView& filename, void** data_return);
+String read_entire_file(FILE* file, void** data_return);
+String read_entire_file(const char* file, void** data_return);
+String read_entire_file(const StringView& filename, void** data_return);
 
 template <typename F>
 struct Defer

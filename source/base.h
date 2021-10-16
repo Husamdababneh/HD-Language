@@ -23,8 +23,12 @@
 #include "queue.h"         // is this really needed?? 
 #include "arena.h"
 #include "vendor/stb_ds.h"  // Do i need this or i should create my own ?? 
-#include <meow_hash\meow_hash.h> 
 
+#pragma warning( push )
+#pragma warning( disable : 4505 )
+#pragma warning( disable : 4324 )
+#include <meow_hash\meow_hash.h> 
+#pragma warning( pop )
 
 
 #endif //BASE_H

@@ -5,6 +5,12 @@ $Creator: Husam Dababneh
 $Description: main function
 ========================================================================*/
 
+#pragma warning( disable : 4505 )
+#pragma warning( disable : 4324 )
+#pragma warning( disable : 4456 )
+
+#define HD_BUILD_INTERNAL 1
+
 #include "main.h"
 #include "base.cpp"
 
@@ -25,28 +31,21 @@ $Description: main function
 
 int allocation_count = 0;
 
-
-void* operator new(U64  count);
-void * operator new[](U64 count);
-void operator delete(void* ptr) noexcept;
-void operator delete[](void* ptr) noexcept;
-
 void Usage() {
 	Logger log;
 	log.prefix = "USAGE"_s;
 	log.print("Usage: hd.exe <filename>\n"_s);
 }
 
-struct CompilerState 
+
+struct Dummy
 {
-	Memory main_memory; // this is where the AST lives ? 
-	//Memory temp_memory;
-	
+	U64 randomi;
+	F32 randomf;
 };
 
 int main(int argc, char ** argv)
 {
-	
 	ZoneScoped;
 	if (argc < 2){
 		Usage();
@@ -55,68 +54,40 @@ int main(int argc, char ** argv)
 	
 	// Allocate Enough Memory and pass it down to other systems
 #if OS_WINDOWS
+# if HD_BUILD_INTERNAL == 1
+	const LPVOID BASE_ADDRESS = (LPVOID)TB((U64)2);
+# else
+	const LPVOID BASE_ADDRESS = 0;
+# endif
 	
-	CompilerState state = {};
-	Memory& memory = state.main_memory;
+	auto arena_size = MB(500);
+	PTR memory = VirtualAlloc(BASE_ADDRESS, arena_size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 	
-	memory.memory_size = MB(500);
-	memory.storage     = VirtualAlloc(0, memory.memory_size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+	MemoryArena arena = InitializeMemoryArena(arena_size, memory);
 	
-	
-	
-	StringView filename = CStringToString(argv[1]);
 	Parser parser = {};
-	parser.lexer.input = readEntireFileToStringView(filename);
-	register_predefined_types(parser);
+	LexerState  lexer  = {};
+	lexer.input = read_entire_file(argv[1]);
+	parser.lexer = lexer;
+	
+	// WHAT ??
+	register_predefined_types(&arena, parser);
+	
+	
+	
 	//FrameMarkStart (sl_Parsing );
-	parse(parser);
-	
-	
-	
-	
-	
+	parse(&arena, parser);
 	
 	
 	FrameMarkEnd(sl_Parsing);
 	//printf("#Allocations Using New Keyword = %d\n", allocation_count);
 	
-#else
+# else
 #endif
 	return 0;
 }
 
 
-
-
-void* operator new(U64  count)
-{
-	allocation_count++;
-	void* ptr = malloc(count);
-	TracyAlloc (ptr , count);
-	return ptr;
-}
-
-void * operator new[](U64 count){
-	allocation_count++;
-	void* ptr = malloc(count);
-	TracyAlloc (ptr , count);
-	return ptr;
-}
-
-
-
-void operator delete(void* ptr) noexcept
-{
-	TracyFree (ptr);
-	free(ptr);
-}
-
-
-void operator delete[](void* ptr) noexcept
-{
-	TracyFree (ptr);
-	free(ptr);
-}
 
 
 

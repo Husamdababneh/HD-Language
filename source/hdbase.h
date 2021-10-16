@@ -183,16 +183,20 @@ typedef uint64_t  U64;
 typedef float     F32;
 typedef double    F64;
 
-// Any Value but 0 is true ? ?
+// Any Value but 0 is true
 typedef uint8_t   B8;
 typedef uint16_t  B16;
 typedef uint32_t  B32;
 typedef uint64_t  B64;
 
+// Sizes
+typedef size_t Size;
+
 #define _BYTE_ 1
 #define KB(x) (U64)(x * 1024)
 #define MB(x) (U64)(KB(x) * 1024)
 #define GB(x) (U64)(MB(x) * 1024)
+#define TB(x) (U64)(GB(x) * 1024)
 
 #endif //HD_TYPES
 
@@ -238,12 +242,12 @@ struct String {
 
 // Forward Declarations  
 typedef String StringView;
-String operator ""_s(const char* string, U64 length);
-String CStringToString(char* string, U64 length);
-String CStringToString(char* string);
+inline  String operator ""_s(const char* string, U64 length);
+inline  String CStringToString(char* string, U64 length);
+inline  String CStringToString(char* string);
 
-S8     CompareStrings(String left, String right);
-B8     EqualStrings(String left, String right);
+S8      CompareStrings(String left, String right);
+B8      EqualStrings(String left, String right);
 #define SV_PRINT(x) (int)x.length, x.str
 
 #if defined(HD_BASE_IMPL)
@@ -295,20 +299,6 @@ B8 EqualStrings(String left, String right)
 }
 
 #endif //HD_BASE_IMPL
-
-//~ Application Layer
-
-#if defined(HD_APPLICATION_LAYER)
-
-struct Memory
-{
-	U64 memory_size;
-	PTR storage;
-};
-
-
-#endif
-
 #endif //BASE_H
 
 

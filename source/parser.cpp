@@ -17,26 +17,26 @@ $Description: parser.cpp
 
 // Forward declarations
 
-Ast parse(Parser& );
-Ast_Node* parse_statement(Parser& );
-Ast_Node* parse_const_def(Parser& );
-Ast_Type* parse_type(Parser& );
-Ast_Block* parse_block(Parser& );
+Ast parse(MemoryArena*, Parser& );
+Ast_Node* parse_statement(MemoryArena* arena, Parser& );
+Ast_Node* parse_const_def(MemoryArena* arena, Parser& );
+Ast_Type* parse_type(MemoryArena* arena, Parser& );
+Ast_Block* parse_block(MemoryArena* arena, Parser& );
 
-Ast_Node* parse_directive(Parser& );
-Ast_Node* parse_if_statement(Parser& );
-Ast_Var_Declaration* parse_var_def(Parser& );
-Ast_Proc_Declaration* parse_proc_def(Parser& );
-Ast_Node* parse_statement_expression(Parser& );
-Ast_Block* parse_block_of_statements(Parser& );
-Ast_Proc_Declaration* parse_proc_header(Parser& );
-Ast_Var_Declaration* parse_argument_def(Parser& );
-Ast_Struct_Declaration* parse_struct_def(Parser& );
+Ast_Node* parse_directive(MemoryArena* arena, Parser& );
+Ast_Node* parse_if_statement(MemoryArena* arena, Parser& );
+Ast_Var_Declaration* parse_var_def(MemoryArena* arena, Parser& );
+Ast_Proc_Declaration* parse_proc_def(MemoryArena* arena, Parser& );
+Ast_Node* parse_statement_expression(MemoryArena* arena, Parser& );
+Ast_Block* parse_block_of_statements(MemoryArena* arena, Parser& );
+Ast_Proc_Declaration* parse_proc_header(MemoryArena* arena, Parser& );
+Ast_Var_Declaration* parse_argument_def(MemoryArena* arena, Parser& );
+Ast_Struct_Declaration* parse_struct_def(MemoryArena* arena, Parser& );
 
-Ast_Expression* parse_expression(Parser&, S8 priority = -1);
-Ast_Expression* parse_suffix_expression(Parser&, Ast_Expression* prev);
-Ast_Expression* parse_unary_expression(Parser& );
-Ast_Expression* parse_primary_expression(Parser& );
+Ast_Expression* parse_expression(MemoryArena* arena, Parser&, S8 priority = -1);
+Ast_Expression* parse_suffix_expression(MemoryArena* arena, Parser&, Ast_Expression* prev);
+Ast_Expression* parse_unary_expression(MemoryArena* arena, Parser& );
+Ast_Expression* parse_primary_expression(MemoryArena* arena, Parser& );
 
 // TODO: Re-read the Tracy documentation to use this in the right way
 #include "../submodules/tracy/Tracy.hpp"
@@ -45,9 +45,15 @@ Ast_Node** flaten_ast = NULL;
 
 // How does this perform ?? 
 #define AllocateNode(type, name) type* name;\
-name = (type*) arena_alloc(&parser.ast_arena, sizeof(type));\
+name = (type*) PushStruct(arena, type);\
 name = ::new(name) type();\
 arrput(flaten_ast,(Ast_Node*)name);
+// NOTE(Husam): I'm not sure about the non-allocating palcement 'new' operator above
+//              I need to know how fast it is and is it worth it to create 'CreateNode' method
+//              for each Node type ?? ... that would be cumbersome but at least we know how fast it is 
+// NOTE(Husam): If we choose to do the cumbersome way, is it possible to creat meta program to help us 
+//              with the task ? 
+
 
 #ifdef _DEBUG
 #define PANIC() exit(0);//abort();
@@ -71,7 +77,7 @@ static void SyntaxError(const Token& token, const StringView& message)
 inline 
 void _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
 {
-	Token& token = peek_token(_this->lexer);
+	const Token& token = peek_token(_this->lexer);
 	if(token.type != type)
 	{
 		printf("expect_and_eat: %s %zd\n", file ,line);
@@ -94,7 +100,7 @@ void _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
 
 
 inline Ast_Scope*
-enter_scope(Parser& parser)
+enter_scope(MemoryArena* arena, Parser& parser)
 {
 	Ast_Scope* prev = parser.current_scope;
 	Ast_Scope ss = {0};
@@ -113,7 +119,7 @@ enter_scope(Parser& parser)
 
 
 inline void
-exit_scope(Parser& parser)
+exit_scope(MemoryArena* arena, Parser& parser)
 {
 	assert(parser.current_scope);
 	parser.current_scope = parser.current_scope->parent;
@@ -127,7 +133,8 @@ Predefined_Type* Parser::predefined_types = nullptr;
 Token create_token(StringView name)
 {
 	static U32 id = 0;
-	id = (id + 3772) % 1000;
+	// This assumes we will only have 3772 scopes, needs to be fixed 
+	id = (id + 3772) % 1000; // worst random number generator ever :).
 	Token token = {0};
 	token.name = name;
 	token.start_position = {id+22, id+9};
@@ -170,12 +177,12 @@ Ast_Type create_type(const U32 size,
 
 
 void 
-register_predefined_types(Parser& parser)
+register_predefined_types(MemoryArena* arena, Parser& parser)
 {
 	Ast_Type _U8 = create_type(1, 1, false, "U8"_s);
 	hmput(parser.predefined_types, _U8.token.name.str_char, _U8);
 	
-	Ast_Type _u16 = create_type(2, 2, false, "u16"_s);
+	Ast_Type _u16 = create_type(2, 2, false, "U16"_s);
 	hmput(parser.predefined_types, _u16.token.name.str_char, _u16);
 	
 	Ast_Type _U32 = create_type(4, 4, false, "U32"_s);
@@ -187,10 +194,10 @@ register_predefined_types(Parser& parser)
 	Ast_Type _S8 = create_type(1, 1, true, "S8"_s);
 	hmput(parser.predefined_types, _S8.token.name.str_char, _S8);
 	
-	Ast_Type _s16 = create_type(2, 2, true, "s16"_s);
+	Ast_Type _s16 = create_type(2, 2, true, "S16"_s);
 	hmput(parser.predefined_types, _s16.token.name.str_char, _s16);
 	
-	Ast_Type _s32 = create_type(4, 4, true, "s32"_s);
+	Ast_Type _s32 = create_type(4, 4, true, "S32"_s);
 	hmput(parser.predefined_types, _s32.token.name.str_char, _s32);
 	
 	Ast_Type _S64 = create_type(8, 8, true, "S64"_s);
@@ -266,13 +273,13 @@ void print_scopes(Ast_Scope* scope)
 
 //static Queue<StringView> files = make_queue<StringView>(10);
 
-Ast parse(Parser& parser)
+Ast parse(MemoryArena* arena, Parser& parser)
 {
 	
-	bool still_parsing = true;
+	//bool still_parsing = true;
 	
 	
-	Ast_Block* block = parse_block(parser);
+	Ast_Block* block = parse_block(arena, parser);
 	PRINT_GRAPH(block, &parser.logger);
 	//print_scopes(block->scope);
 	//generate(block);
@@ -293,7 +300,7 @@ Ast parse(Parser& parser)
 }
 
 Ast_Type*
-parse_type(Parser& parser)
+parse_type(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	Token token = peek_token(lexer);
@@ -313,7 +320,7 @@ parse_type(Parser& parser)
 }
 
 Ast_Var_Declaration*
-parse_argument_def(Parser& parser)
+parse_argument_def(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	AllocateNode(Ast_Var_Declaration, decl);
@@ -327,12 +334,12 @@ parse_argument_def(Parser& parser)
 	decl->token = token;
 	
 	expect_and_eat(TOKEN_COLON);
-	decl->data_type = parse_type(parser);
+	decl->data_type = parse_type(arena, parser);
 	
 	token = peek_token(lexer);
 	if (token.type == '='){
 		eat_token(lexer);
-		decl->body= parse_expression(parser);
+		decl->body= parse_expression(arena, parser);
 	}
 	
 	
@@ -343,7 +350,7 @@ parse_argument_def(Parser& parser)
 
 // TODO(Husam Dababneh): Rethink this part
 Ast_Proc_Declaration* 
-parse_proc_header(Parser& parser) 
+parse_proc_header(MemoryArena* arena, Parser& parser) 
 {
 	auto& lexer = parser.lexer;
 	Token decl_name = eat_token(lexer); // Name
@@ -359,7 +366,7 @@ parse_proc_header(Parser& parser)
 	// Parse Arguments
 	while(token.type != ')' && token.type != TOKEN_EOFA)
 	{
-		Ast_Var_Declaration* var = parse_argument_def(parser);
+		//Ast_Var_Declaration* var = parse_argument_def(parser);
 		token = peek_token(lexer);
 		if (token.type != ')') expect_and_eat(',');
 	}
@@ -371,7 +378,7 @@ parse_proc_header(Parser& parser)
 		eat_token(lexer); 
 		token = peek_token(lexer);
 		while(token.type != '{') {
-			Ast_Type* type = parse_type(parser);
+			Ast_Type* type = parse_type(arena, parser);
 			arrput(proc->return_type, type);
 			token = peek_token(lexer);
 			if (token.type != '{') expect_and_eat(',');
@@ -381,15 +388,15 @@ parse_proc_header(Parser& parser)
 }
 
 Ast_Proc_Declaration* 
-parse_proc_def(Parser& parser)
+parse_proc_def(MemoryArena* arena, Parser& parser)
 {
-	enter_scope(parser);
+	enter_scope(arena, parser);
 	
 	Ast_Proc_Declaration* proc = nullptr;
-	proc = parse_proc_header(parser);
-	proc->body = parse_block_of_statements(parser);
+	proc = parse_proc_header(arena, parser);
+	proc->body = parse_block_of_statements(arena, parser);
 	
-	exit_scope(parser);
+	exit_scope(arena, parser);
 	
 	// Add method to current scope
 	arrput(parser.current_scope->procedures, proc);
@@ -397,7 +404,7 @@ parse_proc_def(Parser& parser)
 }
 
 Ast_Var_Declaration*
-parse_var_def(Parser& parser)
+parse_var_def(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	Token decl_name = eat_token(lexer); // Name
@@ -410,7 +417,7 @@ parse_var_def(Parser& parser)
 	if (token.type == TOKEN_COLON) // Forced Type
 	{
 		eat_token(lexer);
-		type = parse_type(parser);
+		type = parse_type(arena, parser);
 		token = peek_token(lexer);
 		var->data_type = nullptr;
 		
@@ -449,7 +456,7 @@ parse_var_def(Parser& parser)
 	if (!var->constant && token.type == TOKEN_SEMI_COLON)  
 		goto exit;
 	
-	var->body = parse_expression(parser);
+	var->body = parse_expression(arena, parser);
 	
 	exit:
 	arrput(parser.current_scope->variables, var);
@@ -459,14 +466,14 @@ parse_var_def(Parser& parser)
 
 
 Ast_Struct_Declaration* 
-parse_struct_def(Parser& parser)
+parse_struct_def(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	Token decl_name = eat_token(lexer); // Name
 	expect_and_eat(TOKEN_DOUBLE_COLON);
 	Token token = eat_token(lexer); // eat 'struct'
 	
-	enter_scope(parser);
+	enter_scope(arena, parser);
 	AllocateNode(Ast_Struct_Declaration, _struct);
 	_struct->token = decl_name;
 	_struct->scope = parser.current_scope;
@@ -477,14 +484,14 @@ parse_struct_def(Parser& parser)
 	token = peek_token(lexer); 
 	while(token.type != '}' && token.type != TOKEN_EOFA)
 	{
-		Ast_Var_Declaration* var = parse_var_def(parser);
+		Ast_Var_Declaration* var = parse_var_def(arena, parser);
 		arrput(_struct->decls, var);
 		token = peek_token(lexer);
 		if (token.type != '}') continue;
 	}
 	
 	expect_and_eat('}');
-	exit_scope(parser);
+	exit_scope(arena, parser);
 	
 	// Add the new type to current scope
 	arrput(parser.current_scope->structs, _struct);
@@ -501,23 +508,23 @@ parse_struct_def(Parser& parser)
 
 
 Ast_Node* 
-parse_const_def(Parser& parser)
+parse_const_def(MemoryArena* arena, Parser& parser)
 {
 	auto lexer = parser.lexer;
 	Token token = peek_token(lexer, 2); 
-	if      (EqualStrings(token.name, "proc"_s)) return parse_proc_def(parser);
-	else if (EqualStrings(token.name, "struct"_s)) return parse_struct_def(parser);
+	if      (EqualStrings(token.name, "proc"_s)) return parse_proc_def(arena, parser);
+	else if (EqualStrings(token.name, "struct"_s)) return parse_struct_def(arena, parser);
 	// NOTE (Husam): I need to justify the existance of this aproch
 	else if (EqualStrings(token.name, "template"_s)) assert(false && "Templates are Not Supported Yet");
 	else if (EqualStrings(token.name, "enum"_s)) assert(false && "Enums are Not Supported Yet");
 	else if (EqualStrings(token.name, "flag"_s)) assert(false && "Flags are Not Supported Yet");
 	// Check for compile time statements ?? 
-	else    return parse_var_def(parser);
+	else    return parse_var_def(arena, parser);
 	return nullptr;
 }
 
 Ast_Node* 
-parse_statement_expression(Parser& parser)
+parse_statement_expression(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	Token t1 = peek_token(lexer);// ident 
@@ -526,24 +533,24 @@ parse_statement_expression(Parser& parser)
 	if (t1.type == TOKEN_IDENT && t2.type == TOKEN_DOUBLE_COLON)
 	{
 		// Constant Variables, Structs, Procs, Flags, Enums
-		return parse_const_def(parser);
+		return parse_const_def(arena, parser);
 	}
 	
 	if (t1.type == TOKEN_IDENT && (t2.type == TOKEN_COLON ||  t2.type == TOKEN_COLON_EQUAL))
 	{
 		// Variable Declarations 
-		return parse_var_def(parser);
+		return parse_var_def(arena, parser);
 	}
 	
 	
 	// Statements
-	Ast_Node* exp = parse_expression(parser);
+	Ast_Node* exp = parse_expression(arena, parser);
 	expect_and_eat(TOKEN_SEMI_COLON);
 	return exp;
 }
 
 Ast_Node*
-parse_if_statement(Parser& parser)
+parse_if_statement(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	// Determine If it's a normal 'if' statement or switch 'statement' 
@@ -553,17 +560,17 @@ parse_if_statement(Parser& parser)
 	
 	expect_and_eat('(');
 	
-	statement->exp = parse_expression(parser);
+	statement->exp = parse_expression(arena, parser);
 	
 	expect_and_eat(')');
 	
-	statement->statement = parse_statement(parser);
+	statement->statement = parse_statement(arena, parser);
 	
 	Token token = peek_token(lexer);
 	if (token.type == TOKEN_KEYWORD){ // this is faster than string compare, this way we maybe saving some time ??... I doubt that, but I'm gonna keep it :)
 		if (EqualStrings(token.name, "else"_s)) {
 			eat_token(lexer);
-			arrput(statement->next, parse_statement(parser));
+			arrput(statement->next, parse_statement(arena, parser));
 			//statement->next = parse_statement();
 		}
 	}
@@ -572,10 +579,10 @@ parse_if_statement(Parser& parser)
 }
 
 Ast_Node*
-parse_statement(Parser& parser)
+parse_statement(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
-	Ast_Node* return_node = nullptr;
+	//Ast_Node* return_node = nullptr;
 	
 	
 	Token t1 = peek_token(lexer);// ident 
@@ -589,18 +596,18 @@ parse_statement(Parser& parser)
 	
 	// TODO: Handle Compile-time directives
 	if (t1.type == TOKEN_DIRECTIVE) {
-		return parse_directive(parser);
+		return parse_directive(arena, parser);
 	}
 	
 	// Scopes
 	if (t1.type == '{'){
-		return parse_block_of_statements(parser);
+		return parse_block_of_statements(arena, parser);
 	}
 	
 	
 	if (t1.type == TOKEN_KEYWORD) {
 		if (EqualStrings(t1.name, "if"_s)) {
-			return parse_if_statement(parser);
+			return parse_if_statement(arena, parser);
 		}
 		
 		if (EqualStrings(t1.name, "return"_s)){
@@ -610,7 +617,7 @@ parse_statement(Parser& parser)
 			t1 = peek_token(lexer);
 			while (t1.type != TOKEN_SEMI_COLON)
 			{
-				arrput(_return->expressions, (Ast_Expression*)parse_expression(parser)); 
+				arrput(_return->expressions, (Ast_Expression*)parse_expression(arena, parser)); 
 				t1 = peek_token(lexer);
 				if (t1.type != TOKEN_SEMI_COLON) expect_and_eat(',');
 			}
@@ -619,7 +626,7 @@ parse_statement(Parser& parser)
 			return _return;
 		}
 	}
-	return parse_statement_expression(parser);
+	return parse_statement_expression(arena, parser);
 	
 	
 	
@@ -680,10 +687,10 @@ static S8 get_binary_precedence(const Token& token)
 }
 
 Ast_Expression* 
-parse_expression(Parser& parser, S8 priority /* = -1*/ )
+parse_expression(MemoryArena* arena, Parser& parser, S8 priority /* = -1*/ )
 {
 	auto& lexer = parser.lexer;
-	Ast_Expression* left = parse_unary_expression(parser);
+	Ast_Expression* left = parse_unary_expression(arena, parser);
 	
 	
 	while (true)
@@ -699,7 +706,7 @@ parse_expression(Parser& parser, S8 priority /* = -1*/ )
 		binary->token = eat_token(lexer);
 		binary->op = token_to_operation(binary->token);
 		binary->left = left;
-		binary->right = parse_expression(parser, new_priority);
+		binary->right = parse_expression(arena, parser, new_priority);
 		
 		
 		left = binary;
@@ -708,7 +715,7 @@ parse_expression(Parser& parser, S8 priority /* = -1*/ )
 }
 
 Ast_Expression* 
-parse_unary_expression(Parser& parser)
+parse_unary_expression(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	auto token = peek_token(lexer);
@@ -717,17 +724,17 @@ parse_unary_expression(Parser& parser)
 	if (token.type == '(') // factors
 	{
 		eat_token(lexer); // '('
-		result = parse_expression(parser);
+		result = parse_expression(arena, parser);
 		expect_and_eat(')');
 		
-		return parse_suffix_expression(parser, result);
+		return parse_suffix_expression(arena, parser, result);
 	}
 	else if (token.type == '-' || token.type == '+' ) // minus 
 	{
 		eat_token(lexer); //  eat the sign
 		AllocateNode(Ast_Unary, unary);
 		unary->token = token;
-		unary->child = parse_suffix_expression(parser, parse_primary_expression(parser));
+		unary->child = parse_suffix_expression(arena, parser, parse_primary_expression(arena, parser));
 		return unary;
 	}
 	else if (token.type== '*') // addressof 
@@ -736,12 +743,12 @@ parse_unary_expression(Parser& parser)
 		
 	}
 	
-	
-	return parse_suffix_expression(parser, parse_primary_expression(parser));
+	auto primary = parse_primary_expression(arena, parser);
+	return parse_suffix_expression(arena, parser, primary);
 }
 
 Ast_Expression* 
-parse_suffix_expression(Parser& parser , Ast_Expression* prev)
+parse_suffix_expression(MemoryArena* arena, Parser& parser , Ast_Expression* prev)
 {
 	auto& lexer = parser.lexer;
 	Token token = peek_token(lexer);
@@ -761,7 +768,7 @@ parse_suffix_expression(Parser& parser , Ast_Expression* prev)
 		Token next = peek_token(lexer);
 		while(next.type != ')')
 		{
-			Ast_Expression* exp = parse_expression(parser);
+			Ast_Expression* exp = parse_expression(arena, parser);
 			arrput(proc_call->arguments, exp);
 			next = peek_token(lexer);
 			if (next.type != ')') expect_and_eat(',');
@@ -770,19 +777,19 @@ parse_suffix_expression(Parser& parser , Ast_Expression* prev)
 		expect_and_eat(')');
 		proc_call->procedure = prev;
 		
-		return parse_suffix_expression(parser, proc_call);
+		return parse_suffix_expression(arena, parser, proc_call);
 	}
 	
 	if (token.type == '['){
 		eat_token(lexer);
 		AllocateNode(Ast_Subscript, sub);
 		sub->token = token;
-		sub->value= parse_expression(parser);
+		sub->value= parse_expression(arena, parser);
 		sub->exp= prev;
 		
 		expect_and_eat(']');
 		
-		return parse_suffix_expression(parser, sub);
+		return parse_suffix_expression(arena, parser, sub);
 	}
 	
 	if (token.type == '.'){
@@ -797,7 +804,7 @@ parse_suffix_expression(Parser& parser , Ast_Expression* prev)
 		
 		mem_acc->_struct = (Ast_Primary*)prev;
 		mem_acc->member = eat_token(lexer);
-		return parse_suffix_expression(parser, mem_acc);
+		return parse_suffix_expression(arena, parser, mem_acc);
 	}
 	
 	
@@ -805,7 +812,7 @@ parse_suffix_expression(Parser& parser , Ast_Expression* prev)
 }
 
 Ast_Expression* 
-parse_primary_expression(Parser& parser)
+parse_primary_expression(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	auto token = eat_token(lexer);
@@ -841,23 +848,23 @@ parse_primary_expression(Parser& parser)
 		}
 	}
 	
-	return nullptr;
+	// return nullptr;
 }
 
 Ast_Block*
-parse_block_of_statements(Parser& parser)
+parse_block_of_statements(MemoryArena* arena, Parser& parser)
 {
 	expect_and_eat('{');
-	Ast_Block* statements = parse_block(parser);
+	Ast_Block* statements = parse_block(arena, parser);
 	expect_and_eat('}');
 	return statements;
 }
 
 Ast_Block*
-parse_block(Parser& parser)
+parse_block(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
-	enter_scope(parser);
+	enter_scope(arena, parser);
 	AllocateNode(Ast_Block, block);
 	block->scope = parser.current_scope; 
 	
@@ -867,20 +874,20 @@ parse_block(Parser& parser)
 	
 	while(token.type != TOKEN_EOFA && token.type != '}')
 	{
-		Ast_Node* statement = parse_statement(parser);
+		Ast_Node* statement = parse_statement(arena, parser);
 		
 		if (statement) arrput(block->statements, statement);
 		
 		token = peek_token(lexer);
 	}
 	
-	exit_scope(parser);
+	exit_scope(arena, parser);
 	return block;
 }
 
 
 Ast_Node* 
-parse_directive(Parser& parser)
+parse_directive(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	Token directive = eat_token(lexer);
@@ -910,8 +917,6 @@ parse_directive(Parser& parser)
 		// Add filename to parsing queue :) 
 		return import;
 	}
-	
-	
 	
 	
 	printf("%.*s Directive is not Supported Yet\n", SV_PRINT(directive.name) );

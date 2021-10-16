@@ -35,6 +35,8 @@ struct SourceUnit {
 struct Parser {
 	static Predefined_Type*  predefined_types;
 	
+	// TODO(Husam): Make a list of global Loggers and then call the one you need when you want ?? 
+	// i think we only need 1 logger ? 
 	Logger logger;
 	LexerState lexer;
 	Arena ast_arena;

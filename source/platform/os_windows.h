@@ -17,3 +17,23 @@
 #else 
 #error("We only support MSVC compiler on windows");"
 #endif
+
+
+#if 0
+
+SYSTEM_INFO sysInfo;
+GetSystemInfo (&sysInfo);
+printf("Page size                   : %dMB\n", sysInfo.dwPageSize);
+printf("wProcessorArchitecture      : %d\n", sysInfo.wProcessorArchitecture);
+printf("lpMinimumApplicationAddress : %p\n",sysInfo.lpMinimumApplicationAddress);
+printf("lpMaximumApplicationAddress : %p\n", sysInfo.lpMaximumApplicationAddress);
+printf("dwNumberOfProcessors        : %d\n", sysInfo.dwNumberOfProcessors);
+printf("dwProcessorType             : %d\n", sysInfo.dwProcessorType);
+printf("PTR                         : %p\n", (void*)sysInfo.dwActiveProcessorMask) ;
+printf("dwNumberOfProcessors        : %d\n", sysInfo.dwNumberOfProcessors);
+printf("dwProcessorType             : %d\n", sysInfo.dwProcessorType);
+printf("dwAllocationGranularity     : %d\n", sysInfo.dwAllocationGranularity);
+printf("wProcessorLevel             : %d\n", sysInfo.wProcessorLevel);
+printf("wProcessorRevision          : %#X\n", sysInfo.wProcessorRevision);
+
+#endif
