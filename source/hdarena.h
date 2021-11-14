@@ -16,8 +16,6 @@ struct MemoryArena
 	Size used;
 };
 
-
-
 #if !defined(PushStruct) || !defined(PushArray)
 #define PushStruct(arena, type) (type*) PushSize(arena, sizeof(type));
 #define PushArray(arena, type, count)  (type*) PushSize(arena, sizeof(type)*count);

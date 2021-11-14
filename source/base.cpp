@@ -18,7 +18,7 @@ $Description: TODO
 #include "hdbase.h"
 #include "base.h"
 
-#include "arena.cpp"
+//#include "arena.cpp"
 #include "logger.cpp"
 #include "auxiliary.cpp"
 #include "Ast.cpp"

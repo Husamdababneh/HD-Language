@@ -44,6 +44,14 @@ struct Dummy
 	F32 randomf;
 };
 
+template<typename Type>
+struct Array
+{
+	Size size;
+	Type* data;
+};
+
+
 int main(int argc, char ** argv)
 {
 	ZoneScoped;
@@ -81,7 +89,8 @@ int main(int argc, char ** argv)
 	
 	FrameMarkEnd(sl_Parsing);
 	//printf("#Allocations Using New Keyword = %d\n", allocation_count);
-	
+	U64 result = VirtualFree(memory, 0, MEM_RELEASE);
+	assert(result != 0);
 # else
 #endif
 	return 0;

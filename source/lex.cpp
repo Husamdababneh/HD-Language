@@ -456,7 +456,7 @@ Token process_token(LexerState& lex)
 			break;
 		}
 	}
-	token.end_position = get_current_position(lex);
+	//token.end_position = get_current_position(lex);
 	assert(token.type != TOKEN_NONE);
 	token.value = CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
 	token.hash = Hash(token);

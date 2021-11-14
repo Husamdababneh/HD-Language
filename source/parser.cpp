@@ -7,6 +7,8 @@ $Description: parser.cpp
 
 #include "parser.h"
 
+#include <memory>
+
 #define ENABLE_GRAPH_PRINTING 1
 #define GRAPH_SHOW_BLOCK_PARENT 0
 #include <extra/graph.cpp>
@@ -280,6 +282,9 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	
 	
 	Ast_Block* block = parse_block(arena, parser);
+	
+	// this should be the whole file 
+	
 	PRINT_GRAPH(block, &parser.logger);
 	//print_scopes(block->scope);
 	//generate(block);

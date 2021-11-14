@@ -7,7 +7,7 @@
 #pragma once
 
 #include <stdarg.h>
-
+#include <stdio.h>
 // Forward Declaration.. this should not be here i think, 
 // try making this more  generic and add specialization in the lexer .. 
 // this is how everything should work 

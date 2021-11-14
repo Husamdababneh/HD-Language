@@ -4,6 +4,7 @@
 
 #ifdef _MSC_VER
 
+#include <sys/stat.h>
 
 #define fileno _fileno
 #define fstat _fstat

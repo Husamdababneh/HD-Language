@@ -58,7 +58,7 @@ enum {
 	TOKEN_KIND_IDENT_KEYWORD,
 };
 
-
+// This will enforce us to only handle files that are 4GB or less, which is a reasonable 
 struct Position
 {
 	U32 line, index;
@@ -70,7 +70,7 @@ struct Token
 	U16          type;
 	U16          kind;
 	Position 	start_position;
-	Position 	end_position;
+	//Position 	end_position;
 	meow_u128    hash;
 	
 	union
@@ -95,7 +95,6 @@ struct LexerState
 	U64 input_cursor;
 	U32 current_line_number;
 	U32 current_char_index; 
-	Arena strings;
 	LexerStateConfigs config;
 };
 

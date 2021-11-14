@@ -7,9 +7,9 @@ $Desc:
 
 
 #include "arena.h"
+#include <memory>
 
-// nocheckin
-#include "memory"
+
 Region *region_create(U64 capacity)
 {
 	const U64 region_size = sizeof(Region) + capacity;

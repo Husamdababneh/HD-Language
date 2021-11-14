@@ -39,7 +39,7 @@ struct Parser {
 	// i think we only need 1 logger ? 
 	Logger logger;
 	LexerState lexer;
-	Arena ast_arena;
+	//Arena ast_arena;
 	Ast_Scope* scopes;
 	Ast_Scope* current_scope;
 	

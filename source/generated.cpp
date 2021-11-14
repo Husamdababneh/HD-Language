@@ -34,6 +34,7 @@ const StringView token_type_to_string(U64 c){
 #include "ast.h"
 const StringView ast_type_to_string(U64 c){
 	switch(c){
+		case AST_UKNOWN: return "AST_UKNOWN"_s;  
 		case AST_DECLARATION: return "AST_DECLARATION"_s;  
 		case AST_EXPRESSION: return "AST_EXPRESSION"_s;  
 		case AST_IF: return "AST_IF"_s;  
@@ -41,7 +42,6 @@ const StringView ast_type_to_string(U64 c){
 		case AST_BLOCK: return "AST_BLOCK"_s;  
 		case AST_TYPE: return "AST_TYPE"_s;  
 		case AST_DIRECTIVE: return "AST_DIRECTIVE"_s;  
-		case AST_UKNOWN: return "AST_UKNOWN"_s;  
 		default: return ""_s;
 	}
 }

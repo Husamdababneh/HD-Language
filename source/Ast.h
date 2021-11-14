@@ -9,6 +9,7 @@ $Description: Ast.h
 #include "lex.h"
 
 enum Note(GenerateStrings, ast_type) {
+	AST_UKNOWN = 0,
 	AST_DECLARATION,
 	AST_EXPRESSION,
 	AST_IF,
@@ -16,11 +17,10 @@ enum Note(GenerateStrings, ast_type) {
 	AST_BLOCK,
 	AST_TYPE,
 	AST_DIRECTIVE,
-	AST_UKNOWN,
 };
 
 enum Note(GenerateStrings, ast_kind) {
-	AST_KIND_UNKNOWN,
+	AST_KIND_UNKNOWN = 0,
 	// AST_KIND_
 	
 	// Expressions Kinds
@@ -51,7 +51,7 @@ enum Note(GenerateStrings, ast_kind) {
 	
 };
 
-enum {
+enum AST_BINARY_TYPE {
 	AST_BINARY_PLUS,
 	AST_BINARY_MINUS,
 	AST_BINARY_MUL,
@@ -70,10 +70,9 @@ struct Ast {
 
 
 struct Ast_Node {
-	U16 type = AST_UKNOWN; // ?? 
-	U16 kind = AST_KIND_UNKNOWN;
+	U16 type;
+	U16 kind;
 	Token token;
-	
 };
 
 struct Ast_Block : Ast_Node {
