@@ -455,8 +455,8 @@ typedef struct meow_state
     int unsigned BufferLen;
     
     meow_U8 Buffer[256];
-	// :nocheckin
-    //meow_u128 Pad[2]; // NOTE(casey): So we know we can over-read Buffer as necessary
+	
+    meow_u128 Pad[2]; // NOTE(casey): So we know we can over-read Buffer as necessary
 } meow_state;
 
 static void

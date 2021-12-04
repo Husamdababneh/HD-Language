@@ -22,8 +22,6 @@ Region *region_create(U64 capacity)
 void *arena_alloc(Arena *arena, U64 size)
 {
     if (arena->last == NULL) {
-        //assert(arena->first == NULL); // nocheckin
-		
         Region *region = region_create(size > ARENA_DEFAULT_CAPACITY ? size : ARENA_DEFAULT_CAPACITY);
 		
         arena->last = region;

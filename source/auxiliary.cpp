@@ -14,7 +14,7 @@
 
 String read_entire_file(FILE* file)
 {
-	// assert(file); // nocheckin
+	// assert(file);
 	int descriptor = fileno(file);
 	
 	struct stat file_stats;
@@ -53,7 +53,7 @@ String read_entire_file(const char* filepath)
 
 String read_entire_file(const StringView& filename)
 {
-	// assert(filename.count <= 255); // nocheckin
+	// assert(filename.count <= 255);
 	char name[256];
 	
 	memcpy((void*)name, (void*)filename.str, filename.length);

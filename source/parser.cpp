@@ -14,7 +14,7 @@ $Description: parser.cpp
 #define GRAPH_SHOW_BLOCK_PARENT 0
 #include <extra/graph.cpp>
 
-// :nocheckin
+
 #include "generator.cpp"
 
 
@@ -723,7 +723,7 @@ parse_statement(MemoryArena* arena, Parser& parser)
 	
 	// Scopes
 	if (t1.type == '{'){
-		return parse_block_of_statements(arena, parser); // :nocheckin
+		return parse_block_of_statements(arena, parser);
 	}
 	
 	

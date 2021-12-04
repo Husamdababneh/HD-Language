@@ -153,7 +153,7 @@ void generate_expression(Ast_Expression* exp) {
 		return;
 	}
 	
-	if (exp->kind == AST_KIND_LITERAL_NUMBER) // :nocheckin
+	if (exp->kind == AST_KIND_LITERAL_NUMBER)
 	{
 		Ast_Primary* primary = (Ast_Primary*)exp;
 		if (primary->kind == AST_KIND_PRIMARY_IDENTIFIER){
