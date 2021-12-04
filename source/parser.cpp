@@ -728,7 +728,7 @@ parse_statement(MemoryArena* arena, Parser& parser)
 	
 	
 	if (t1.type == TOKEN_KEYWORD) {
-		if (EqualStrings(t1.name, "if"_s)) {
+		if (EqualStrings(t1.name, "if"_s)) { 
 			return parse_if_statement(arena, parser);
 		}
 		
