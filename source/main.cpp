@@ -86,7 +86,8 @@ void make_minidump(EXCEPTION_POINTERS* e)
 									 GetCurrentProcess(),
 									 GetCurrentProcessId(),
 									 hFile,
-									 MINIDUMP_TYPE(MiniDumpWithFullMemoryInfo | MiniDumpWithFullMemory),
+									 //MiniDumpWithFullMemoryInfo | MiniDumpWithFullMemory
+									 MINIDUMP_TYPE(MiniDumpNormal),
 									 e ? &exceptionInfo : nullptr,
 									 nullptr,
 									 nullptr);
@@ -107,7 +108,7 @@ LONG CALLBACK unhandled_handler(EXCEPTION_POINTERS* e)
 
 int main(int argc, char ** argv)
 {
-	//SetUnhandledExceptionFilter(unhandled_handler);
+	SetUnhandledExceptionFilter(unhandled_handler);
 	ZoneScoped;
 	if (argc < 2){
 		Usage();

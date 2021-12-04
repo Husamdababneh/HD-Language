@@ -230,6 +230,7 @@ Token process_token(LexerState& lex)
 	{
 		case '/':
 		{
+			// Move this to somewhere else
 			U8 next = peek_character(lex);
 			if(next  == '/'){
 				token.type = HDTokenType::TOKEN_COMMENT;
@@ -237,7 +238,6 @@ Token process_token(LexerState& lex)
 					  peek_character(lex) != '\n'){eat_character(lex);}
 			}
 			else if (next == '*'){
-				// TODO: 
 				token.type = HDTokenType::TOKEN_MULTILINE_COMMENT;
 				int nested_level = 1;
 				while(lex.input_cursor < lex.input.length){
@@ -468,7 +468,10 @@ Token process_token(LexerState& lex)
 	
 	// Do we need a mechanesim to bundle the comment with statments ? 
 	// or we just ignore them altogather
-	if (lex.config.ignore_comments && token.type == HDTokenType::TOKEN_COMMENT)
+	if (lex.config.ignore_comments && 
+		(token.type == HDTokenType::TOKEN_COMMENT || 
+		 token.type == HDTokenType::TOKEN_MULTILINE_COMMENT)
+		)
 	{
 		return process_token(lex);
 	}

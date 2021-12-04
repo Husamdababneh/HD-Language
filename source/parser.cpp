@@ -388,6 +388,8 @@ void TypeCheck(Ast_Scope* scope, int level = 0)
 	}
 }
 
+#define my_assert(x) if(!x) {*(int*)0 = 0;}
+
 Ast parse(MemoryArena* arena, Parser& parser)
 {
 	
@@ -508,15 +510,9 @@ parse_proc_header(MemoryArena* arena, Parser& parser)
 Ast_Proc_Declaration* 
 parse_proc_def(MemoryArena* arena, Parser& parser)
 {
-	enter_scope(arena, parser);
-	
 	Ast_Proc_Declaration* proc = nullptr;
 	proc = parse_proc_header(arena, parser);
 	proc->body = parse_block_of_statements(arena, parser);
-	
-	exit_scope(arena, parser);
-	
-	// Add method to current scope
 	arrput(parser.current_scope->procedures, proc);
 	return proc;
 }
@@ -563,7 +559,15 @@ parse_var_def(MemoryArena* arena, Parser& parser, B8 addToScope = true)
 		eat_token(lexer);
 	}
 	else {
-		assert(false);
+		
+		printf("decl_name[%.*s], Token[%.*s], Line [%d], Index [%d]\n",
+			   SV_PRINT(decl_name.name),
+			   SV_PRINT(token.name),
+			   token.start_position.line,
+			   token.start_position.index);
+		
+		//exit(-1);
+		my_assert(false);
 	}
 	
 	
