@@ -8,8 +8,8 @@
 #pragma once
 
 #define Note(...) 
-enum Note(GenerateStrings, token_type)
-{
+Note(GenerateStrings, token_type)
+enum HDTokenType : U16 {
 	TOKEN_NONE = 0,
 	TOKEN_SEMI_COLON = ';',
 	TOKEN_COMMA = ',',
@@ -19,6 +19,7 @@ enum Note(GenerateStrings, token_type)
 	TOKEN_KEYWORD,
 	TOKEN_HDTYPE,
 	TOKEN_LITERAL,
+	TOKEN_BOOLEAN,
 	TOKEN_COMMENT,
 	TOKEN_MULTILINE_COMMENT,
 	TOKEN_COLON,
@@ -38,11 +39,17 @@ enum Note(GenerateStrings, token_type)
 	TOKEN_SHIFT_RIGHT,
 	TOKEN_EOFA,
 	TOKEN_ERROR,
+	
 };
 
 
-
-enum {
+// TODO: Add kinds for keywords, that way we don't have to compare strings
+enum TokenKind : U16 {
+	
+	
+	TOKEN_KIND_ELSE,
+	TOKEN_KIND_IF,
+	
 	// Token Kinds 
 	TOKEN_KIND_BINARY,
 	TOKEN_KIND_UNARY,
@@ -56,6 +63,7 @@ enum {
 	//
 	TOKEN_KIND_IDENT_HDTYPE,
 	TOKEN_KIND_IDENT_KEYWORD,
+	
 };
 
 // This will enforce us to only handle files that are 4GB or less, which is a reasonable 
@@ -67,10 +75,9 @@ struct Position
 struct Token
 {
 	// TODO : Add string_in_source
-	U16          type;
-	U16          kind;
+	HDTokenType   type;
+	TokenKind   kind;
 	Position 	start_position;
-	//Position 	end_position;
 	meow_u128    hash;
 	
 	union
@@ -99,4 +106,6 @@ struct LexerState
 };
 
 bool isKeyword(StringView& string);
+//bool operator==(HDTokenType left, HDTokenType right);
+//bool operator!=(HDTokenType left, HDTokenType right);
 

@@ -153,10 +153,10 @@ void generate_expression(Ast_Expression* exp) {
 		return;
 	}
 	
-	if (exp->kind == AST_KIND_EXP_PRIMARY)
+	if (exp->kind == AST_KIND_LITERAL_NUMBER) // :nocheckin
 	{
 		Ast_Primary* primary = (Ast_Primary*)exp;
-		if (primary->priamry_kind == AST_KIND_PRIMARY_IDENTIFIER){
+		if (primary->kind == AST_KIND_PRIMARY_IDENTIFIER){
 			fprintf(getFile(), "\tmov rax, [%.*s] ; [Ident]\n", SV_PRINT(exp->token.name));
 			// TODO: Add the ident to stack ?? 
 		}

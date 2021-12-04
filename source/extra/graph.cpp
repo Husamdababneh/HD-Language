@@ -63,12 +63,24 @@ static void
 output_graph(Ast_Node* node, Logger* logger)
 {
 	if (node == nullptr) return; 
-	if (node->type == AST_UKNOWN) return;
+	if (node->type == AST_UKNOWN) assert(false);
+	
+	if (node->kind == AST_KIND_UNKNOWN)
+	{
+		printf("Unknown Node Kind\n");
+		printf("Node Token (%.*s)\n", SV_PRINT(node->token.name));
+		printf("Node type (%d)\n", node->type);
+	}
 	
 	meow_u128 hash = node->token.hash;
 	//auto hash = MeowU32From(full_hash, 3);
 	switch(node->type)
 	{
+		case AST_UKNOWN:
+		{
+			printf("Unknown Type Or Kind\n");
+			break;
+		}
 		case AST_EXPRESSION:
 		{
 			
@@ -111,8 +123,9 @@ output_graph(Ast_Node* node, Logger* logger)
 				arrput(labels, label);
 				break;
 			}
-			
-			else if (node->kind == AST_KIND_EXP_PRIMARY)
+			else if (node->kind == AST_KIND_LITERAL_NUMBER || 
+					 node->kind == AST_KIND_LITERAL_STRING || 
+					 node->kind == AST_KIND_PRIMARY_IDENTIFIER)
 			{
 				Ast_Primary* primary = (Ast_Primary*) node;
 				Graph_Label label = { primary->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
@@ -204,7 +217,8 @@ output_graph(Ast_Node* node, Logger* logger)
 				arrput(labels, label);
 			}
 			else {
-				
+				printf("node->type = %d\n", node->type);
+				printf("node->kind = %d\n", node->kind);
 				assert(false && "Not supported Expression type");
 			}
 			break;
@@ -341,6 +355,7 @@ output_graph(Ast_Node* node, Logger* logger)
 			if (ifnode->statement)
 				output_graph(ifnode->statement, logger);
 			
+			
 			if (ifnode->next)
 			{
 				for(U64 i = 0; i < arrlenu(ifnode->next); i++){
@@ -360,7 +375,8 @@ output_graph(Ast_Node* node, Logger* logger)
 		default:
 		{
 			//output_graph(node, logger);
-			printf("[Graph] Unhandled Node Type [%*s] Token name [%.*s]\n", SV_PRINT(ast_kind_to_string(node->type)), SV_PRINT(node->token.name));
+			printf("[Graph] Unhandled Node Type [%d] Token name [%d]\n", node->type, node->kind);
+			//printf("[Graph] Unhandled Node Type [%*s] Token name [%.*s]\n", //SV_PRINT(ast_kind_to_string(node->type)), SV_PRINT(node->token.name));
 			break;
 		}
 	}

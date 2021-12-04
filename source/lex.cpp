@@ -214,13 +214,16 @@ Token process_token(LexerState& lex)
 {
 	// @TODO: init a token and return it.
 	//static int COUTNER = 1;
+	Token token;
 	if(lex.input_cursor >= lex.input.length)
-		return { TOKEN_EOFA , 0, 0 , 0 };
-	
-	Token token = {0};
+	{
+		token.type = HDTokenType::TOKEN_EOFA;
+		return token;
+	}
 	//COUTNER++;
 	
 	U8 ch = eat_until_character(lex);
+	//HDTokenType type  = (HDTokenType)ch;
 	U64 temp = lex.input_cursor - 1;
 	token.start_position = get_current_position(lex);
 	switch(ch)
@@ -229,13 +232,13 @@ Token process_token(LexerState& lex)
 		{
 			U8 next = peek_character(lex);
 			if(next  == '/'){
-				token.type = TOKEN_COMMENT;
+				token.type = HDTokenType::TOKEN_COMMENT;
 				while(peek_character(lex) != '\r' && 
 					  peek_character(lex) != '\n'){eat_character(lex);}
 			}
 			else if (next == '*'){
 				// TODO: 
-				token.type = TOKEN_MULTILINE_COMMENT;
+				token.type = HDTokenType::TOKEN_MULTILINE_COMMENT;
 				int nested_level = 1;
 				while(lex.input_cursor < lex.input.length){
 					U8 eaten = eat_character(lex);
@@ -260,7 +263,7 @@ Token process_token(LexerState& lex)
 			} 
 			else {
 				// division ?? 
-				token.type = ch;
+				token.type = (HDTokenType)ch;
 				break;	  
 			}
 			break;
@@ -272,14 +275,14 @@ Token process_token(LexerState& lex)
 		case '~': case '!': case '\\':
 		case '&': case '?': 
 		{
-			token.type = ch;
+			token.type = (HDTokenType)ch;
 			break;
 		}
 		
 #if LEXER_ENABLE_C_CHAR_TOKEN == 0
 		case '\'':
 		{
-			token.type = ch;
+			token.type = (HDTokenType)ch;
 			break;
 		}
 #endif
@@ -287,33 +290,32 @@ Token process_token(LexerState& lex)
 		case '{': 
 		case '(': 
 		{
-			
-			token.type = ch;
+			token.type = (HDTokenType)ch;
 			break;
 		}
 		case ']': 
 		{
-			token.type = ch;
+			token.type = (HDTokenType)ch;
 			break;
 		}
 		case '}':
 		{
-			token.type = ch;
+			token.type = (HDTokenType)ch;
 			break;
 		}
 		case ')': 
 		{
-			token.type = ch;
+			token.type = (HDTokenType)ch;
 			break;
 		}
 		case '-':
 		{
 			auto next = peek_character(lex);
 			if (next == '>'){ 
-				token.type = TOKEN_ARROW;
+				token.type = HDTokenType::TOKEN_ARROW;
 				eat_character(lex);
 			} else {
-				token.type = ch;
+				token.type = (HDTokenType)ch;
 			}
 			break;
 			
@@ -322,14 +324,14 @@ Token process_token(LexerState& lex)
 		case '@': 
 		{
 			//TODO : Notes
-			token.type = TOKEN_DIRECTIVE;
+			token.type = HDTokenType::TOKEN_DIRECTIVE;
 			eat_until_whitespace(lex);
 			break;
 		}
 		// Compiler Directives
 		case '#':
 		{
-			token.type = TOKEN_DIRECTIVE;
+			token.type = HDTokenType::TOKEN_DIRECTIVE;
 			eat_until_whitespace(lex);
 			break;
 		}
@@ -338,10 +340,10 @@ Token process_token(LexerState& lex)
 			auto next = peek_character(lex);
 			if (next == '='){
 				eat_character(lex);
-				token.type = TOKEN_EQL;
+				token.type = HDTokenType::TOKEN_EQL;
 			}
 			else {
-				token.type = ch;
+				token.type = (HDTokenType)ch;
 			}
 			break;
 		}
@@ -350,12 +352,12 @@ Token process_token(LexerState& lex)
 			auto next = peek_character(lex);
 			if (next == '='){
 				eat_character(lex);
-				token.type = TOKEN_LT_OR_EQL;
+				token.type = HDTokenType::TOKEN_LT_OR_EQL;
 			} else if (next == '<'){
 				eat_character(lex);
-				token.type = TOKEN_SHIFT_LEFT;
+				token.type = HDTokenType::TOKEN_SHIFT_LEFT;
 			} else {
-				token.type = TOKEN_LT;
+				token.type = HDTokenType::TOKEN_LT;
 			}
 			break;
 		}
@@ -364,12 +366,12 @@ Token process_token(LexerState& lex)
 			auto next = peek_character(lex);
 			if (next == '='){
 				eat_character(lex);
-				token.type = TOKEN_GT_OR_EQL;
+				token.type = HDTokenType::TOKEN_GT_OR_EQL;
 			} else if (next == '>'){
 				eat_character(lex);
-				token.type = TOKEN_SHIFT_RIGHT;
+				token.type = HDTokenType::TOKEN_SHIFT_RIGHT;
 			} else {
-				token.type = TOKEN_GT;
+				token.type = HDTokenType::TOKEN_GT;
 			}
 			break;
 		}
@@ -378,10 +380,10 @@ Token process_token(LexerState& lex)
 			auto next = peek_character(lex);
 			if (next == '.') {
 				eat_character(lex);
-				token.type = TOKEN_DOUBLEDOT;
+				token.type = HDTokenType::TOKEN_DOUBLEDOT;
 			}
 			else {
-				token.type = ch;
+				token.type = (HDTokenType)ch;
 			}
 			break;
 		}
@@ -403,7 +405,7 @@ Token process_token(LexerState& lex)
 				eat_character(lex);
 				if(peeked == cu) break;
 			}	  
-			token.type = TOKEN_LITERAL;
+			token.type = HDTokenType::TOKEN_LITERAL;
 			token.kind = TOKEN_KIND_STRING_LITERAL;
 			break;	  
 		}
@@ -412,22 +414,22 @@ Token process_token(LexerState& lex)
 			if (peek_character(lex) == ':')
 			{
 				eat_character(lex);
-				token.type = TOKEN_DOUBLE_COLON;
+				token.type = HDTokenType::TOKEN_DOUBLE_COLON;
 			}
 			else if (peek_character(lex) == '='){
-				token.type = TOKEN_COLON_EQUAL;
+				token.type = HDTokenType::TOKEN_COLON_EQUAL;
 				eat_character(lex);
 			}
 			else {
-				token.type = TOKEN_COLON;
+				token.type = HDTokenType::TOKEN_COLON;
 			}
 			break;
 		}
 		break;
 		case '\0':
 		{
-			return { TOKEN_EOFA , 0 , 0 , 0};
-			break;
+			token.type = HDTokenType::TOKEN_EOFA;
+			return token;
 		}
 		default:
 		{
@@ -435,9 +437,12 @@ Token process_token(LexerState& lex)
 				//eat_until_whitespace();
 				eat_ident(lex);
 				token.value = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
-				token.type = TOKEN_IDENT;
-				if (isKeyword(token.value))
-					token.type = TOKEN_KEYWORD;
+				token.type = HDTokenType::TOKEN_IDENT;
+				
+				if (EqualStrings(token.value, "true"_s) || EqualStrings(token.value, "true"_s))
+					token.type = HDTokenType::TOKEN_BOOLEAN;
+				else if (isKeyword(token.value))
+					token.type = HDTokenType::TOKEN_KEYWORD;
 			}
 			else if (isDigit(ch))
 			{
@@ -446,7 +451,7 @@ Token process_token(LexerState& lex)
 				// We assume that this will be only numbers
 				// (0x -> hex) (0b -> binary) (0c  -> Octal)
 				// auto& pos = get_current_position();
-				token.type = TOKEN_LITERAL;
+				token.type = HDTokenType::TOKEN_LITERAL;
 				token.kind = TOKEN_KIND_INT_LITERAL;
 				auto peeked = peek_character(lex);
 				if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character(lex);
@@ -457,18 +462,22 @@ Token process_token(LexerState& lex)
 		}
 	}
 	//token.end_position = get_current_position(lex);
-	assert(token.type != TOKEN_NONE);
+	assert(token.type != HDTokenType::TOKEN_NONE);
 	token.value = CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
 	token.hash = Hash(token);
 	
 	// Do we need a mechanesim to bundle the comment with statments ? 
 	// or we just ignore them altogather
-	if (lex.config.ignore_comments && token.type == TOKEN_COMMENT)
+	if (lex.config.ignore_comments && token.type == HDTokenType::TOKEN_COMMENT)
 	{
 		return process_token(lex);
 	}
 	
 	return token;
+	
+	
+	
+	
 }
 
 
@@ -490,7 +499,7 @@ Token
 eat_until_token_by_type(LexerState& lex, U64 token_type)
 {
 	Token tok = eat_token(lex);
-	while(tok.type != token_type) tok = eat_token(lex);
+	while((U16)tok.type != (U16)token_type) tok = eat_token(lex);
 	return tok;
 }
 

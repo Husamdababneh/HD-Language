@@ -11,11 +11,11 @@ $Description: typer.h
 struct Alias;
 
 struct Type {
-	U32 size;
-	U32 alignment;
 	U8* name;
 	Alias* aliases;
 	Type* children;
+	U16 size;
+	U16 alignment;
 };
 
 struct Type_Map {
@@ -25,30 +25,6 @@ struct Type_Map {
 
 extern Type_Map* types;
 
-void register_predefined_types();
-
-/*
-struct Alias {
-	Type* realType;
-	StringView name;
-	Alias* aliases;
-};
-
-
-String type {
-		 
-size = 8 + 8 // sizeof string, + sizeof pointer to string
-name = string
-aliases = NULL
-children {
-U64 size;
-stringPtr  { data, string, str}  
-}
-
-}
-
-
-*/
 
 
 #endif //TYPER_H

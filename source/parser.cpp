@@ -6,6 +6,7 @@ $Description: parser.cpp
 ========================================================================*/
 
 #include "parser.h"
+#include "Ast.cpp"
 
 #include <memory>
 
@@ -27,7 +28,7 @@ Ast_Block* parse_block(MemoryArena* arena, Parser& );
 
 Ast_Node* parse_directive(MemoryArena* arena, Parser& );
 Ast_Node* parse_if_statement(MemoryArena* arena, Parser& );
-Ast_Var_Declaration* parse_var_def(MemoryArena* arena, Parser& );
+Ast_Var_Declaration* parse_var_def(MemoryArena* arena, Parser&, B8);
 Ast_Proc_Declaration* parse_proc_def(MemoryArena* arena, Parser& );
 Ast_Node* parse_statement_expression(MemoryArena* arena, Parser& );
 Ast_Block* parse_block_of_statements(MemoryArena* arena, Parser& );
@@ -46,10 +47,13 @@ Ast_Expression* parse_primary_expression(MemoryArena* arena, Parser& );
 Ast_Node** flaten_ast = NULL;
 
 // How does this perform ?? 
-#define AllocateNode(type, name) type* name;\
-name = (type*) PushStruct(arena, type);\
-name = ::new(name) type();\
+#define AllocateNode(type, name)\
+type* name = PushStruct(arena, type);\
+AllocateNodeEx(name);\
 arrput(flaten_ast,(Ast_Node*)name);
+//name = (type*) PushStruct(arena, type);\
+//name = ::new(name) type();\
+
 // NOTE(Husam): I'm not sure about the non-allocating palcement 'new' operator above
 //              I need to know how fast it is and is it worth it to create 'CreateNode' method
 //              for each Node type ?? ... that would be cumbersome but at least we know how fast it is 
@@ -84,11 +88,12 @@ void _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
 	{
 		printf("expect_and_eat: %s %zd\n", file ,line);
 		
-		auto token_type = token_type_to_string(type); 
+		String token_type = "TODO : "_s;
+		// auto token_type = token_type_to_string(type); 
 		if(token_type.length <= 1){
-			printf("Expected: %.*s(\'%c\', %d)  got \"%.*s\" \n", SV_PRINT(token_type_to_string(type)), (char)type, (int)type, SV_PRINT(token.name));
+			printf("Expected: %.*s(\'%c\', %d)  got \"%.*s\" \n", SV_PRINT(token_type), (char)type, (int)type, SV_PRINT(token.name));
 		}else{
-			printf("Expected: %.*s(%d)  got \"%.*s\" \n", SV_PRINT(token_type_to_string(type)), (int)type, SV_PRINT(token.name));
+			printf("Expected: %.*s(%d)  got \"%.*s\" \n", SV_PRINT(token_type), (int)type, SV_PRINT(token.name));
 		}
 		printf("Token[%.*s] Located in Line: %d, Col: %d \n", SV_PRINT(token.name), token.start_position.line, token.start_position.index);
 		
@@ -105,8 +110,8 @@ inline Ast_Scope*
 enter_scope(MemoryArena* arena, Parser& parser)
 {
 	Ast_Scope* prev = parser.current_scope;
-	Ast_Scope ss = {0};
-	arrput(parser.scopes, ss);
+	AllocateNode(Ast_Scope, ss);
+	arrput(parser.scopes, *ss);
 	Ast_Scope* scope = &arrlast(parser.scopes);
 	
 	
@@ -146,33 +151,36 @@ Token create_token(StringView name)
 }
 
 inline 
-Ast_Type 
-create_type(const U32 size, 
+Ast_Type* 
+create_type(MemoryArena*arena, 
+			const U32 size, 
 			const U32 alignment, 
 			const bool is_signed, 
 			const StringView& name)
 {
-	Ast_Type type;
-	type.size = size;
-	type.alignment = alignment;
-	type.is_signed = is_signed;
-	type.token = create_token(name);
+	AllocateNode(Ast_Type, type);
+	type->size = size;
+	type->alignment = alignment;
+	type->is_signed = is_signed;
+	type->token = create_token(name);
 	
 	return type;
 }
 
 
 inline 
-Ast_Type create_type(const U32 size, 
-					 const U32 alignment, 
-					 const bool is_signed, 
-					 const Token& token)
+Ast_Type* 
+create_type(MemoryArena*arena, 
+			const U32 size, 
+			const U32 alignment, 
+			const bool is_signed, 
+			const Token& token)
 {
-	Ast_Type type;
-	type.size = size;
-	type.alignment = alignment;
-	type.is_signed = is_signed;
-	type.token = token;
+	AllocateNode(Ast_Type, type);
+	type->size = size;
+	type->alignment = alignment;
+	type->is_signed = is_signed;
+	type->token = token;
 	
 	return type;
 }
@@ -181,29 +189,29 @@ Ast_Type create_type(const U32 size,
 void 
 register_predefined_types(MemoryArena* arena, Parser& parser)
 {
-	Ast_Type _U8 = create_type(1, 1, false, "U8"_s);
-	hmput(parser.predefined_types, _U8.token.name.str_char, _U8);
+	Ast_Type* _U8 = create_type(arena, 1, 1, false, "U8"_s);
+	//hmput(parser.predefined_types, _U8.token.name.str_char, _U8);
 	
-	Ast_Type _u16 = create_type(2, 2, false, "U16"_s);
-	hmput(parser.predefined_types, _u16.token.name.str_char, _u16);
+	Ast_Type*_u16 = create_type(arena, 2, 2, false, "U16"_s);
+	//hmput(parser.predefined_types, _u16.token.name.str_char, _u16);
 	
-	Ast_Type _U32 = create_type(4, 4, false, "U32"_s);
-	hmput(parser.predefined_types, _U32.token.name.str_char, _U32);
+	Ast_Type*_U32 = create_type(arena, 4, 4, false, "U32"_s);
+	//hmput(parser.predefined_types, _U32.token.name.str_char, _U32);
 	
-	Ast_Type _U64 = create_type(8, 8, false, "U64"_s);
-	hmput(parser.predefined_types, _U64.token.name.str_char, _U64);
+	Ast_Type*_U64 = create_type(arena, 8, 8, false, "U64"_s);
+	//hmput(parser.predefined_types, _U64.token.name.str_char, _U64);
 	
-	Ast_Type _S8 = create_type(1, 1, true, "S8"_s);
-	hmput(parser.predefined_types, _S8.token.name.str_char, _S8);
+	Ast_Type*_S8 = create_type(arena, 1, 1, true, "S8"_s);
+	//hmput(parser.predefined_types, _S8.token.name.str_char, _S8);
 	
-	Ast_Type _s16 = create_type(2, 2, true, "S16"_s);
-	hmput(parser.predefined_types, _s16.token.name.str_char, _s16);
+	Ast_Type*_s16 = create_type(arena, 2, 2, true, "S16"_s);
+	//hmput(parser.predefined_types, _s16.token.name.str_char, _s16);
 	
-	Ast_Type _s32 = create_type(4, 4, true, "S32"_s);
-	hmput(parser.predefined_types, _s32.token.name.str_char, _s32);
+	Ast_Type*_s32 = create_type(arena, 4, 4, true, "S32"_s);
+	//hmput(parser.predefined_types, _s32.token.name.str_char, _s32);
 	
-	Ast_Type _S64 = create_type(8, 8, true, "S64"_s);
-	hmput(parser.predefined_types, _S64.token.name.str_char, _S64);
+	Ast_Type*_S64 = create_type(arena, 8, 8, true, "S64"_s);
+	//hmput(parser.predefined_types, _S64.token.name.str_char, _S64);
 	
 	
 	/* 	
@@ -272,8 +280,113 @@ void print_scopes(Ast_Scope* scope)
 }
 
 
+void TypeCheck(Ast_Node* node)
+{
+	switch(node->type)
+	{
+		case AST_BLOCK:
+		{
+			printf("Node type is : AST_BLOCK\n");
+			for(U16 a = 0; a < arrlenu(((Ast_Block*)node)->statements); a++)
+			{
+				printf("Number of statements [%lld]\n", arrlenu(((Ast_Block*)node)->statements));
+				TypeCheck(((Ast_Block*)node)->statements[a]);
+			}
+			break;
+		}
+		case AST_EXPRESSION:
+		{
+			printf("Node type is : AST_EXPRESSION\n");
+			break;
+		}
+		case AST_TYPE:
+		{
+			printf("Node type is : AST_TYPE\n");
+			break;
+		}
+		case AST_DECLARATION:
+		{
+			Ast_Var_Declaration* decl = (Ast_Var_Declaration*)node;
+			printf("Node type is : AST_DECLARATION\n");
+			TypeCheck(decl->body);
+			break;
+		}
+		case AST_IF:
+		{
+			printf("Node type is : AST_IF\n");
+			break;
+		}
+		case AST_NOTE:
+		{
+			printf("Node type is : AST_NOTE\n");
+			break;
+		}
+		case AST_DIRECTIVE:
+		{
+			printf("Node type is : AST_DIRECTIVE\n");
+			break;
+		}
+		default:
+		{
+			printf("Unknown AST Node type\n");
+		}
+	}
+	
+	
+}
 
-//static Queue<StringView> files = make_queue<StringView>(10);
+void TypeCheck(Ast_Scope* scope, int level = 0)
+{
+	if(scope == nullptr) return;
+	// Print All variable declarations in this scope
+	if (scope->variables)
+	{
+		auto variables_count = arrlenu(scope->variables);
+		for(auto i = 0; i < variables_count; i++)
+		{
+			Ast_Var_Declaration* decl = scope->variables[i];
+			
+			printf("[%d] - %.*s\n", level, SV_PRINT(decl->token.name));
+		}
+	}
+	
+	
+	if(scope->procedures)
+	{
+		//Ast_Var_Declaration
+		auto procedures_count = arrlenu(scope->procedures);
+		
+		for(auto i = 0; i < procedures_count; i++)
+		{
+			// 
+			Ast_Proc_Declaration* decl = scope->procedures[i];
+			
+			printf("[%d] - %.*s\n", level, SV_PRINT(decl->token.name));
+		}
+	}
+	
+	if (scope->structs)
+	{
+		auto structs_count = arrlenu(scope->structs);
+		for(auto i = 0; i < structs_count; i++)
+		{
+			Ast_Struct_Declaration* decl = scope->structs[i];
+			
+			printf("[%d] - %.*s\n", level, SV_PRINT(decl->token.name));
+		}
+		
+	}
+	
+	if (scope->children)
+	{
+		auto children_count = arrlenu(scope->children);
+		for(auto i = 0; i < children_count; i++)
+		{
+			Ast_Scope* child_scope  = scope->children[i];
+			TypeCheck(child_scope, level+1);
+		}
+	}
+}
 
 Ast parse(MemoryArena* arena, Parser& parser)
 {
@@ -282,10 +395,10 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	
 	
 	Ast_Block* block = parse_block(arena, parser);
-	
+	TypeCheck(block->scope);
 	// this should be the whole file 
 	
-	PRINT_GRAPH(block, &parser.logger);
+	//PRINT_GRAPH(block, &parser.logger);
 	//print_scopes(block->scope);
 	//generate(block);
 	
@@ -409,7 +522,7 @@ parse_proc_def(MemoryArena* arena, Parser& parser)
 }
 
 Ast_Var_Declaration*
-parse_var_def(MemoryArena* arena, Parser& parser)
+parse_var_def(MemoryArena* arena, Parser& parser, B8 addToScope = true)
 {
 	auto& lexer = parser.lexer;
 	Token decl_name = eat_token(lexer); // Name
@@ -464,7 +577,7 @@ parse_var_def(MemoryArena* arena, Parser& parser)
 	var->body = parse_expression(arena, parser);
 	
 	exit:
-	arrput(parser.current_scope->variables, var);
+	if (addToScope) arrput(parser.current_scope->variables, var);
 	expect_and_eat(TOKEN_SEMI_COLON);
 	return var;
 }
@@ -489,7 +602,7 @@ parse_struct_def(MemoryArena* arena, Parser& parser)
 	token = peek_token(lexer); 
 	while(token.type != '}' && token.type != TOKEN_EOFA)
 	{
-		Ast_Var_Declaration* var = parse_var_def(arena, parser);
+		Ast_Var_Declaration* var = parse_var_def(arena, parser, false);
 		arrput(_struct->decls, var);
 		token = peek_token(lexer);
 		if (token.type != '}') continue;
@@ -503,7 +616,7 @@ parse_struct_def(MemoryArena* arena, Parser& parser)
 	
 	// Add Struct to types
 	
-	hmput(parser.predefined_types, decl_name.name.str_char, create_type(0,0,0,decl_name));
+	//hmput(parser.predefined_types, decl_name.name.str_char, create_type(0,0,0,decl_name));
 	
 	//arrput(current_scope->types, type);
 	
@@ -606,7 +719,7 @@ parse_statement(MemoryArena* arena, Parser& parser)
 	
 	// Scopes
 	if (t1.type == '{'){
-		return parse_block_of_statements(arena, parser);
+		return parse_block_of_statements(arena, parser); // nocheckin
 	}
 	
 	
@@ -638,7 +751,7 @@ parse_statement(MemoryArena* arena, Parser& parser)
 }
 
 // TODO: Merge token_to_operation with get_binary_precedence
-static S64 token_to_operation(const Token& token){
+static AST_BINARY_TYPE token_to_operation(const Token& token){
 	
 	switch(token.type)
 	{
@@ -656,7 +769,7 @@ static S64 token_to_operation(const Token& token){
 		}
 	}
 	
-	return -1;
+	return AST_BINARY_NONE;
 }
 
 static S8 get_binary_precedence(const Token& token)
@@ -734,7 +847,7 @@ parse_unary_expression(MemoryArena* arena, Parser& parser)
 		
 		return parse_suffix_expression(arena, parser, result);
 	}
-	else if (token.type == '-' || token.type == '+' ) // minus 
+	else if (token.type == '-' || token.type == '+' || token.type == '!')
 	{
 		eat_token(lexer); //  eat the sign
 		AllocateNode(Ast_Unary, unary);
@@ -828,7 +941,7 @@ parse_primary_expression(MemoryArena* arena, Parser& parser)
 		{
 			AllocateNode(Ast_Primary, primary);
 			primary->token = token;
-			primary->priamry_kind = AST_KIND_PRIMARY_IDENTIFIER;
+			primary->kind = AST_KIND_PRIMARY_IDENTIFIER;
 			return primary;
 			break;
 		}
@@ -836,18 +949,23 @@ parse_primary_expression(MemoryArena* arena, Parser& parser)
 		{
 			AllocateNode(Ast_Literal, literal);
 			
-			if (token.kind == TOKEN_KIND_STRING_LITERAL) 
-				literal->literal_kind = AST_KIND_LITERAL_STRING;
-			else 
-				literal->literal_kind = AST_KIND_LITERAL_NUMBER;
+			literal->kind = token.kind == TOKEN_KIND_STRING_LITERAL ? AST_KIND_LITERAL_STRING : AST_KIND_LITERAL_NUMBER;
+			
 			literal->token = token;
 			return literal;
 			break;
 		}
+		case TOKEN_BOOLEAN:
+		{
+			printf("TODO: Handel true/false constants ");
+			exit(-1);
+			break;
+		}
 		default:
 		{
+			String token_type = "TODO: "_s;
 			printf("Token [%.*s] At [Line: %d, Col: %d], Is not a primary expression [%.*s] \n",SV_PRINT(token.name), token.start_position.line,token.start_position.index
-				   , SV_PRINT(token_type_to_string(token.type)));
+				   , SV_PRINT(token_type));
 			exit(-1);
 			break;
 		}
@@ -896,7 +1014,7 @@ parse_directive(MemoryArena* arena, Parser& parser)
 {
 	auto& lexer = parser.lexer;
 	Token directive = eat_token(lexer);
-	if (EqualStrings(directive.name, "#import"_s))
+	if (EqualStrings(directive.name, "#import"_s)) // Replace this with Enum
 	{
 		Token filename = eat_token(lexer);
 		

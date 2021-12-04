@@ -23,6 +23,9 @@ $Description: main function
 #include "ir.cpp"
 
 
+#include <Dbghelp.h>
+#pragma comment(lib, "User32.lib")
+
 // TODO(Husam Dababneh): Insure that we allocate enough zero-filled memory 
 
 #if ARCH_AMD64 != 1
@@ -51,9 +54,60 @@ struct Array
 	Type* data;
 };
 
+void make_minidump(EXCEPTION_POINTERS* e)
+{
+    auto hDbgHelp = LoadLibraryA("dbghelp");
+    if(hDbgHelp == nullptr)
+        return;
+    auto pMiniDumpWriteDump = (decltype(&MiniDumpWriteDump))GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
+    if(pMiniDumpWriteDump == nullptr)
+        return;
+	
+    char name[MAX_PATH];
+    {
+        auto nameEnd = name + GetModuleFileNameA(GetModuleHandleA(0), name, MAX_PATH);
+        SYSTEMTIME t;
+        GetSystemTime(&t);
+        wsprintfA(nameEnd - strlen(".exe"),
+				  "_%4d%02d%02d_%02d%02d%02d.dmp",
+				  t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
+    }
+	
+    auto hFile = CreateFileA(name, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+    if(hFile == INVALID_HANDLE_VALUE)
+        return;
+	
+    MINIDUMP_EXCEPTION_INFORMATION exceptionInfo;
+    exceptionInfo.ThreadId = GetCurrentThreadId();
+    exceptionInfo.ExceptionPointers = e;
+    exceptionInfo.ClientPointers = FALSE;
+	
+    auto dumped = pMiniDumpWriteDump(
+									 GetCurrentProcess(),
+									 GetCurrentProcessId(),
+									 hFile,
+									 MINIDUMP_TYPE(MiniDumpWithFullMemoryInfo | MiniDumpWithFullMemory),
+									 e ? &exceptionInfo : nullptr,
+									 nullptr,
+									 nullptr);
+	
+    CloseHandle(hFile);
+	
+    return;
+}
+
+LONG CALLBACK unhandled_handler(EXCEPTION_POINTERS* e)
+{
+    make_minidump(e);
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+
+
 
 int main(int argc, char ** argv)
 {
+	//SetUnhandledExceptionFilter(unhandled_handler);
 	ZoneScoped;
 	if (argc < 2){
 		Usage();
@@ -73,10 +127,13 @@ int main(int argc, char ** argv)
 	
 	MemoryArena arena = InitializeMemoryArena(arena_size, memory);
 	
+	
+	//printf("Parsing %s\n", argv[1]);
 	Parser parser = {};
 	LexerState  lexer  = {};
 	lexer.input = read_entire_file(argv[1]);
 	parser.lexer = lexer;
+	
 	
 	// WHAT ??
 	register_predefined_types(&arena, parser);

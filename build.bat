@@ -13,7 +13,7 @@ set outputs=/Fp"%bin_int%\hd.pch" /Fo%bin_int%\ /Fd"%bin_int%\vc142.pdb"
 
 set common_flags=/nologo  /diagnostics:caret /D _UNICODE /D UNICODE 
 rem /GF
-set debug_flags=/Z7 /JMC /W3 /WX- /Od /TP /FC /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 
+set debug_flags=/Z7 /JMC /W3 /WX- /Od /TP /FC /Gm- /EHs /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 
 rem /d1reportAllClassLayout
 
 REM Once we get rid of all c/c++ headers, we will enable this to see the layout of the struct
@@ -35,26 +35,26 @@ rem  /D _UNICODE /D UNICODE /Yu"pch.h"
 
 
 REM Compile And Link Meta
-cl /c %INCLUDE_PATHS% %flags% .\source\meta.cpp %outputs%
-IF %ERRORLEVEL% NEQ 0 (goto FINISH)
+REM cl /c %INCLUDE_PATHS% %flags% .\source\meta.cpp %outputs%
+REM IF %ERRORLEVEL% NEQ 0 (goto FINISH)
 
 
-pushd %bin_int%
-link .\meta.obj  /OUT:..\..\bin\meta.exe %debug_link_option% 
-IF %ERRORLEVEL% NEQ 0 (goto FINISH)
-popd
-pushd .\source\
-..\bin\meta.exe
-IF %ERRORLEVEL% NEQ 0 (goto FINISH)
-popd
+REM pushd %bin_int%
+REM link .\meta.obj  /OUT:..\..\bin\meta.exe %debug_link_option% 
+REM IF %ERRORLEVEL% NEQ 0 (goto FINISH)
+REM popd
+REM pushd .\source\
+REM ..\bin\meta.exe
+REM IF %ERRORLEVEL% NEQ 0 (goto FINISH)
+REM popd
 
 
 REM compile main
-cl /c %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
+cl /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
 
 REM LINK 
 pushd %bin_int%
-link %object_files% /OUT:..\..\bin\hd.exe %debug_link_option%
+link %object_files% /NATVIS:..\..\misc\strings.natvis  /OUT:..\..\bin\hd.exe %debug_link_option%
 popd
 
 :FINISH

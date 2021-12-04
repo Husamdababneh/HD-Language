@@ -6,7 +6,7 @@ $Description: parser
 ========================================================================*/
 #pragma once
 
-#include "Ast.h"
+//#include "Ast.h"
 #include "lex.h"
 #include "typer.h"
 
