@@ -36,23 +36,10 @@ int allocation_count = 0;
 
 void Usage() {
 	Logger log;
-	log.prefix = "USAGE"_s;
+	//log.prefix = "USAGE"_s;
 	log.print("Usage: hd.exe <filename>\n"_s);
 }
 
-
-struct Dummy
-{
-	U64 randomi;
-	F32 randomf;
-};
-
-template<typename Type>
-struct Array
-{
-	Size size;
-	Type* data;
-};
 
 void make_minidump(EXCEPTION_POINTERS* e)
 {
@@ -86,8 +73,8 @@ void make_minidump(EXCEPTION_POINTERS* e)
 									 GetCurrentProcess(),
 									 GetCurrentProcessId(),
 									 hFile,
-									 //MiniDumpWithFullMemoryInfo | MiniDumpWithFullMemory
-									 MINIDUMP_TYPE(MiniDumpNormal),
+									 //
+									 MINIDUMP_TYPE(MiniDumpWithFullMemoryInfo | MiniDumpWithFullMemory),
 									 e ? &exceptionInfo : nullptr,
 									 nullptr,
 									 nullptr);
@@ -103,11 +90,36 @@ LONG CALLBACK unhandled_handler(EXCEPTION_POINTERS* e)
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-
+//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
+void GetLastErrorAsString()
+{
+    //Get the error message ID, if any.
+    DWORD errorMessageID = ::GetLastError();
+    if(errorMessageID == 0) {
+        return;
+    }
+    
+	
+    LPSTR messageBuffer = nullptr;
+	
+    //Ask Win32 to give us the string version of that message ID.
+    //The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+    
+    //Copy the error message into a std::string.
+    //std::string message(messageBuffer, size);
+    printf("messageBuffer: %s\n", messageBuffer);
+    //Free the Win32's string's buffer.
+    LocalFree(messageBuffer);
+	
+    //return message;
+}
 
 
 int main(int argc, char ** argv)
 {
+	//return 0;
 	SetUnhandledExceptionFilter(unhandled_handler);
 	ZoneScoped;
 	if (argc < 2){
@@ -115,9 +127,11 @@ int main(int argc, char ** argv)
 		return 0;
 	}
 	
+	//GetLastErrorAsString(487);
+	//return 1;
 	// Allocate Enough Memory and pass it down to other systems
 #if OS_WINDOWS
-# if HD_BUILD_INTERNAL == 1
+# if HD_BUILD_INTERNAL == 0
 	const LPVOID BASE_ADDRESS = (LPVOID)TB((U64)2);
 # else
 	const LPVOID BASE_ADDRESS = 0;
@@ -126,12 +140,19 @@ int main(int argc, char ** argv)
 	auto arena_size = MB(500);
 	PTR memory = VirtualAlloc(BASE_ADDRESS, arena_size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 	
+	if (memory == nullptr) 
+	{
+		GetLastErrorAsString();
+		exit(-1);
+	}
+	
 	MemoryArena arena = InitializeMemoryArena(arena_size, memory);
 	
 	
 	//printf("Parsing %s\n", argv[1]);
 	Parser parser = {};
 	LexerState  lexer  = {};
+	lexer.config.ignore_comments = true;
 	lexer.input = read_entire_file(argv[1]);
 	parser.lexer = lexer;
 	

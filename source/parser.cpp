@@ -111,17 +111,17 @@ enter_scope(MemoryArena* arena, Parser& parser)
 {
 	Ast_Scope* prev = parser.current_scope;
 	AllocateNode(Ast_Scope, ss);
-	arrput(parser.scopes, *ss);
-	Ast_Scope* scope = &arrlast(parser.scopes);
+	//arrput(parser.scopes, ss);
+	//Ast_Scope* scope = arrlast(parser.scopes);
 	
 	
 	if (prev != nullptr){
-		arrput(prev->children, scope);
+		arrput(prev->children, ss);
 	}
 	
-	scope->parent = prev;
-	parser.current_scope = scope;
-	return scope;
+	ss->parent = prev;
+	parser.current_scope = ss;
+	return ss;
 }
 
 

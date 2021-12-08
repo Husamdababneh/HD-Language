@@ -16,10 +16,12 @@
 //struct String;
 // TODO: Change putchar to putc ?? to make the user able to output to files 
 struct Logger {
-	String prefix = "Temp"_s;
+	//String prefix = "Temp"_s;
 	FILE * out = stdout ;
 	
-	inline void print_prefix();
+	Logger() = default;
+	
+	//inline void print_prefix();
 	void print(String str, ...);
 	void vprint(String str,va_list args);
 	//void print_token_pos(Token * token );

@@ -113,6 +113,7 @@ void Logger::vprint(StringView str, va_list args) {
 	
 }
 
+#if 0
 inline void Logger::print_prefix() {
 	putchar('[');
 	for(size_t i = 0; i < prefix.length; i++) putchar(prefix[i]);
@@ -121,3 +122,4 @@ inline void Logger::print_prefix() {
 	putchar(' ');		
 	
 }
+#endif

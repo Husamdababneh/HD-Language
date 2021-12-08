@@ -92,7 +92,7 @@ struct Token
 };
 
 struct LexerStateConfigs {
-	bool ignore_comments = true;
+	bool ignore_comments;
 };
 
 padding_check

@@ -146,11 +146,13 @@ bool isHDtype(StringView& string)
 
 S8 peek_next_character(LexerState& lex)
 {
-	return lex.input[lex.input_cursor + 1];
+	// bounds check
+	return peek_character(lex);
 }
 
 S8 peek_character(LexerState& lex, U64 lookAhead /* = 0 */)
 {
+	if (lex.input_cursor + lookAhead >= lex.input.size) return -1;
 	return lex.input[lex.input_cursor + lookAhead];
 }
 
@@ -158,22 +160,28 @@ S8 peek_character(LexerState& lex, U64 lookAhead /* = 0 */)
 void eat_characters(LexerState& lex, U64 count)
 {
 	for(int a = 0; a < count; a++)
-		eat_character(lex);
+		if (eat_character(lex) == -1) break;
 }
 
 S8 eat_until_character(LexerState& lex)
 {
-	
-	while(isWhiteSpace(peek_character(lex))) eat_character(lex);
-	return eat_character(lex);
+	while(true)
+	{
+		// eat_character is EOF safe
+		auto ch = eat_character(lex);
+		if (isWhiteSpace(ch)) continue;
+		return ch;
+	}
 }
 
+
+#if 0
 S8 eat_until(LexerState& lex, S8 charr)
 {
-	
 	while(peek_character(lex) != charr) eat_character(lex);
 	return eat_character(lex);
 }
+#endif
 
 
 inline 
@@ -193,6 +201,7 @@ void eat_ident(LexerState& lex)
 S8 eat_character(LexerState& lex)
 {
 	// TODO: Check for end of file
+	if (lex.input_cursor >= lex.input.size) return -1;
 	switch(lex.input[lex.input_cursor])
 	{
 		case '\n':
@@ -214,15 +223,15 @@ Token process_token(LexerState& lex)
 {
 	// @TODO: init a token and return it.
 	//static int COUTNER = 1;
+	//COUTNER++;
 	Token token;
-	if(lex.input_cursor >= lex.input.length)
+	U8 ch = eat_until_character(lex);
+	if(ch == -1) 
 	{
 		token.type = HDTokenType::TOKEN_EOFA;
 		return token;
 	}
-	//COUTNER++;
 	
-	U8 ch = eat_until_character(lex);
 	//HDTokenType type  = (HDTokenType)ch;
 	U64 temp = lex.input_cursor - 1;
 	token.start_position = get_current_position(lex);
