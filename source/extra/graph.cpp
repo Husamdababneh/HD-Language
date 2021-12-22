@@ -5,7 +5,7 @@ $Creator: Husam
 $Desc:  
 =========================================================================*/
 
-#if ENABLE_GRAPH_PRINTING == 0
+#if ENABLE_GRAPH_PRINTING == 1
 #include "graph.h"
 
 StringView Shape_Names [] = {
@@ -260,8 +260,8 @@ output_graph(Ast_Node* node)
 					for (U64 i = 0; i < arrlenu(decl->return_type); i++)
 						printf("T_%x ", MeowU32From(decl->return_type[i]->token.hash, 3));
 				}
-				
-				if (decl->body && arrlenu(decl->body->statements) > 0){
+				//&& arrlenu(decl->body->statements) > 0
+				if (decl->body ){
 					printf("T_%x ", MeowU32From(decl->body->token.hash,3));
 				}
 				
@@ -315,8 +315,6 @@ output_graph(Ast_Node* node)
 		{
 			Ast_Block* block =  (Ast_Block*) node;
 			
-#if 1
-			// this should not happen ?? 
 			if (arrlenu(block->statements) <= 0)
 				break;
 			printf("T_%x -> { ", hash);
@@ -328,13 +326,13 @@ output_graph(Ast_Node* node)
 			
 			
 			printf("}\n");
-#endif
+			
 			
 			for(U64 i = 0; i < arrlenu(block->statements); i++){
 				output_graph(block->statements[i]);
 			}
 			
-			Graph_Label label = { "Block"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+			Graph_Label label =  { "Block"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
 			arrput(labels, label);
 			break;
 		}

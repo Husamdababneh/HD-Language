@@ -27,7 +27,7 @@ main :: proc () -> U64
 	// Scope Level 1
 	function :: proc () -> U64
 	{
-		a:: 2;
+
 	}
 	
 	// Scope Level 1

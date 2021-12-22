@@ -81,7 +81,7 @@ static void SyntaxError(const Token& token, const StringView& message)
 }
 
 inline 
-void _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
+Token _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
 {
 	const Token& token = peek_token(_this->lexer);
 	if(token.type != type)
@@ -100,7 +100,7 @@ void _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
 		SyntaxError(token, "Expected Another Token Here"_s);
 		exit(-1);
 	}
-	eat_token(_this->lexer);
+	return eat_token(_this->lexer);
 	
 }
 #define expect_and_eat(x) _expect_and_eat(&parser, x, __LINE__, __FILE__)
@@ -110,18 +110,16 @@ inline Ast_Scope*
 enter_scope(MemoryArena* arena, Parser& parser)
 {
 	Ast_Scope* prev = parser.current_scope;
-	AllocateNode(Ast_Scope, ss);
-	//arrput(parser.scopes, ss);
-	//Ast_Scope* scope = arrlast(parser.scopes);
-	
+	AllocateNode(Ast_Scope, current_scope);
 	
 	if (prev != nullptr){
-		arrput(prev->children, ss);
+		arrput(prev->children, current_scope);
 	}
 	
-	ss->parent = prev;
-	parser.current_scope = ss;
-	return ss;
+	current_scope->parent = prev;
+	parser.current_scope = current_scope;
+	
+	return current_scope;
 }
 
 
@@ -397,10 +395,10 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	
 	
 	Ast_Block* block = parse_block(arena, parser);
-	TypeCheck(block->scope);
+	//TypeCheck(block->scope);
 	// this should be the whole file 
 	
-	//PRINT_GRAPH(block, &parser.logger);
+	PRINT_GRAPH(block);
 	//print_scopes(block->scope);
 	//generate(block);
 	
@@ -983,10 +981,30 @@ parse_primary_expression(MemoryArena* arena, Parser& parser)
 Ast_Block*
 parse_block_of_statements(MemoryArena* arena, Parser& parser)
 {
-	expect_and_eat('{');
-	Ast_Block* statements = parse_block(arena, parser);
+	auto& lexer = parser.lexer;
+	
+	Token token = expect_and_eat('{');
+	enter_scope(arena, parser);
+	
+	AllocateNode(Ast_Block, block);
+	
+	block->token = token;
+	block->scope = parser.current_scope; 
+	
+	token = peek_token(lexer);
+	
+	while(token.type != TOKEN_EOFA && token.type != '}')
+	{
+		Ast_Node* statement = parse_statement(arena, parser);
+		
+		if (statement) arrput(block->statements, statement);
+		
+		token = peek_token(lexer);
+	}
+	
+	exit_scope(arena, parser);
 	expect_and_eat('}');
-	return statements;
+	return block;
 }
 
 Ast_Block*
