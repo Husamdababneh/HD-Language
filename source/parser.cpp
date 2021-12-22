@@ -533,7 +533,7 @@ parse_var_def(MemoryArena* arena, Parser& parser, B8 addToScope = true)
 		eat_token(lexer);
 		type = parse_type(arena, parser);
 		token = peek_token(lexer);
-		var->data_type = nullptr;
+		var->data_type = type;
 		
 		// Immutable Variable
 		if (token.type == TOKEN_COLON){
@@ -573,12 +573,14 @@ parse_var_def(MemoryArena* arena, Parser& parser, B8 addToScope = true)
 	
 	
 	token = peek_token(lexer);
-	// If it's a constant it have to have a value; 
 	
+	// If it's a constant it have to have a value; 
 	if (!var->constant && token.type == TOKEN_SEMI_COLON)  
 		goto exit;
 	
 	var->body = parse_expression(arena, parser);
+	my_assert(var->body);
+	
 	
 	exit:
 	if (addToScope) arrput(parser.current_scope->variables, var);

@@ -61,7 +61,7 @@ inline void pop_register(const StringView& str) {
 // Forward declerations 
 void generate_expression(Ast_Expression* exp);
 void generate_binary_expression(Ast_Binary* binary);
-void generate_block(Ast_Block* block);
+//void generate_block(Ast_Block* block);
 
 void generate_address(Ast_Expression* exp)
 {
@@ -227,7 +227,7 @@ void generate_node(Ast_Node* node){
 		}
 		case AST_BLOCK:
 		{
-			generate_block((Ast_Block*) node);
+			//generate_block((Ast_Block*) node);
 			break;
 		}
 		case AST_IF:
@@ -251,6 +251,7 @@ void generate_node(Ast_Node* node){
 }
 
 
+#if 0
 void generate_block(Ast_Block* block)
 {
 	//printf("#Of Statements = %zd\n", arrlenu(block->statements));
@@ -262,6 +263,7 @@ void generate_block(Ast_Block* block)
 	//FILE* file = getFile();
 	
 }
+#endif
 
 
 
@@ -297,7 +299,7 @@ void generate_proc(Ast_Proc_Declaration* decl)
 	if (EqualStrings("main"_s, funcName))
 		fprintf(file, "\tcall _CRT_INIT\n");
 	
-	generate_block(decl->body);
+	//generate_block(decl->body);
 	// Generate Work
 	
 	// Generate Postwork

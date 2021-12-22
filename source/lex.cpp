@@ -37,7 +37,7 @@ get_current_position(LexerState& lex)
 TODO(Husam Dababneh): I want to change the way the lexer works, but just after finishing the base
 */
 
-#define FOR_RANGE(x) for(U64 it = 0; it < x; it++)
+
 
 // TODO : Remove them from reserved[]  
 StringView predefined_types [] = {
@@ -213,19 +213,53 @@ S8 eat_character(LexerState& lex)
 		break;
 	}
 	lex.input_cursor++;
-	if (lex.input_cursor >= lex.input.length) return 0;
+	if (lex.input_cursor >= lex.input.length) return -1;
 	
 	return lex.input[lex.input_cursor - 1];
+}
+
+void handleComments(LexerState& lex, Token& token)
+{
+	auto ch = eat_character(lex);
+	if (ch == '/')
+	{
+		token.type = HDTokenType::TOKEN_COMMENT;
+		while(peek_character(lex) != '\r' && peek_character(lex) != '\n')
+			eat_character(lex);
+		return;
+	}
+	
+	assert(ch == '*');
+	token.type = HDTokenType::TOKEN_MULTILINE_COMMENT;
+	int nested_level = 1;
+	while(lex.input_cursor < lex.input.length){
+		U8 eaten = eat_character(lex);
+		U8 next_to_be_eaten = peek_character(lex);
+		if (eaten == '/' && next_to_be_eaten == '*'){
+			eat_character(lex);
+			nested_level++;
+		}
+		if(eaten == '*' && next_to_be_eaten == '/'){
+			eat_character(lex);
+			nested_level--;
+			continue;
+		}
+		if (nested_level == 0) break;	  
+	};
+	if (nested_level != 0) {
+		// TODO : Report location where it started and 
+		printf("Uncontinued Multiline comment\n");
+		exit(-1);
+	}
 }
 
 #define Hash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
 Token process_token(LexerState& lex)
 {
-	// @TODO: init a token and return it.
 	//static int COUTNER = 1;
 	//COUTNER++;
-	Token token;
-	U8 ch = eat_until_character(lex);
+	Token token = {};
+	S8 ch = eat_until_character(lex);
 	if(ch == -1) 
 	{
 		token.type = HDTokenType::TOKEN_EOFA;
@@ -241,40 +275,8 @@ Token process_token(LexerState& lex)
 		{
 			// Move this to somewhere else
 			U8 next = peek_character(lex);
-			if(next  == '/'){
-				token.type = HDTokenType::TOKEN_COMMENT;
-				while(peek_character(lex) != '\r' && 
-					  peek_character(lex) != '\n'){eat_character(lex);}
-			}
-			else if (next == '*'){
-				token.type = HDTokenType::TOKEN_MULTILINE_COMMENT;
-				int nested_level = 1;
-				while(lex.input_cursor < lex.input.length){
-					U8 eaten = eat_character(lex);
-					U8 next_to_be_eaten = peek_character(lex);
-					if (eaten == '/' && next_to_be_eaten == '*'){
-						eat_character(lex);
-						nested_level++;
-					}
-					if(eaten == '*' && next_to_be_eaten == '/'){
-						eat_character(lex);
-						nested_level--;
-						continue;
-					}
-					if (nested_level == 0) break;	  
-				};
-				if (nested_level != 0) {
-					// TODO : Report location where it started and 
-					printf("Uncontinued Multiline comment\n");
-					exit(-1);
-				}
-				break;
-			} 
-			else {
-				// division ?? 
-				token.type = (HDTokenType)ch;
-				break;	  
-			}
+			if (next == '/' || next == '*') handleComments(lex, token);
+			else                            token.type = (HDTokenType)ch;
 			break;
 		}
 		break;
@@ -445,12 +447,12 @@ Token process_token(LexerState& lex)
 			if (isAlphabet(ch) || ch == '_'){
 				//eat_until_whitespace();
 				eat_ident(lex);
-				token.value = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
+				token.name = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
 				token.type = HDTokenType::TOKEN_IDENT;
 				
-				if (EqualStrings(token.value, "true"_s) || EqualStrings(token.value, "true"_s))
+				if (EqualStrings(token.name, "true"_s) || EqualStrings(token.name, "true"_s))
 					token.type = HDTokenType::TOKEN_BOOLEAN;
-				else if (isKeyword(token.value))
+				else if (isKeyword(token.name))
 					token.type = HDTokenType::TOKEN_KEYWORD;
 			}
 			else if (isDigit(ch))
@@ -472,7 +474,7 @@ Token process_token(LexerState& lex)
 	}
 	//token.end_position = get_current_position(lex);
 	assert(token.type != HDTokenType::TOKEN_NONE);
-	token.value = CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
+	token.name = CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
 	token.hash = Hash(token);
 	
 	// Do we need a mechanesim to bundle the comment with statments ? 
@@ -514,5 +516,3 @@ eat_until_token_by_type(LexerState& lex, U64 token_type)
 	while((U16)tok.type != (U16)token_type) tok = eat_token(lex);
 	return tok;
 }
-
-#undef FOR_RANGE

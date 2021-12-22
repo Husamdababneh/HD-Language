@@ -51,6 +51,7 @@ REM popd
 
 REM compile main
 cl /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
+rem clang /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
 
 REM LINK 
 pushd %bin_int%

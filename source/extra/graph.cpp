@@ -5,7 +5,7 @@ $Creator: Husam
 $Desc:  
 =========================================================================*/
 
-#if ENABLE_GRAPH_PRINTING == 1
+#if ENABLE_GRAPH_PRINTING == 0
 #include "graph.h"
 
 StringView Shape_Names [] = {
@@ -47,20 +47,22 @@ StringView Shape_Names [] = {
 
 static Graph_Label* labels = nullptr;
 static void 	
-output_labels(Logger* logger)
+output_labels()
 {
 	for(U64 i = 0; i < arrlenu(labels); i++)
 	{
 		auto& label = labels[i];
-		logger->print("T_%x [shape=\"%s\" label=\"%s\"];\n"_s, label.hash, Shape_Names[(U64)label.type], 
-					  label.str);
+		printf("T_%x [shape=\"%.*s\" label=\"%.*s\"];\n", 
+			   label.hash,
+			   SV_PRINT(Shape_Names[(U64)label.type]), 
+			   SV_PRINT(label.str));
 	}
 	
 	arrfree(labels);
 	
 }
 static void
-output_graph(Ast_Node* node, Logger* logger)
+output_graph(Ast_Node* node)
 {
 	if (node == nullptr) return; 
 	if (node->type == AST_UKNOWN) assert(false);
@@ -72,8 +74,8 @@ output_graph(Ast_Node* node, Logger* logger)
 		printf("Node type (%d)\n", node->type);
 	}
 	
-	meow_u128 hash = node->token.hash;
-	//auto hash = MeowU32From(full_hash, 3);
+	
+	U32 hash = MeowU32From(node->token.hash, 3);
 	switch(node->type)
 	{
 		case AST_UKNOWN:
@@ -87,19 +89,19 @@ output_graph(Ast_Node* node, Logger* logger)
 			if (node->kind == AST_KIND_EXP_BINARY){
 				
 				Ast_Binary* bin = (Ast_Binary*)node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
 				if (bin->left != nullptr){
-					logger->print("T_%x "_s, bin->left->token.hash);
+					printf("T_%x ", MeowU32From(bin->left->token.hash, 3));
 				}
 				
 				if (bin->right!= nullptr){
-					logger->print("T_%x "_s, bin->right->token.hash);
+					printf("T_%x ", MeowU32From(bin->right->token.hash, 3));
 				}
-				logger->print("}\n"_s);
+				printf("}\n");
 				
-				output_graph(bin->left, logger);
-				output_graph(bin->right, logger);
+				output_graph(bin->left);
+				output_graph(bin->right);
 				
 				Graph_Label label = { bin->token.name ,  hash, Shape_Type::GRAPH_DIAMOND};
 				arrput(labels, label);
@@ -109,15 +111,15 @@ output_graph(Ast_Node* node, Logger* logger)
 			else if (node->kind == AST_KIND_EXP_UNARY)
 			{
 				Ast_Unary* unary = (Ast_Unary*)node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
 				if (unary->child != nullptr){
-					logger->print("T_%x "_s, unary->child->token.hash);
+					printf("T_%x ", MeowU32From(unary->child->token.hash, 3));
 				}
 				
-				logger->print("}\n"_s);
+				printf("}\n");
 				
-				output_graph(unary->child, logger);
+				output_graph(unary->child);
 				
 				Graph_Label label = { unary->token.name,  hash, Shape_Type::GRAPH_DIAMOND};
 				arrput(labels, label);
@@ -143,16 +145,16 @@ output_graph(Ast_Node* node, Logger* logger)
 			else if (node->kind == AST_KIND_EXP_RETURN)
 			{
 				Ast_Return* _return =  (Ast_Return*) node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
 				for(U64 i = 0; i < arrlenu(_return->expressions); i++){
-					logger->print("T_%x "_s, _return->expressions[i]->token.hash);
+					printf("T_%x ", MeowU32From(_return->expressions[i]->token.hash, 3));
 				}
 				
-				logger->print("}\n"_s);
+				printf("}\n");
 				
 				for(U64 i = 0; i < arrlenu(_return->expressions); i++){
-					output_graph(_return->expressions[i], logger);
+					output_graph(_return->expressions[i]);
 				}
 				
 				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
@@ -163,21 +165,21 @@ output_graph(Ast_Node* node, Logger* logger)
 			else if (node->kind == AST_KIND_EXP_PROC_CALL)
 			{
 				Ast_Proc_Call* call =  (Ast_Proc_Call*) node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
 				for(U64 i = 0; i < arrlenu(call->arguments); i++){
-					logger->print("T_%x "_s, call->arguments[i]->token.hash);
+					printf("T_%x ", MeowU32From(call->arguments[i]->token.hash, 3));
 				}
 				
-				logger->print("T_%x "_s, call->procedure->token.hash);
+				printf("T_%x ", MeowU32From(call->procedure->token.hash, 3));
 				
 				
-				logger->print("}\n"_s);
+				printf("}\n");
 				
 				for(U64 i = 0; i < arrlenu(call->arguments); i++){
-					output_graph(call->arguments[i], logger);
+					output_graph(call->arguments[i]);
 				}
-				output_graph(call->procedure, logger);
+				output_graph(call->procedure);
 				
 				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
 				arrput(labels, label);
@@ -186,33 +188,33 @@ output_graph(Ast_Node* node, Logger* logger)
 			else if (node->kind == AST_KIND_EXP_MEM_ACC)
 			{
 				auto mem = (Ast_Member_Access*) node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
-				logger->print("T_%x "_s, mem->_struct->token.hash);
+				printf("T_%x ", MeowU32From(mem->_struct->token.hash, 3));
 				
-				logger->print("T_%x "_s, mem->member.hash);
+				printf("T_%x ", MeowU32From(mem->member.hash,3 ));
 				
-				logger->print("}\n"_s);
+				printf("}\n");
 				
-				//logger->print("T_%x -> T_%x\n"_s, mem->_struct->token.hash, mem->member.hash);
+				//printf("T_%x -> T_%x\n", mem->_struct->token.hash, mem->member.hash);
 				
-				output_graph(mem->_struct, logger);
+				output_graph(mem->_struct);
 				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
-				Graph_Label label2= { mem->member.name ,  mem->member.hash, Shape_Type::GRAPH_INVTRIANGLE};
+				Graph_Label label2= { mem->member.name ,  (U32)MeowU32From(mem->member.hash, 3), Shape_Type::GRAPH_INVTRIANGLE};
 				arrput(labels, label);
 				arrput(labels, label2);
 			}
 			else if (node->kind == AST_KIND_EXP_SUBSCRIPT)
 			{
 				auto sub = (Ast_Subscript* )node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
-				logger->print("T_%x "_s, sub->exp->token.hash);
-				logger->print("T_%x "_s, sub->value->token.hash);
-				logger->print("}\n"_s);
+				printf("T_%x ", MeowU32From(sub->exp->token.hash, 3));
+				printf("T_%x ", MeowU32From(sub->value->token.hash, 3));
+				printf("}\n");
 				
-				output_graph(sub->exp, logger);
-				output_graph(sub->value, logger);
+				output_graph(sub->exp);
+				output_graph(sub->value);
 				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
 				arrput(labels, label);
 			}
@@ -230,18 +232,18 @@ output_graph(Ast_Node* node, Logger* logger)
 			if (node->kind == AST_KIND_DECL_STRUCT)
 			{
 				Ast_Struct_Declaration* _struct = (Ast_Struct_Declaration*)node;
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
 				if (_struct->decls != nullptr && arrlenu(_struct->decls) > 0){
 					for (U64 i = 0; i < arrlenu(_struct->decls); i++)
-						logger->print("T_%x "_s, _struct->decls[i]->token.hash);
+						printf("T_%x ", MeowU32From(_struct->decls[i]->token.hash,3));
 				}
 				
-				logger->print("}\n"_s);
+				printf("}\n");
 				
 				if (_struct->decls != nullptr && arrlenu(_struct->decls) > 0){
 					for (U64 i = 0; i < arrlenu(_struct->decls); i++)
-						output_graph(_struct->decls[i], logger);
+						output_graph(_struct->decls[i]);
 				}
 				
 				Graph_Label label = { _struct->token.name ,  hash, Shape_Type::GRAPH_PENTAGON};
@@ -252,23 +254,23 @@ output_graph(Ast_Node* node, Logger* logger)
 			if (node->kind == AST_KIND_DECL_PROCEDURE)
 			{
 				Ast_Proc_Declaration * decl = (Ast_Proc_Declaration*) node; 
-				logger->print("T_%x -> { "_s, hash);
+				printf("T_%x -> { ", hash);
 				
 				if (decl->return_type != nullptr && arrlenu(decl->return_type) > 0){
 					for (U64 i = 0; i < arrlenu(decl->return_type); i++)
-						logger->print("T_%x "_s, decl->return_type[i]->token.hash);
+						printf("T_%x ", MeowU32From(decl->return_type[i]->token.hash, 3));
 				}
 				
-				if (decl->body){
-					logger->print("T_%x "_s, decl->body->token.hash);
+				if (decl->body && arrlenu(decl->body->statements) > 0){
+					printf("T_%x ", MeowU32From(decl->body->token.hash,3));
 				}
 				
-				logger->print("}\n"_s);
+				printf("}\n");
 				
-				output_graph(decl->body, logger);
+				output_graph(decl->body);
 				if (decl->return_type != nullptr && arrlenu(decl->return_type) > 0){
 					for (U64 i = 0; i < arrlenu(decl->return_type); i++)
-						output_graph(decl->return_type[i], logger);
+						output_graph(decl->return_type[i]);
 				}
 				
 				Graph_Label label = { decl->token.name ,  hash, Shape_Type::GRAPH_PENTAGON};
@@ -279,19 +281,22 @@ output_graph(Ast_Node* node, Logger* logger)
 			if (node->kind == AST_KIND_DECL_VARIABLE)
 			{
 				Ast_Var_Declaration* decl = (Ast_Var_Declaration *) node; 
-				logger->print("T_%x -> { "_s, hash);
 				
-				if (decl->data_type){
-					logger->print("T_%x "_s, decl->data_type->token.hash);
+				if (decl->data_type || decl->body){
+					printf("T_%x -> { ", hash);
+					
+					if (decl->data_type){
+						printf("T_%x ", MeowU32From(decl->data_type->token.hash, 3));
+					}
+					
+					if (decl->body){
+						printf("T_%x ", MeowU32From(decl->body->token.hash, 3));
+					}
+					
+					printf("}\n");
+					output_graph(decl->body);
+					output_graph(decl->data_type);
 				}
-				
-				if (decl->body){
-					logger->print("T_%x "_s, decl->body->token.hash);
-				}
-				
-				logger->print("}\n"_s);
-				output_graph(decl->body, logger);
-				output_graph(decl->data_type, logger);
 				Graph_Label label = { decl->token.name ,  hash, Shape_Type::GRAPH_PENTAGON};
 				arrput(labels, label);
 				break;
@@ -310,18 +315,23 @@ output_graph(Ast_Node* node, Logger* logger)
 		{
 			Ast_Block* block =  (Ast_Block*) node;
 			
-			logger->print("T_%x -> { "_s, hash);
+#if 1
+			// this should not happen ?? 
+			if (arrlenu(block->statements) <= 0)
+				break;
+			printf("T_%x -> { ", hash);
 			
 			
 			for(U64 i = 0; i < arrlenu(block->statements); i++){
-				logger->print("T_%x "_s, block->statements[i]->token.hash);
+				printf("T_%x ", MeowU32From(block->statements[i]->token.hash,3));
 			}
 			
 			
-			logger->print("}\n"_s);
+			printf("}\n");
+#endif
 			
 			for(U64 i = 0; i < arrlenu(block->statements); i++){
-				output_graph(block->statements[i], logger);
+				output_graph(block->statements[i]);
 			}
 			
 			Graph_Label label = { "Block"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
@@ -331,35 +341,35 @@ output_graph(Ast_Node* node, Logger* logger)
 		case AST_IF:
 		{
 			Ast_If* ifnode =  (Ast_If *) node;
-			logger->print("T_%x -> { "_s, hash);
+			printf("T_%x -> { ", hash);
 			
 			if (ifnode->exp)
-				logger->print("T_%x "_s, ifnode->exp->token.hash);
+				printf("T_%x ", MeowU32From(ifnode->exp->token.hash, 3));
 			
 			if (ifnode->statement)
-				logger->print("T_%x "_s, ifnode->statement->token.hash);
+				printf("T_%x ", MeowU32From(ifnode->statement->token.hash, 3));
 			
 			if (ifnode->next)
 			{
 				for(U64 i = 0; i < arrlenu(ifnode->next); i++){
-					logger->print("T_%x "_s, ifnode->next[i]->token.hash);
+					printf("T_%x ", MeowU32From(ifnode->next[i]->token.hash, 3));
 				}
 			}
 			
-			logger->print("}\n"_s);
+			printf("}\n");
 			
 			if (ifnode->exp)
-				output_graph(ifnode->exp, logger);
+				output_graph(ifnode->exp);
 			
 			
 			if (ifnode->statement)
-				output_graph(ifnode->statement, logger);
+				output_graph(ifnode->statement);
 			
 			
 			if (ifnode->next)
 			{
 				for(U64 i = 0; i < arrlenu(ifnode->next); i++){
-					output_graph(ifnode->next[i], logger);
+					output_graph(ifnode->next[i]);
 				}
 			}
 			
@@ -369,7 +379,7 @@ output_graph(Ast_Node* node, Logger* logger)
 		}
 		case AST_WHILE:
 		{
-			logger->print("//Node Type AST_WHILE is not supported yet\n"_s);
+			printf("//Node Type AST_WHILE is not supported yet\n");
 			break;
 		}
 		default:
@@ -383,7 +393,7 @@ output_graph(Ast_Node* node, Logger* logger)
 	return;
 }
 
-#define PRINT_GRAPH(node, logger)  output_graph(node, logger); output_labels(logger);
+#define PRINT_GRAPH(node)  output_graph(node); output_labels();
 #else
 #define PRINT_GRAPH(node, logger)
 #endif

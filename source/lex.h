@@ -45,7 +45,7 @@ enum HDTokenType : U16 {
 
 // TODO: Add kinds for keywords, that way we don't have to compare strings
 enum TokenKind : U16 {
-	
+	TOKEN_KIND_NONE,
 	
 	TOKEN_KIND_ELSE,
 	TOKEN_KIND_IF,
@@ -77,18 +77,11 @@ struct Token
 	// TODO : Add string_in_source
 	HDTokenType   type;
 	TokenKind   kind;
+	// this is just so we don't recalculate the line&index into the file, but do i actually need it ?? 
 	Position 	start_position;
+	StringView   name;
 	meow_u128    hash;
 	
-	union
-	{
-		StringView   name;
-		bool     boolean;
-		U64      integer;
-		F32      _float32;
-		F64 	 _float64;
-		StringView   value;
-	};
 };
 
 struct LexerStateConfigs {
