@@ -332,7 +332,8 @@ output_graph(Ast_Node* node)
 				output_graph(block->statements[i]);
 			}
 			
-			Graph_Label label =  { "Block"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+			Graph_Label label =  { block->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+			//{ "Block"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
 			arrput(labels, label);
 			break;
 		}

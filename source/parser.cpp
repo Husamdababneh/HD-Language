@@ -24,8 +24,6 @@ Ast parse(MemoryArena*, Parser& );
 Ast_Node* parse_statement(MemoryArena* arena, Parser& );
 Ast_Node* parse_const_def(MemoryArena* arena, Parser& );
 Ast_Type* parse_type(MemoryArena* arena, Parser& );
-Ast_Block* parse_block(MemoryArena* arena, Parser& );
-
 Ast_Node* parse_directive(MemoryArena* arena, Parser& );
 Ast_Node* parse_if_statement(MemoryArena* arena, Parser& );
 Ast_Var_Declaration* parse_var_def(MemoryArena* arena, Parser&, B8);
@@ -394,25 +392,29 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	//bool still_parsing = true;
 	
 	
-	Ast_Block* block = parse_block(arena, parser);
-	//TypeCheck(block->scope);
-	// this should be the whole file 
+	enter_scope(arena, parser);
+	AllocateNode(Ast_Block, block);
+	block->scope = parser.current_scope; 
+	
+	Token token = {};
+	token.type = TOKEN_IDENT;
+	token.name = parser.lexer.filename;
+	token.hash = MHash(token);
+	// TODO:  will this break ?? 
+	block->token = token; //create_token(peek_token(lexer).name);
+	
+	while(token.type != TOKEN_EOFA && token.type != '}')
+	{
+		Ast_Node* statement = parse_statement(arena, parser);
+		
+		if (statement) arrput(block->statements, statement);
+		
+		token = peek_token(parser.lexer);
+	}
+	
+	exit_scope(arena, parser);
 	
 	PRINT_GRAPH(block);
-	//print_scopes(block->scope);
-	//generate(block);
-	
-	
-	
-	/* 
-		for(U64 i = 0; i < hmlenu(predefined_types); i++)
-		{
-			Predefined_Type type = predefined_types[i];
-			printf("Name [%s]\n", type.key);
-			//printf("Name [%s]\n", *type.value.token.value);
-			//Ast_Type* hmget(predefined_types, type_name);
-		}
-		 */
 	
 	return {0};
 }
@@ -1006,32 +1008,6 @@ parse_block_of_statements(MemoryArena* arena, Parser& parser)
 	expect_and_eat('}');
 	return block;
 }
-
-Ast_Block*
-parse_block(MemoryArena* arena, Parser& parser)
-{
-	auto& lexer = parser.lexer;
-	enter_scope(arena, parser);
-	AllocateNode(Ast_Block, block);
-	block->scope = parser.current_scope; 
-	
-	Token token = peek_token(lexer);
-	// TODO:  will this break ?? 
-	block->token = create_token(peek_token(lexer).name);
-	
-	while(token.type != TOKEN_EOFA && token.type != '}')
-	{
-		Ast_Node* statement = parse_statement(arena, parser);
-		
-		if (statement) arrput(block->statements, statement);
-		
-		token = peek_token(lexer);
-	}
-	
-	exit_scope(arena, parser);
-	return block;
-}
-
 
 Ast_Node* 
 parse_directive(MemoryArena* arena, Parser& parser)

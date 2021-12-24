@@ -153,6 +153,7 @@ int main(int argc, char ** argv)
 	Parser parser = {};
 	LexerState  lexer  = {};
 	lexer.config.ignore_comments = true;
+	lexer.filename = CStringToString(argv[1]);
 	lexer.input = read_entire_file(argv[1]);
 	parser.lexer = lexer;
 	

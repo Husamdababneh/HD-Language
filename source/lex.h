@@ -91,6 +91,7 @@ struct LexerStateConfigs {
 padding_check
 struct LexerState
 {
+	StringView filename;
 	StringView input;
 	U64 input_cursor;
 	U32 current_line_number;
