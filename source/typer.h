@@ -12,7 +12,7 @@ struct Alias;
 
 struct Type {
 	U8* name;
-	Alias* aliases;
+	//Alias* aliases;
 	Type* children;
 	U16 size;
 	U16 alignment;

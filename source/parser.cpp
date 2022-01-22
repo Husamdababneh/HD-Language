@@ -276,23 +276,69 @@ void print_scopes(Ast_Scope* scope)
 }
 
 
+void TypeCheck(Ast_Node* node);
+
+void TypeCheckExpression(Ast_Expression* node)
+{
+	switch(node->kind)
+	{
+		case AST_KIND_EXP_BINARY:
+		{
+			printf("Node type is : AST_KIND_EXP_BINARY\n");
+			
+			break;
+		}
+		case AST_KIND_EXP_UNARY:
+		{
+			printf("Node type is : AST_KIND_EXP_UNARY\n");
+			break;
+		}
+		case AST_KIND_EXP_LITERAL:
+		{
+			printf("Node type is : AST_KIND_EXP_LITERAL\n");
+			break;
+		}
+		case AST_KIND_EXP_RETURN:
+		{
+			printf("Node type is : AST_KIND_EXP_RETURN\n");
+			break;
+		}
+		case AST_KIND_EXP_PROC_CALL:
+		{
+			printf("Node type is : KIND_EXP_PROC_CALL\n");
+			break;
+		}
+		case AST_KIND_EXP_MEM_ACC:
+		{
+			printf("Node type is : KIND_EXP_MEM_ACC\n");
+			break;
+		}
+		case AST_KIND_EXP_SUBSCRIPT:
+		{
+			printf("Node type is : AST_KIND_EXP_SUBSCRIPT\n");
+			break;
+		}
+	}
+}
+
 void TypeCheck(Ast_Node* node)
 {
 	switch(node->type)
 	{
 		case AST_BLOCK:
 		{
-			printf("Node type is : AST_BLOCK\n");
+			//printf("Node type is : AST_BLOCK\n");
 			for(U16 a = 0; a < arrlenu(((Ast_Block*)node)->statements); a++)
 			{
-				printf("Number of statements [%lld]\n", arrlenu(((Ast_Block*)node)->statements));
+				//printf("Number of statements [%lld]\n", arrlenu(((Ast_Block*)node)->statements));
 				TypeCheck(((Ast_Block*)node)->statements[a]);
 			}
 			break;
 		}
 		case AST_EXPRESSION:
 		{
-			printf("Node type is : AST_EXPRESSION\n");
+			//printf("Node type is : AST_EXPRESSION\n");
+			TypeCheckExpression((Ast_Expression*)node);
 			break;
 		}
 		case AST_TYPE:
@@ -302,9 +348,37 @@ void TypeCheck(Ast_Node* node)
 		}
 		case AST_DECLARATION:
 		{
-			Ast_Var_Declaration* decl = (Ast_Var_Declaration*)node;
-			printf("Node type is : AST_DECLARATION\n");
-			TypeCheck(decl->body);
+			//Ast_Var_Declaration* decl = (Ast_Var_Declaration*)node;
+			
+			switch(((Ast_Var_Declaration*)node)->kind)
+			{
+				case AST_KIND_DECL_PROCEDURE:
+				{
+					//printf("Node type is : AST_KIND_DECL_PROCEDURE\n");
+					auto* ProcDecl = (Ast_Proc_Declaration*)node;
+					TypeCheck(ProcDecl->body);
+					break;
+				}
+				case AST_KIND_DECL_VARIABLE:
+				{
+					auto* VarDecl = (Ast_Var_Declaration*)node;
+					//printf("Node type is : AST_KIND_DECL_VARIABLE\n");
+					if (VarDecl->data_type != nullptr)
+					{
+						printf("%.*s\n", SV_PRINT(VarDecl->data_type->token.name));
+					}
+					TypeCheck(VarDecl->body);
+					break;
+				}
+				case AST_KIND_DECL_STRUCT:
+				{
+					printf("Node type is : AST_KIND_DECL_STRUCT\n");
+					//TypeCheck(decl->body);
+					break;
+				}
+			}
+			
+			
 			break;
 		}
 		case AST_IF:
@@ -414,7 +488,9 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	
 	exit_scope(arena, parser);
 	
-	PRINT_GRAPH(block);
+	
+	TypeCheck(block);
+	//PRINT_GRAPH(block);
 	
 	return {0};
 }
