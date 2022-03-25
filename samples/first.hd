@@ -2,7 +2,7 @@
 
 
 // Scope Level 0
-a :: 1 - 3;
+a : U64 : 1 - 3;
 
 // Scope Level 0
 

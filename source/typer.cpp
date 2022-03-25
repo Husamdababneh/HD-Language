@@ -10,7 +10,7 @@
 #define UNREACHABLE assert(false && "Unreachable Code");
 
 /*
- NOTEs:
+  NOTEs:
 
 */
 
@@ -83,7 +83,7 @@ add_type_to_map(Ast_Type* type)
 	char temp[MAX_NUMBER];
 	String& type_name = type->token.name;
 	memcpy(temp, type_name.str, type_name.length);
-	if (!type_name.isNullTerminated) temp[type_name.length] = '0';
+	if (!type_name.isNullTerminated) temp[type_name.length] = 0;
 
 	shput(types, temp, type);
 }
@@ -105,7 +105,7 @@ get_type_from_map(String type_name)
 	constexpr U64 MAX_NUMBER = 256;
 	U8 temp[MAX_NUMBER];
 	memcpy(temp, type_name.str, type_name.length);
-	if (!type_name.isNullTerminated) temp[type_name.length] = '0';	
+	if (!type_name.isNullTerminated) temp[type_name.length] = 0;	
 	return get_type_from_map(temp);
 }
 
@@ -144,6 +144,7 @@ register_predefined_types(MemoryArena* arena, Parser& parser)
 	type = create_type(arena, 16, 16, true, "String"_s); _string = type;
 	add_type_to_map(_string);
 
+	// TODO: Add all predefined types here
 	
 }
 
@@ -158,11 +159,14 @@ static void type_check_declaration(Ast_Declaration* decl);
 
 static Ast_Type* type_expression(Ast_Expression* node)
 {
+
+	if (node->resulting_type != nullptr) return node->resulting_type;
+	
 	switch(node->kind)
 	{
 	  case AST_KIND_EXP_BINARY:
 	  {
-		  printf("Node type is : AST_KIND_EXP_BINARY\n");
+		  //printf("Node type is : AST_KIND_EXP_BINARY\n");
 
 		  // get The operation
 
@@ -219,12 +223,11 @@ static Ast_Type* type_expression(Ast_Expression* node)
 	  }
 	  case AST_KIND_LITERAL_NUMBER:
 	  {
-		  printf("Node type is : AST_KIND_LITERAL_NUMBER\n");
-		  return _U64;
+		  node->resulting_type = _U64;
 	  }
 	  case AST_KIND_LITERAL_STRING:
 	  {
-		  return _string;
+		  node->resulting_type = _string;
 	  }
 	  default:
 	  {
@@ -236,7 +239,10 @@ static Ast_Type* type_expression(Ast_Expression* node)
 	  }
 	}
 
-	return nullptr;
+
+	// TODO: More details
+	assert(node->resulting_type && "Could Not infer type");
+	return node->resulting_type;
 }
 
 
@@ -258,9 +264,7 @@ static void type_check_declaration(Ast_Declaration* decl)
 			printf("Variable Declaration: Name[%.*s], Type[%.*s]\n",
 				   SV_PRINT(var_decl->token.name),
 				   SV_PRINT(var_decl->data_type->token.name));
-
 		}
-
 	}
 }
 
@@ -270,7 +274,7 @@ static void type_check_block(Ast_Block* block)
 	auto statements_len = arrlenu(block->statements);
 	for(auto a = 0; a < statements_len; a++)
 	{
-		printf("Number of statements [%lld]\n", arrlenu(block->statements));
+		//printf("Number of statements [%lld]\n", arrlenu(block->statements));
 		type_check_node(block->statements[a]);
 	}	
 }
@@ -280,48 +284,48 @@ static void type_check_node(Ast_Node* node)
 {
 	switch(node->type)
 	{
-		case AST_BLOCK:
-		{
-			//UNREACHABLE;
-			//printf("Node type is : AST_BLOCK\n");
-			type_check_block((Ast_Block*)node);
-			break;
-		}
-		case AST_EXPRESSION:
-		{
-			//printf("Node type is : AST_EXPRESSION\n");
-			//TypeCheckExpression((Ast_Expression*)node);
-			break;
-		}
-		case AST_TYPE:
-		{
-			printf("Node type is : AST_TYPE\n");
-			break;
-		}
-		case AST_DECLARATION:
-		{
-			type_check_declaration((Ast_Declaration*)node);
-			break;
-		}
-		case AST_IF:
-		{
-			printf("Node type is : AST_IF\n");
-			break;
-		}
-		case AST_NOTE:
-		{
-			printf("Node type is : AST_NOTE\n");
-			break;
-		}
-		case AST_DIRECTIVE:
-		{
-			printf("Node type is : AST_DIRECTIVE\n");
-			break;
-		}
-		default:
-		{
-			printf("Unknown AST Node type\n");
-		}
+	  case AST_BLOCK:
+	  {
+		  //UNREACHABLE;
+		  //printf("Node type is : AST_BLOCK\n");
+		  type_check_block((Ast_Block*)node);
+		  break;
+	  }
+	  case AST_EXPRESSION:
+	  {
+		  //printf("Node type is : AST_EXPRESSION\n");
+		  //TypeCheckExpression((Ast_Expression*)node);
+		  break;
+	  }
+	  case AST_TYPE:
+	  {
+		  printf("Node type is : AST_TYPE\n");
+		  break;
+	  }
+	  case AST_DECLARATION:
+	  {
+		  type_check_declaration((Ast_Declaration*)node);
+		  break;
+	  }
+	  case AST_IF:
+	  {
+		  printf("Node type is : AST_IF\n");
+		  break;
+	  }
+	  case AST_NOTE:
+	  {
+		  printf("Node type is : AST_NOTE\n");
+		  break;
+	  }
+	  case AST_DIRECTIVE:
+	  {
+		  printf("Node type is : AST_DIRECTIVE\n");
+		  break;
+	  }
+	  default:
+	  {
+		  printf("Unknown AST Node type\n");
+	  }
 	}
 }
 

@@ -207,7 +207,7 @@ typedef size_t Size;
 struct String {
 	// Anonymous Union Because we don't want to deal with str.<union name>.<field name>
 	union {U64 length; U64 size;};
-	union {S8* str; char* str_char;};
+	union {S8* str; char* str_char;}; // why the fuck this is S8* ?? 
 	
 	// NOTE(Husam Dababneh): When this is true, the string (in memory) has a size of length + 1
 	B8 isNullTerminated;

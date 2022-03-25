@@ -227,7 +227,7 @@ parse_type(MemoryArena* arena, Parser& parser)
 	expect_and_eat(TOKEN_IDENT); // TODO: Add message if failed
 	
 	Ast_Type* type_from_map = get_type_from_map(token.name);
-	
+
 	if (type_from_map != nullptr) return type_from_map;
 	
 	AllocateNode(Ast_Type, type);

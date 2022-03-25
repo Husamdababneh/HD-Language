@@ -475,7 +475,8 @@ Token process_token(LexerState& lex)
 	}
 	//token.end_position = get_current_position(lex);
 	assert(token.type != HDTokenType::TOKEN_NONE);
-	token.name = CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
+	token.name = {lex.input_cursor  - temp, (S8*)lex.input.str_char + temp, false};
+	// CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
 	token.hash = Hash(token);
 	
 	// Do we need a mechanesim to bundle the comment with statments ? 
