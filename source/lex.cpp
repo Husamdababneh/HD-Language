@@ -464,8 +464,9 @@ Token process_token(LexerState& lex)
 				// auto& pos = get_current_position();
 				token.type = HDTokenType::TOKEN_LITERAL;
 				token.kind = TOKEN_KIND_INT_LITERAL;
-				auto peeked = peek_character(lex);
-				if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character(lex);
+				//auto peeked = peek_character(lex);
+				// if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character(lex);
+				//tokenize_number(lex)
 				while (isDigit(peek_character(lex))) eat_character(lex);
 				
 			} 

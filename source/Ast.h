@@ -7,7 +7,13 @@ $Description: Ast.h
 #pragma once
 
 #include "lex.h"
-Note(GenerateStrings, ast_type) 
+//Note(GenerateStrings, ast_type)
+
+#define AllocateNode(type, name)\
+type* name = PushStruct(arena, type);\
+AllocateNodeEx(name);\
+arrput(flaten_ast,(Ast_Node*)name);
+
 enum AstType : U16 {
 	AST_UKNOWN = 0,
 	AST_DECLARATION,
@@ -81,6 +87,7 @@ enum AST_BINARY_TYPE : U16 {
 
 struct Ast_Node;
 struct Ast_Scope;
+struct Ast_Type;
 
 struct Ast {
 	Ast_Node** nodes;
@@ -101,6 +108,7 @@ struct Ast_Block : Ast_Node {
 
 
 struct Ast_Expression : Ast_Node {
+	Ast_Type* resulting_type;
 };
 
 struct Ast_Literal : Ast_Expression {
@@ -133,8 +141,8 @@ struct Ast_Subscript : Ast_Expression {
 
 struct Ast_Binary : Ast_Expression {
 	AST_BINARY_TYPE op;
-	Ast_Node* left;
-	Ast_Node* right;
+	Ast_Expression* left;
+	Ast_Expression* right;
 };
 
 
@@ -171,7 +179,7 @@ struct Ast_Proc_Declaration : public Ast_Declaration {
 
 struct Ast_Var_Declaration : public Ast_Declaration {
 	Ast_Type* data_type;
-	Ast_Node* body;
+	Ast_Expression* body;
 };
 
 struct Ast_Struct_Declaration : public Ast_Declaration {

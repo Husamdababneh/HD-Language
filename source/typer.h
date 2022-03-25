@@ -10,20 +10,20 @@ $Description: typer.h
 
 struct Alias;
 
-struct Type {
-	U8* name;
+struct DataType {
+	String name;
 	//Alias* aliases;
-	Type* children;
+	DataType* children;
 	U16 size;
 	U16 alignment;
 };
 
 struct Type_Map {
 	U8* key;
-	Type value;
+	Ast_Type* value;
 };
 
-extern Type_Map* types;
+//extern Type_Map* types;
 
 
 

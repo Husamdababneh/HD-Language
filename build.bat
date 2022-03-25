@@ -52,6 +52,7 @@ REM popd
 REM compile main
 cl /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
 rem clang /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
+IF ERRORLEVEL 1 GOTO errorHandling
 
 REM LINK 
 pushd %bin_int%
@@ -59,5 +60,12 @@ link %object_files% /NATVIS:..\..\misc\strings.natvis  /OUT:..\..\bin\hd.exe %de
 popd
 
 :FINISH
-
 ENDLOCAL
+exit /b 0
+
+
+:errorHandling
+echo The build Failed
+ENDLOCAL
+exit /b 1
+

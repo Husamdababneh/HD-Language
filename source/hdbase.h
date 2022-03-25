@@ -7,13 +7,12 @@ $Desc:
 /* NOTEs
 		
 																						
-	*/
+*/
 
 /* TODOs
 
+TODO(Husam Dababneh): Add Intel Compiler ?? 
 TODO(Husam Dababneh): Create new Printf function to handle our strings :) !!
-
-	TODO(Husam Dababneh): Add Intel Compiler ?? 
 TODO(Husam Dababneh): Architectures
 
 */
@@ -203,9 +202,7 @@ typedef size_t Size;
 
 //~ Strings and String Views 
 // This is a simple String/StringView implementation.
-// A String Builder will be provided in a separate file 
 // NOTE(Husam Dababneh): I dont want to complicate things here
-
 // NOTE(Husam Dababneh): This can be used as a String view!!.. we'll see what happens
 struct String {
 	// Anonymous Union Because we don't want to deal with str.<union name>.<field name>
@@ -223,7 +220,6 @@ struct String {
 		U64 index;
 		
 		// NOTE(Husam Dababneh): Do we even support C ?? 
-		// This may cause errors with #include
 		bool operator !=(Iterator a){ return this->str != a.str; }
 		void operator ++(){++str;++index;}
 		void operator ++(int){str++;index++;}
@@ -231,13 +227,13 @@ struct String {
 	};
 	// This may cause errors with #include
 	typedef const Iterator const_iterator;
-	Iterator begin() {Iterator a = {str, 0}; return a;}
-	const_iterator begin() const {Iterator a = {str, 0}; return a;}
-	Iterator end() {Iterator a = {str + length, length};return a;}
-	const_iterator end() const {Iterator a = {str + length, length};return a;}
+	Iterator       begin()       { Iterator a = {str, 0}; return a; }
+	const_iterator begin() const { Iterator a = {str, 0}; return a; }
+	Iterator       end()         { Iterator a = {str + length, length}; return a; }
+	const_iterator end() const   { Iterator a = {str + length, length}; return a; }
 	
 	// TODO(Husam Dababneh): Do we need to specify if the string in null terminated ?? 
-	// TODO(Husam Dababneh): i think this will cause issue with hashmap ??  
+
 };
 
 // Forward Declarations  
@@ -254,7 +250,7 @@ B8      EqualStrings(String left, String right);
 //#define HD_BASE_IMPL
 String operator ""_s(const char* string, U64 length)
 {
-	String str = {length, (S8*)string, true}; 
+	String str = {length + 1, (S8*)string, true}; 
 	return str;
 }
 
@@ -270,7 +266,7 @@ String CStringToString(char* string)
 	U64 len = 0;
 	char* str = string;
 	while(*(str++)) len++;
-	return CStringToString(string, len); 
+	return CStringToString(string, len + 1); 
 }
 
 S8 CompareStrings(String left, String right)

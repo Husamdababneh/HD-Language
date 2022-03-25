@@ -5,6 +5,8 @@
 a :: 1 - 3;
 
 // Scope Level 0
+
+/*
 data :: struct
 {
 	// No-scope / Scope Level 1 // i'm not sure if i want to add these to scopes 
@@ -37,3 +39,4 @@ main :: proc () -> U64
 		lastname  : String;
 	}
 }
+*/

@@ -1,9 +1,10 @@
 /* ========================================================================
-$File: parser.cpp
-$Date: 2020-10-16
-$Creator: Husam Dababneh
-$Description: parser.cpp
-========================================================================*/
+   $File: parser.cpp
+   $Date: 2020-10-16
+   $Creator: Husam Dababneh
+   $Description: parser.cpp
+   ========================================================================*/
+
 
 #include "parser.h"
 #include "Ast.cpp"
@@ -17,6 +18,10 @@ $Description: parser.cpp
 
 #include "generator.cpp"
 
+Ast_Node** flaten_ast = NULL;
+
+
+#include "typer.cpp"
 
 // Forward declarations
 
@@ -42,13 +47,9 @@ Ast_Expression* parse_primary_expression(MemoryArena* arena, Parser& );
 // TODO: Re-read the Tracy documentation to use this in the right way
 #include "../submodules/tracy/Tracy.hpp"
 
-Ast_Node** flaten_ast = NULL;
 
 // How does this perform ?? 
-#define AllocateNode(type, name)\
-type* name = PushStruct(arena, type);\
-AllocateNodeEx(name);\
-arrput(flaten_ast,(Ast_Node*)name);
+
 //name = (type*) PushStruct(arena, type);\
 //name = ::new(name) type();\
 
@@ -128,101 +129,7 @@ exit_scope(MemoryArena* arena, Parser& parser)
 	parser.current_scope = parser.current_scope->parent;
 }
 
-Predefined_Type* Parser::predefined_types = nullptr;
-
-
-#define MHash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
-// TODO: Remove this
-Token create_token(StringView name)
-{
-	static U32 id = 0;
-	// This assumes we will only have 3772 scopes, needs to be fixed 
-	id = (id + 3772) % 1000; // worst random number generator ever :).
-	Token token = {0};
-	token.name = name;
-	token.start_position = {id+22, id+9};
-	token.hash = MHash(token);
-	
-	return token;
-}
-
-inline 
-Ast_Type* 
-create_type(MemoryArena*arena, 
-			const U32 size, 
-			const U32 alignment, 
-			const bool is_signed, 
-			const StringView& name)
-{
-	AllocateNode(Ast_Type, type);
-	type->size = size;
-	type->alignment = alignment;
-	type->is_signed = is_signed;
-	type->token = create_token(name);
-	
-	return type;
-}
-
-
-inline 
-Ast_Type* 
-create_type(MemoryArena*arena, 
-			const U32 size, 
-			const U32 alignment, 
-			const bool is_signed, 
-			const Token& token)
-{
-	AllocateNode(Ast_Type, type);
-	type->size = size;
-	type->alignment = alignment;
-	type->is_signed = is_signed;
-	type->token = token;
-	
-	return type;
-}
-
-
-void 
-register_predefined_types(MemoryArena* arena, Parser& parser)
-{
-	Ast_Type* _U8 = create_type(arena, 1, 1, false, "U8"_s);
-	//hmput(parser.predefined_types, _U8.token.name.str_char, _U8);
-	
-	Ast_Type*_u16 = create_type(arena, 2, 2, false, "U16"_s);
-	//hmput(parser.predefined_types, _u16.token.name.str_char, _u16);
-	
-	Ast_Type*_U32 = create_type(arena, 4, 4, false, "U32"_s);
-	//hmput(parser.predefined_types, _U32.token.name.str_char, _U32);
-	
-	Ast_Type*_U64 = create_type(arena, 8, 8, false, "U64"_s);
-	//hmput(parser.predefined_types, _U64.token.name.str_char, _U64);
-	
-	Ast_Type*_S8 = create_type(arena, 1, 1, true, "S8"_s);
-	//hmput(parser.predefined_types, _S8.token.name.str_char, _S8);
-	
-	Ast_Type*_s16 = create_type(arena, 2, 2, true, "S16"_s);
-	//hmput(parser.predefined_types, _s16.token.name.str_char, _s16);
-	
-	Ast_Type*_s32 = create_type(arena, 4, 4, true, "S32"_s);
-	//hmput(parser.predefined_types, _s32.token.name.str_char, _s32);
-	
-	Ast_Type*_S64 = create_type(arena, 8, 8, true, "S64"_s);
-	//hmput(parser.predefined_types, _S64.token.name.str_char, _S64);
-	
-	
-	/* 	
-		for(U64 i = 0; i < hmlenu(predefined_types); i++)
-		{
-			Predefined_Type type = predefined_types[i];
-			//printf("Name [%s]\n", type.key);
-			//printf("Name [%s]\n", *type.value.token.value);
-			//Ast_Type* hmget(predefined_types, type_name);
-		}
-		*/
-	
-	//auto type = hmget(predefined_types, "U8");
-}
-
+//Predefined_Type* Parser::predefined_types = nullptr;
 
 void print_scopes(Ast_Scope* scope);
 void print_struct_decl(Ast_Struct_Declaration* decl) 
@@ -261,202 +168,18 @@ void print_decls(Ast_Scope* scope)
 void print_scopes(Ast_Scope* scope)
 {
 	if (scope == nullptr) return;
-	
 	printf("Start Scope #%p--------------------------------------------\n", scope);
-	
 	print_decls(scope);
 	for(U64 it = 0; it < arrlenu(scope->children); it++)
 	{
 		print_scopes(scope->children[it]);
 	}
-	
 	printf("End Scope #%p----------------------------------------------\n", scope);
-	//printf("---------\n");
-	
 }
 
 
-void TypeCheck(Ast_Node* node);
 
-void TypeCheckExpression(Ast_Expression* node)
-{
-	switch(node->kind)
-	{
-		case AST_KIND_EXP_BINARY:
-		{
-			printf("Node type is : AST_KIND_EXP_BINARY\n");
-			
-			break;
-		}
-		case AST_KIND_EXP_UNARY:
-		{
-			printf("Node type is : AST_KIND_EXP_UNARY\n");
-			break;
-		}
-		case AST_KIND_EXP_LITERAL:
-		{
-			printf("Node type is : AST_KIND_EXP_LITERAL\n");
-			break;
-		}
-		case AST_KIND_EXP_RETURN:
-		{
-			printf("Node type is : AST_KIND_EXP_RETURN\n");
-			break;
-		}
-		case AST_KIND_EXP_PROC_CALL:
-		{
-			printf("Node type is : KIND_EXP_PROC_CALL\n");
-			break;
-		}
-		case AST_KIND_EXP_MEM_ACC:
-		{
-			printf("Node type is : KIND_EXP_MEM_ACC\n");
-			break;
-		}
-		case AST_KIND_EXP_SUBSCRIPT:
-		{
-			printf("Node type is : AST_KIND_EXP_SUBSCRIPT\n");
-			break;
-		}
-	}
-}
 
-void TypeCheck(Ast_Node* node)
-{
-	switch(node->type)
-	{
-		case AST_BLOCK:
-		{
-			//printf("Node type is : AST_BLOCK\n");
-			for(U16 a = 0; a < arrlenu(((Ast_Block*)node)->statements); a++)
-			{
-				//printf("Number of statements [%lld]\n", arrlenu(((Ast_Block*)node)->statements));
-				TypeCheck(((Ast_Block*)node)->statements[a]);
-			}
-			break;
-		}
-		case AST_EXPRESSION:
-		{
-			//printf("Node type is : AST_EXPRESSION\n");
-			TypeCheckExpression((Ast_Expression*)node);
-			break;
-		}
-		case AST_TYPE:
-		{
-			printf("Node type is : AST_TYPE\n");
-			break;
-		}
-		case AST_DECLARATION:
-		{
-			//Ast_Var_Declaration* decl = (Ast_Var_Declaration*)node;
-			
-			switch(((Ast_Var_Declaration*)node)->kind)
-			{
-				case AST_KIND_DECL_PROCEDURE:
-				{
-					//printf("Node type is : AST_KIND_DECL_PROCEDURE\n");
-					auto* ProcDecl = (Ast_Proc_Declaration*)node;
-					TypeCheck(ProcDecl->body);
-					break;
-				}
-				case AST_KIND_DECL_VARIABLE:
-				{
-					auto* VarDecl = (Ast_Var_Declaration*)node;
-					//printf("Node type is : AST_KIND_DECL_VARIABLE\n");
-					if (VarDecl->data_type != nullptr)
-					{
-						printf("%.*s\n", SV_PRINT(VarDecl->data_type->token.name));
-					}
-					TypeCheck(VarDecl->body);
-					break;
-				}
-				case AST_KIND_DECL_STRUCT:
-				{
-					printf("Node type is : AST_KIND_DECL_STRUCT\n");
-					//TypeCheck(decl->body);
-					break;
-				}
-			}
-			
-			
-			break;
-		}
-		case AST_IF:
-		{
-			printf("Node type is : AST_IF\n");
-			break;
-		}
-		case AST_NOTE:
-		{
-			printf("Node type is : AST_NOTE\n");
-			break;
-		}
-		case AST_DIRECTIVE:
-		{
-			printf("Node type is : AST_DIRECTIVE\n");
-			break;
-		}
-		default:
-		{
-			printf("Unknown AST Node type\n");
-		}
-	}
-	
-	
-}
-
-void TypeCheck(Ast_Scope* scope, int level = 0)
-{
-	if(scope == nullptr) return;
-	// Print All variable declarations in this scope
-	if (scope->variables)
-	{
-		auto variables_count = arrlenu(scope->variables);
-		for(auto i = 0; i < variables_count; i++)
-		{
-			Ast_Var_Declaration* decl = scope->variables[i];
-			
-			printf("[%d] - %.*s\n", level, SV_PRINT(decl->token.name));
-		}
-	}
-	
-	
-	if(scope->procedures)
-	{
-		//Ast_Var_Declaration
-		auto procedures_count = arrlenu(scope->procedures);
-		
-		for(auto i = 0; i < procedures_count; i++)
-		{
-			// 
-			Ast_Proc_Declaration* decl = scope->procedures[i];
-			
-			printf("[%d] - %.*s\n", level, SV_PRINT(decl->token.name));
-		}
-	}
-	
-	if (scope->structs)
-	{
-		auto structs_count = arrlenu(scope->structs);
-		for(auto i = 0; i < structs_count; i++)
-		{
-			Ast_Struct_Declaration* decl = scope->structs[i];
-			
-			printf("[%d] - %.*s\n", level, SV_PRINT(decl->token.name));
-		}
-		
-	}
-	
-	if (scope->children)
-	{
-		auto children_count = arrlenu(scope->children);
-		for(auto i = 0; i < children_count; i++)
-		{
-			Ast_Scope* child_scope  = scope->children[i];
-			TypeCheck(child_scope, level+1);
-		}
-	}
-}
 
 #define my_assert(x) if(!x) {*(int*)0 = 0;}
 
@@ -489,7 +212,7 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	exit_scope(arena, parser);
 	
 	
-	TypeCheck(block);
+	type_check_node(block);
 	//PRINT_GRAPH(block);
 	
 	return {0};
@@ -501,18 +224,16 @@ parse_type(MemoryArena* arena, Parser& parser)
 	auto& lexer = parser.lexer;
 	Token token = peek_token(lexer);
 	
-	expect_and_eat(TOKEN_IDENT);
+	expect_and_eat(TOKEN_IDENT); // TODO: Add message if failed
 	
-	S64 type_index = hmgeti(parser.predefined_types, token.name.str);
+	Ast_Type* type_from_map = get_type_from_map(token.name);
 	
-	if (type_index == -1) {
-		AllocateNode(Ast_Type, type);
-		type->token = token;
-		return type;
-	}
+	if (type_from_map != nullptr) return type_from_map;
 	
+	AllocateNode(Ast_Type, type);
+	type->token = token;
+	return type;
 	
-	return &parser.predefined_types[type_index].value;
 }
 
 Ast_Var_Declaration*
@@ -523,7 +244,7 @@ parse_argument_def(MemoryArena* arena, Parser& parser)
 	Token token = eat_token(lexer);
 	if (token.type != TOKEN_IDENT)
 	{
-		
+		UNREACHABLE;
 		exit(-1);
 	}
 	
@@ -535,7 +256,7 @@ parse_argument_def(MemoryArena* arena, Parser& parser)
 	token = peek_token(lexer);
 	if (token.type == '='){
 		eat_token(lexer);
-		decl->body= parse_expression(arena, parser);
+		decl->body = parse_expression(arena, parser);
 	}
 	
 	
@@ -658,7 +379,7 @@ parse_var_def(MemoryArena* arena, Parser& parser, B8 addToScope = true)
 	my_assert(var->body);
 	
 	
-	exit:
+  exit:
 	if (addToScope) arrput(parser.current_scope->variables, var);
 	expect_and_eat(TOKEN_SEMI_COLON);
 	return var;
@@ -837,18 +558,18 @@ static AST_BINARY_TYPE token_to_operation(const Token& token){
 	
 	switch(token.type)
 	{
-		case '+': return AST_BINARY_PLUS;
-		case '-': return AST_BINARY_MINUS;
-		case '*': return AST_BINARY_MUL;
-		case '/': return AST_BINARY_DIV;
-		case '=': return AST_BINARY_ASSIGN;
-		case TOKEN_EQL: return AST_BINARY_IS_EQL;
-		default:
-		{
-			printf("Unknown Operator [%.*s]\n", SV_PRINT(token.name));
-			assert(false && "Unknown Operator");
-			break;
-		}
+	  case '+': return AST_BINARY_PLUS;
+	  case '-': return AST_BINARY_MINUS;
+	  case '*': return AST_BINARY_MUL;
+	  case '/': return AST_BINARY_DIV;
+	  case '=': return AST_BINARY_ASSIGN;
+	  case TOKEN_EQL: return AST_BINARY_IS_EQL;
+	  default:
+	  {
+		  printf("Unknown Operator [%.*s]\n", SV_PRINT(token.name));
+		  assert(false && "Unknown Operator");
+		  break;
+	  }
 	}
 	
 	return AST_BINARY_NONE;
@@ -858,28 +579,28 @@ static S8 get_binary_precedence(const Token& token)
 {
 	switch(token.type)
 	{
-		case '*':
-		case '/':
-		{
-			return 10;
-		}
-		case '+':
-		case '-':
-		{
-			return 9;
-		}
-		case TOKEN_EQL:
-		case TOKEN_GT:
-		case TOKEN_LT:
-		case TOKEN_GT_OR_EQL:
-		case TOKEN_LT_OR_EQL:
-		{
-			return 8;
-		}
-		case '=':
-		{
-			return 1;
-		}
+	  case '*':
+	  case '/':
+	  {
+		  return 10;
+	  }
+	  case '+':
+	  case '-':
+	  {
+		  return 9;
+	  }
+	  case TOKEN_EQL:
+	  case TOKEN_GT:
+	  case TOKEN_LT:
+	  case TOKEN_GT_OR_EQL:
+	  case TOKEN_LT_OR_EQL:
+	  {
+		  return 8;
+	  }
+	  case '=':
+	  {
+		  return 1;
+	  }
 	}
 	
 	
@@ -1019,38 +740,47 @@ parse_primary_expression(MemoryArena* arena, Parser& parser)
 	
 	switch(token.type)
 	{
-		case TOKEN_IDENT: 
-		{
-			AllocateNode(Ast_Primary, primary);
-			primary->token = token;
-			primary->kind = AST_KIND_PRIMARY_IDENTIFIER;
-			return primary;
-			break;
-		}
-		case TOKEN_LITERAL: 
-		{
-			AllocateNode(Ast_Literal, literal);
-			
-			literal->kind = token.kind == TOKEN_KIND_STRING_LITERAL ? AST_KIND_LITERAL_STRING : AST_KIND_LITERAL_NUMBER;
-			
-			literal->token = token;
-			return literal;
-			break;
-		}
-		case TOKEN_BOOLEAN:
-		{
-			printf("TODO: Handel true/false constants ");
-			exit(-1);
-			break;
-		}
-		default:
-		{
-			String token_type = "TODO: "_s;
-			printf("Token [%.*s] At [Line: %d, Col: %d], Is not a primary expression [%.*s] \n",SV_PRINT(token.name), token.start_position.line,token.start_position.index
-				   , SV_PRINT(token_type));
-			exit(-1);
-			break;
-		}
+	  case TOKEN_IDENT:  // this means we are refering to a value or a type
+	  {
+		  AllocateNode(Ast_Primary, primary);
+		  primary->token = token;
+		  primary->kind = AST_KIND_PRIMARY_IDENTIFIER;
+		  return primary;
+	  }
+	  case TOKEN_LITERAL: 
+	  {
+		  AllocateNode(Ast_Literal, literal);
+
+		  // TODO: HANDLE this from the lexer side?? 
+		  if (token.kind == TOKEN_KIND_STRING_LITERAL) {
+			  literal->kind = AST_KIND_LITERAL_STRING;
+			  literal->resulting_type = _string;
+		  }
+		  else {
+			  literal->kind = AST_KIND_LITERAL_NUMBER;
+			  literal->resulting_type = _S64;
+		  }
+		  literal->token = token;
+		  
+		  return literal;
+	  }
+	  case TOKEN_BOOLEAN:
+	  {
+		  printf("TODO: Handel true/false constants ");
+		  exit(-1);
+		  break;
+	  }
+	  default:
+	  {
+		  String token_type = "TODO: "_s;
+		  printf("Token [%.*s] At [Line: %d, Col: %d], Is not a primary expression [%.*s] \n",
+				 SV_PRINT(token.name),
+				 token.start_position.line,
+				 token.start_position.index,
+				 SV_PRINT(token_type));
+		  exit(-1);
+		  break;
+	  }
 	}
 	
 	// return nullptr;

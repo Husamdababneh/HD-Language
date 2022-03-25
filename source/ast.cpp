@@ -36,6 +36,7 @@ AllocateNodeEx(Ast_Expression* node)
 {
 	AllocateNodeEx((Ast_Node*) node);
 	node->type = AST_EXPRESSION;
+	node->resulting_type = nullptr;
 }
 
 static inline void
