@@ -1,0 +1,5102 @@
+meta.cpp
+
+class _PMD	size(12):
+	+---
+ 0	| mdisp
+ 4	| pdisp
+ 8	| vdisp
+	+---
+
+class _TypeDescriptor	size(16):
+	+---
+ 0	| pVFTable
+ 8	| spare
+16	| name
+	+---
+
+class _s__CatchableType	size(36):
+	+---
+ 0	| properties
+ 4	| pType
+12	| _PMD thisDisplacement
+24	| sizeOrOffset
+28	| copyFunction
+	+---
+
+class _s__CatchableTypeArray	size(4):
+	+---
+ 0	| nCatchableTypes
+ 4	| arrayOfCatchableTypes
+	+---
+
+class _s__ThrowInfo	size(28):
+	+---
+ 0	| attributes
+ 4	| pmfnUnwind
+12	| pForwardCompat
+20	| pCatchableTypeArray
+	+---
+
+class _s__RTTIBaseClassDescriptor	size(36):
+	+---
+ 0	| pTypeDescriptor
+ 8	| numContainedBases
+12	| _PMD where
+24	| attributes
+28	| pClassDescriptor
+	+---
+
+class _s__RTTIBaseClassArray	size(1):
+	+---
+ 0	| arrayOfBaseClassDescriptors
+	+---
+
+class _s__RTTIClassHierarchyDescriptor	size(20):
+	+---
+ 0	| signature
+ 4	| attributes
+ 8	| numBaseClasses
+12	| pBaseClassArray
+	+---
+
+class _s__RTTICompleteObjectLocator2	size(36):
+	+---
+ 0	| signature
+ 4	| offset
+ 8	| cdOffset
+12	| pTypeDescriptor
+20	| pClassDescriptor
+28	| pSelf
+	+---
+
+class __s_GUID	size(16):
+	+---
+ 0	| Data1
+ 4	| Data2
+ 6	| Data3
+ 8	| Data4
+	+---
+
+class __noop_coroutine_frame_standard	size(24):
+	+---
+ 0	| resume
+ 8	| destroy
+16	| promise
+  	| <alignment member> (size=7)
+	+---
+
+class __noop_coroutine_frame_legacy	size(16):
+	+---
+ 0	| resume
+ 8	| flag
+12	| index
+	+---
+
+class __vc_attributes::helper_attributes::default_valueAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helper_attributes::attributeAttribute	size(8):
+	+---
+ 0	| ValidOn
+ 4	| AllowMultiple
+ 5	| Inherited
+  	| <alignment member> (size=2)
+	+---
+
+class __vc_attributes::helper_attributes::source_annotation_attributeAttribute	size(8):
+	+---
+ 0	| ValidOn
+ 4	| AllowMultiple
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::helper_attributes::v1_earlyAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::v1_nameAttribute	size(8):
+	+---
+ 0	| name
+	+---
+
+class __vc_attributes::helper_attributes::v1_alttypeAttribute	size(4):
+	+---
+ 0	| type_e type
+	+---
+
+class __vc_attributes::helper_attributes::usageAttribute	size(4):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helper_attributes::repeatableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::as_stringAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::process_earlyAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::notify_atlprovAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::help_stringAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helper_attributes::requires_valueAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::multi_valueAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::event_receiverAttribute	size(8):
+	+---
+ 0	| type_e type
+ 4	| layout_dependent
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::no_injected_textAttribute	size(1):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::emitidlAttribute	size(8):
+	+---
+ 0	| value
+ 4	| defaultimports
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::exportAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::idl_moduleAttribute	size(56):
+	+---
+ 0	| name
+ 8	| dllname
+16	| version
+24	| uuid
+32	| helpstring
+40	| helpstringcontext
+44	| helpcontext
+48	| hidden
+49	| restricted
+  	| <alignment member> (size=6)
+	+---
+
+class __vc_attributes::idl_quoteAttribute	size(8):
+	+---
+ 0	| text
+	+---
+
+class __vc_attributes::implementsAttribute	size(16):
+	+---
+ 0	| interfaces
+ 8	| dispinterfaces
+	+---
+
+class __vc_attributes::importidlAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::includelibAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::library_blockAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::satypeAttribute	size(8):
+	+---
+ 0	| type
+	+---
+
+class __vc_attributes::propgetAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::propputAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::propputrefAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::providerAttribute	size(24):
+	+---
+ 0	| name
+ 8	| uuid
+16	| cookies
+  	| <alignment member> (size=4)
+	+---
+
+class __vc_attributes::coclassAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::controlAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::customAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::dispinterfaceAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::dualAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::lcidAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::objectAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::progidAttribute	size(8):
+	+---
+ 0	| name
+	+---
+
+class __vc_attributes::threadingAttribute	size(4):
+	+---
+ 0	| threading_e value
+	+---
+
+class __vc_attributes::uuidAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::versionAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::vi_progidAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::moduleAttribute	size(96):
+	+---
+ 0	| type_e type
+  	| <alignment member> (size=4)
+ 8	| name
+16	| version
+24	| uuid
+32	| lcid
+36	| control
+  	| <alignment member> (size=3)
+40	| helpstring
+48	| helpstringcontext
+  	| <alignment member> (size=4)
+56	| helpstringdll
+64	| helpfile
+72	| helpcontext
+76	| hidden
+77	| restricted
+  	| <alignment member> (size=2)
+80	| custom
+88	| resource_name
+	+---
+
+class __vc_attributes::aggregatableAttribute	size(4):
+	+---
+ 0	| type_e type
+	+---
+
+class __vc_attributes::appobjectAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::async_uuidAttribute	size(8):
+	+---
+ 0	| uuid
+	+---
+
+class __vc_attributes::bindableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::call_asAttribute	size(8):
+	+---
+ 0	| local_proc
+	+---
+
+class __vc_attributes::caseAttribute	size(4):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::cpp_quoteAttribute	size(8):
+	+---
+ 0	| string
+	+---
+
+class __vc_attributes::defaultAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::defaultbindAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::defaultcollelemAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::defaultvalueAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::defaultvtableAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::displaybindAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::entryAttribute	size(8):
+	+---
+ 0	| entry_id
+	+---
+
+class __vc_attributes::first_isAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helpcontextAttribute	size(8):
+	+---
+ 0	| helpcontext_value
+	+---
+
+class __vc_attributes::helpfileAttribute	size(8):
+	+---
+ 0	| filename
+	+---
+
+class __vc_attributes::helpstringAttribute	size(8):
+	+---
+ 0	| help_text_string
+	+---
+
+class __vc_attributes::helpstringcontextAttribute	size(4):
+	+---
+ 0	| contextid
+	+---
+
+class __vc_attributes::helpstringdllAttribute	size(8):
+	+---
+ 0	| dllname
+	+---
+
+class __vc_attributes::hiddenAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::idAttribute	size(4):
+	+---
+ 0	| id_num
+	+---
+
+class __vc_attributes::iid_isAttribute	size(8):
+	+---
+ 0	| limited_expression
+	+---
+
+class __vc_attributes::immediatebindAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::importAttribute	size(8):
+	+---
+ 0	| idl_file
+	+---
+
+class __vc_attributes::importlibAttribute	size(8):
+	+---
+ 0	| tlb_file
+	+---
+
+class __vc_attributes::inAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::includeAttribute	size(8):
+	+---
+ 0	| include_file
+	+---
+
+class __vc_attributes::last_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::length_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::licensedAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::localAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::max_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::ms_unionAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::nonbrowsableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::noncreatableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::nonextensibleAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::odlAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::oleautomationAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::optionalAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::outAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::pointer_defaultAttribute	size(4):
+	+---
+ 0	| type_e type
+	+---
+
+class __vc_attributes::pragmaAttribute	size(8):
+	+---
+ 0	| token_sequence
+	+---
+
+class __vc_attributes::ptrAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::publicAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::rangeAttribute	size(8):
+	+---
+ 0	| low_val
+ 4	| high_val
+	+---
+
+class __vc_attributes::readonlyAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::refAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::requesteditAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::restrictedAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::retvalAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::size_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::stringAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::sourceAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::switch_isAttribute	size(8):
+	+---
+ 0	| limited_expression
+	+---
+
+class __vc_attributes::switch_typeAttribute	size(8):
+	+---
+ 0	| switch_type_specifier
+	+---
+
+class __vc_attributes::transmit_asAttribute	size(8):
+	+---
+ 0	| xmit_type
+	+---
+
+class __vc_attributes::uidefaultAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::uniqueAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::usesgetlasterrorAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::v1_enumAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::varargAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::wire_marshalAttribute	size(8):
+	+---
+ 0	| wire_type
+	+---
+
+class __vc_attributes::event_sourceAttribute	size(12):
+	+---
+ 0	| type_e type
+ 4	| optimize_e optimize
+ 8	| decorate
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::hookAttribute	size(32):
+	+---
+ 0	| event
+ 8	| source
+16	| handler
+24	| receiver
+	+---
+
+class __vc_attributes::unhookAttribute	size(32):
+	+---
+ 0	| event
+ 8	| source
+16	| handler
+24	| receiver
+	+---
+
+class __vc_attributes::atl::synchronizeAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::atl::soap_handlerAttribute	size(40):
+	+---
+ 0	| name
+ 8	| namespace
+16	| protocol
+24	| style
+32	| use
+	+---
+
+class __vc_attributes::atl::soap_methodAttribute	size(8):
+	+---
+ 0	| name
+	+---
+
+class __vc_attributes::atl::soap_headerAttribute	size(16):
+	+---
+ 0	| value
+ 8	| required
+ 9	| in
+10	| out
+  	| <alignment member> (size=5)
+	+---
+
+class __vc_attributes::atl::soap_namespaceAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::com_interface_entryAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::support_error_infoAttribute	size(8):
+	+---
+ 0	| error_interface
+	+---
+
+class __vc_attributes::atl::aggregatesAttribute	size(8):
+	+---
+ 0	| clsid
+	+---
+
+class __vc_attributes::atl::implements_categoryAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::requires_categoryAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::rdxAttribute	size(24):
+	+---
+ 0	| key
+ 8	| valuename
+16	| regtype
+	+---
+
+class __vc_attributes::atl::registration_scriptAttribute	size(8):
+	+---
+ 0	| script
+	+---
+
+class __vc_attributes::atl::db_sourceAttribute	size(24):
+	+---
+ 0	| source
+ 8	| name
+16	| hresult
+	+---
+
+class __vc_attributes::atl::db_commandAttribute	size(48):
+	+---
+ 0	| command
+ 8	| name
+16	| source_name
+24	| hresult
+32	| bindings
+40	| bulk_fetch
+	+---
+
+class __vc_attributes::atl::db_tableAttribute	size(40):
+	+---
+ 0	| table
+ 8	| name
+16	| source_name
+24	| hresult
+32	| bulk_fetch
+	+---
+
+class __vc_attributes::atl::db_accessorAttribute	size(8):
+	+---
+ 0	| id
+ 4	| auto_
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::atl::db_columnAttribute	size(48):
+	+---
+ 0	| ordinal
+ 8	| dbtype
+16	| precision
+24	| scale
+32	| status
+40	| length
+	+---
+
+class __vc_attributes::atl::db_paramAttribute	size(56):
+	+---
+ 0	| ordinal
+ 8	| paramtype
+16	| dbtype
+24	| precision
+32	| scale
+40	| status
+48	| length
+	+---
+
+class __vc_attributes::atl::tag_nameAttribute	size(16):
+	+---
+ 0	| name
+ 8	| parse_func
+	+---
+
+class __vc_attributes::atl::request_handlerAttribute	size(16):
+	+---
+ 0	| name
+ 8	| sdl
+	+---
+
+class __vc_attributes::atl::perfmonAttribute	size(16):
+	+---
+ 0	| name
+ 8	| register
+  	| <alignment member> (size=7)
+	+---
+
+class __vc_attributes::atl::perf_objectAttribute	size(48):
+	+---
+ 0	| name_res
+ 4	| help_res
+ 8	| namestring
+16	| helpstring
+24	| detail
+28	| no_instances
+  	| <alignment member> (size=3)
+32	| class_
+40	| maxinstnamelen
+  	| <alignment member> (size=4)
+	+---
+
+class __vc_attributes::atl::perf_counterAttribute	size(56):
+	+---
+ 0	| namestring
+ 8	| helpstring
+16	| name_res
+20	| help_res
+24	| countertype
+28	| defscale
+32	| default_counter
+  	| <alignment member> (size=3)
+36	| detail
+40	| max_counter_size
+  	| <alignment member> (size=4)
+48	| countertype_string
+	+---
+
+class String::<unnamed-tag>	size(8):
+	+---
+ 0	| length
+ 0	| size
+	+---
+
+class String::<unnamed-tag>	size(8):
+	+---
+ 0	| str
+ 0	| str_char
+	+---
+
+class String::Iterator	size(16):
+	+---
+ 0	| str
+ 8	| index
+	+---
+
+class String	size(24):
+	+---
+ 0	| length
+ 0	| size
+ 8	| str
+ 8	| str_char
+16	| isNullTerminated
+  	| <alignment member> (size=7)
+	+---
+
+class Region	size(24):
+	+---
+ 0	| next
+ 8	| capacity
+16	| size
+24	| buffer
+	+---
+
+class Arena	size(16):
+	+---
+ 0	| first
+ 8	| last
+	+---
+
+class __crt_locale_data_public	size(16):
+	+---
+ 0	| _locale_pctype
+ 8	| _locale_mb_cur_max
+12	| _locale_lc_codepage
+	+---
+
+class __crt_locale_pointers	size(16):
+	+---
+ 0	| locinfo
+ 8	| mbcinfo
+	+---
+
+class _Mbstatet	size(8):
+	+---
+ 0	| _Wchar
+ 4	| _Byte
+ 6	| _State
+	+---
+
+class std::nothrow_t	size(1):
+	+---
+	+---
+
+class _CrtMemState	size(104):
+	+---
+ 0	| pBlockHeader
+ 8	| lCounts
+48	| lSizes
+88	| lHighWaterCount
+96	| lTotalCount
+	+---
+
+class std::_Lockit	size(4):
+	+---
+ 0	| _Locktype
+	+---
+
+class std::_Init_locks	size(1):
+	+---
+	+---
+
+class std::integral_constant<bool,0>	size(1):
+	+---
+	+---
+
+class _exception	size(40):
+	+---
+ 0	| type
+  	| <alignment member> (size=4)
+ 8	| name
+16	| arg1
+24	| arg2
+32	| retval
+	+---
+
+class _complex	size(16):
+	+---
+ 0	| x
+ 8	| y
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| _Sh
+ 0	| _Val
+	+---
+
+class <unnamed-tag>	size(4):
+	+---
+ 0	| _Sh
+ 0	| _Val
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| _Sh
+ 0	| _Val
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| _Word
+ 0	| _Float
+ 0	| _Double
+ 0	| _Long_double
+	+---
+
+class _Combined_type<float,double>	size(1):
+	+---
+	+---
+
+class _Combined_type<float,long double>	size(1):
+	+---
+	+---
+
+class _Real_widened<float,float>	size(1):
+	+---
+	+---
+
+class _Real_widened<float,double>	size(1):
+	+---
+	+---
+
+class _Real_widened<double,float>	size(1):
+	+---
+	+---
+
+class _Real_widened<double,double>	size(1):
+	+---
+	+---
+
+class _Real_type<float>	size(1):
+	+---
+	+---
+
+class _Real_type<long double>	size(1):
+	+---
+	+---
+
+class _div_t	size(8):
+	+---
+ 0	| quot
+ 4	| rem
+	+---
+
+class _ldiv_t	size(8):
+	+---
+ 0	| quot
+ 4	| rem
+	+---
+
+class _lldiv_t	size(16):
+	+---
+ 0	| quot
+ 8	| rem
+	+---
+
+class <unnamed-tag>	size(10):
+	+---
+ 0	| ld
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| x
+	+---
+
+class <unnamed-tag>	size(4):
+	+---
+ 0	| f
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| x
+	+---
+
+class <unnamed-tag>	size(12):
+	+---
+ 0	| ld12
+	+---
+
+class std::plus<void>	size(1):
+	+---
+	+---
+
+class std::minus<void>	size(1):
+	+---
+	+---
+
+class std::multiplies<void>	size(1):
+	+---
+	+---
+
+class std::equal_to<void>	size(1):
+	+---
+	+---
+
+class std::not_equal_to<void>	size(1):
+	+---
+	+---
+
+class std::greater<void>	size(1):
+	+---
+	+---
+
+class std::less<void>	size(1):
+	+---
+	+---
+
+class std::greater_equal<void>	size(1):
+	+---
+	+---
+
+class std::less_equal<void>	size(1):
+	+---
+	+---
+
+class std::integral_constant<bool,1>	size(1):
+	+---
+	+---
+
+class std::_Select<0>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<1>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<2>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<4>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<8>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<1>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<2>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<4>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<8>	size(1):
+	+---
+	+---
+
+class std::integral_constant<unsigned __int64,0>	size(1):
+	+---
+	+---
+
+class std::_Maximum<>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<unsigned __int64,0>)
+	| +---
+	+---
+
+class std::common_type<>	size(1):
+	+---
+	+---
+
+class std::_Invoker_functor	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmf_object	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmf_refwrap	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmf_pointer	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmd_object	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmd_refwrap	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmd_pointer	size(1):
+	+---
+	+---
+
+class std::hash<float>	size(1):
+	+---
+	+---
+
+class std::hash<double>	size(1):
+	+---
+	+---
+
+class std::hash<long double>	size(1):
+	+---
+	+---
+
+class std::hash<std::nullptr_t>	size(1):
+	+---
+	+---
+
+class _heapinfo	size(24):
+	+---
+ 0	| _pentry
+ 8	| _size
+16	| _useflag
+  	| <alignment member> (size=4)
+	+---
+
+class __std_exception_data	size(16):
+	+---
+ 0	| _What
+ 8	| _DoFree
+  	| <alignment member> (size=7)
+	+---
+
+class std::exception	size(24):
+	+---
+ 0	| {vfptr}
+ 8	| __std_exception_data _Data
+	+---
+
+std::exception::$vftable@:
+	| &exception_meta
+	|  0
+ 0	| &std::exception::{dtor} 
+ 1	| &std::exception::what 
+
+std::exception::{dtor} this adjustor: 0
+std::exception::what this adjustor: 0
+std::exception::__delDtor this adjustor: 0
+std::exception::__vecDelDtor this adjustor: 0
+
+class std::bad_exception	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_exception::$vftable@:
+	| &bad_exception_meta
+	|  0
+ 0	| &std::bad_exception::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_exception::{dtor} this adjustor: 0
+std::bad_exception::__delDtor this adjustor: 0
+std::bad_exception::__vecDelDtor this adjustor: 0
+
+class std::bad_alloc	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_alloc::$vftable@:
+	| &bad_alloc_meta
+	|  0
+ 0	| &std::bad_alloc::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_alloc::{dtor} this adjustor: 0
+std::bad_alloc::__delDtor this adjustor: 0
+std::bad_alloc::__vecDelDtor this adjustor: 0
+
+class std::bad_array_new_length	size(24):
+	+---
+ 0	| +--- (base class std::bad_alloc)
+ 0	| | +--- (base class std::exception)
+ 0	| | | {vfptr}
+ 8	| | | __std_exception_data _Data
+	| | +---
+	| +---
+	+---
+
+std::bad_array_new_length::$vftable@:
+	| &bad_array_new_length_meta
+	|  0
+ 0	| &std::bad_array_new_length::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_array_new_length::{dtor} this adjustor: 0
+std::bad_array_new_length::__delDtor this adjustor: 0
+std::bad_array_new_length::__vecDelDtor this adjustor: 0
+
+class std::exception_ptr	size(16):
+	+---
+ 0	| _Data1
+ 8	| _Data2
+	+---
+
+class std::nested_exception	size(24):
+	+---
+ 0	| {vfptr}
+ 8	| exception_ptr _Exc
+	+---
+
+std::nested_exception::$vftable@:
+	| &nested_exception_meta
+	|  0
+ 0	| &std::nested_exception::{dtor} 
+
+std::nested_exception::{dtor} this adjustor: 0
+std::nested_exception::__delDtor this adjustor: 0
+std::nested_exception::__vecDelDtor this adjustor: 0
+
+class _iobuf	size(8):
+	+---
+ 0	| _Placeholder
+	+---
+
+class __vcrt_va_list_is_reference<struct __crt_locale_pointers * const>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<struct __crt_locale_pointers * const>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<wchar_t const * const>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<wchar_t const * const>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<wchar_t const *>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<wchar_t const *>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<struct __crt_locale_pointers *>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<struct __crt_locale_pointers *>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<char const * const>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<char const * const>	size(1):
+	+---
+	+---
+
+class _wfinddata32_t	size(540):
+	+---
+ 0	| attrib
+ 4	| time_create
+ 8	| time_access
+12	| time_write
+16	| size
+20	| name
+	+---
+
+class _wfinddata32i64_t	size(544):
+	+---
+ 0	| attrib
+ 4	| time_create
+ 8	| time_access
+12	| time_write
+16	| size
+24	| name
+	+---
+
+class _wfinddata64i32_t	size(560):
+	+---
+ 0	| attrib
+  	| <alignment member> (size=4)
+ 8	| time_create
+16	| time_access
+24	| time_write
+32	| size
+36	| name
+  	| <alignment member> (size=4)
+	+---
+
+class _wfinddata64_t	size(560):
+	+---
+ 0	| attrib
+  	| <alignment member> (size=4)
+ 8	| time_create
+16	| time_access
+24	| time_write
+32	| size
+40	| name
+	+---
+
+class tm	size(36):
+	+---
+ 0	| tm_sec
+ 4	| tm_min
+ 8	| tm_hour
+12	| tm_mday
+16	| tm_mon
+20	| tm_year
+24	| tm_wday
+28	| tm_yday
+32	| tm_isdst
+	+---
+
+class _stat32	size(36):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+20	| st_size
+24	| st_atime
+28	| st_mtime
+32	| st_ctime
+	+---
+
+class _stat32i64	size(48):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+  	| <alignment member> (size=4)
+24	| st_size
+32	| st_atime
+36	| st_mtime
+40	| st_ctime
+  	| <alignment member> (size=4)
+	+---
+
+class _stat64i32	size(48):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+20	| st_size
+24	| st_atime
+32	| st_mtime
+40	| st_ctime
+	+---
+
+class _stat64	size(56):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+  	| <alignment member> (size=4)
+24	| st_size
+32	| st_atime
+40	| st_mtime
+48	| st_ctime
+	+---
+
+class stat	size(48):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+20	| st_size
+24	| st_atime
+32	| st_mtime
+40	| st_ctime
+	+---
+
+class __std_type_info_data	size(16):
+	+---
+ 0	| _UndecoratedName
+ 8	| _DecoratedName
+  	| <alignment member> (size=7)
+	+---
+
+class type_info	size(24):
+	+---
+ 0	| {vfptr}
+ 8	| __std_type_info_data _Data
+	+---
+
+type_info::$vftable@:
+	| &type_info_meta
+	|  0
+ 0	| &type_info::{dtor} 
+
+type_info::{dtor} this adjustor: 0
+type_info::__delDtor this adjustor: 0
+type_info::__vecDelDtor this adjustor: 0
+
+class std::bad_cast	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_cast::$vftable@:
+	| &bad_cast_meta
+	|  0
+ 0	| &std::bad_cast::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_cast::{dtor} this adjustor: 0
+std::bad_cast::__delDtor this adjustor: 0
+std::bad_cast::__vecDelDtor this adjustor: 0
+
+class std::bad_typeid	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_typeid::$vftable@:
+	| &bad_typeid_meta
+	|  0
+ 0	| &std::bad_typeid::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_typeid::{dtor} this adjustor: 0
+std::bad_typeid::__delDtor this adjustor: 0
+std::bad_typeid::__vecDelDtor this adjustor: 0
+
+class std::__non_rtti_object	size(24):
+	+---
+ 0	| +--- (base class std::bad_typeid)
+ 0	| | +--- (base class std::exception)
+ 0	| | | {vfptr}
+ 8	| | | __std_exception_data _Data
+	| | +---
+	| +---
+	+---
+
+std::__non_rtti_object::$vftable@:
+	| &__non_rtti_object_meta
+	|  0
+ 0	| &std::__non_rtti_object::{dtor} 
+ 1	| &std::exception::what 
+
+std::__non_rtti_object::{dtor} this adjustor: 0
+std::__non_rtti_object::__delDtor this adjustor: 0
+std::__non_rtti_object::__vecDelDtor this adjustor: 0
+
+class std::_Num_base	size(1):
+	+---
+	+---
+
+class std::_Num_int_base	size(1):
+	+---
+ 0	| +--- (base class std::_Num_base)
+	| +---
+	+---
+
+class std::_Num_float_base	size(1):
+	+---
+ 0	| +--- (base class std::_Num_base)
+	| +---
+	+---
+
+class std::numeric_limits<bool>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<char>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<signed char>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned char>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<char16_t>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<char32_t>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<wchar_t>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<short>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<int>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<long>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<__int64>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned short>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned int>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned long>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned __int64>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<float>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_float_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<double>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_float_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<long double>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_float_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::piecewise_construct_t	size(1):
+	+---
+	+---
+
+class std::integral_constant<unsigned __int64,2>	size(1):
+	+---
+	+---
+
+class std::in_place_t	size(1):
+	+---
+	+---
+
+class std::_Unused_parameter	size(1):
+	+---
+	+---
+
+class std::input_iterator_tag	size(1):
+	+---
+	+---
+
+class std::output_iterator_tag	size(1):
+	+---
+	+---
+
+class std::forward_iterator_tag	size(1):
+	+---
+ 0	| +--- (base class std::input_iterator_tag)
+	| +---
+	+---
+
+class std::bidirectional_iterator_tag	size(1):
+	+---
+ 0	| +--- (base class std::forward_iterator_tag)
+ 0	| | +--- (base class std::input_iterator_tag)
+	| | +---
+	| +---
+	+---
+
+class std::random_access_iterator_tag	size(1):
+	+---
+ 0	| +--- (base class std::bidirectional_iterator_tag)
+ 0	| | +--- (base class std::forward_iterator_tag)
+ 0	| | | +--- (base class std::input_iterator_tag)
+	| | | +---
+	| | +---
+	| +---
+	+---
+
+class std::_Distance_unknown	size(1):
+	+---
+	+---
+
+class std::_Default_sentinel	size(1):
+	+---
+	+---
+
+class std::_False_copy_cat	size(1):
+	+---
+	+---
+
+class std::_Is_character<char>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character<signed char>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character<unsigned char>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character_or_byte_or_bool<enum std::byte>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character_or_byte_or_bool<bool>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Lex_compare_check_element_types_helper<enum std::byte,enum std::byte,enum std::byte>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Lex_compare_check_element_types_helper<enum std::byte,enum std::byte,void>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::allocator_arg_t	size(1):
+	+---
+	+---
+
+class std::_Float_traits<float>	size(1):
+	+---
+	+---
+
+class std::_Nontrivial_dummy_type	size(1):
+	+---
+	+---
+
+class std::_Default_allocate_traits	size(1):
+	+---
+	+---
+
+class std::_Equal_allocators	size(1):
+	+---
+	+---
+
+class std::allocator<void>	size(1):
+	+---
+	+---
+
+class std::_Fake_allocator	size(1):
+	+---
+	+---
+
+class std::_Container_base0	size(1):
+	+---
+	+---
+
+class std::_Iterator_base0	size(1):
+	+---
+	+---
+
+class std::_Container_proxy	size(16):
+	+---
+ 0	| _Mycont
+ 8	| _Myfirstiter
+	+---
+
+class std::_Container_base12	size(8):
+	+---
+ 0	| _Myproxy
+	+---
+
+class std::_Iterator_base12	size(16):
+	+---
+ 0	| _Myproxy
+ 8	| _Mynextiter
+	+---
+
+class std::_Leave_proxy_unbound	size(1):
+	+---
+	+---
+
+class std::_Fake_proxy_ptr_impl	size(1):
+	+---
+	+---
+
+class std::_Basic_container_proxy_ptr12	size(8):
+	+---
+ 0	| _Ptr
+	+---
+
+class std::_Zero_then_variadic_args_t	size(1):
+	+---
+	+---
+
+class std::_One_then_variadic_args_t	size(1):
+	+---
+	+---
+
+class std::_Move_allocator_tag	size(1):
+	+---
+	+---
+
+class std::_Alloc_temporary<`template-type-parameter-1'>::<unnamed-tag>	size(0):
+	+---
+ 0	| ?$_Wrap@$_Alloc@BAAB@:value_type: _Storage
+	+---
+
+class std::bad_weak_ptr	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_weak_ptr::$vftable@:
+	| &bad_weak_ptr_meta
+	|  0
+ 0	| &std::bad_weak_ptr::{dtor} 
+ 1	| &std::bad_weak_ptr::what 
+
+std::bad_weak_ptr::what this adjustor: 0
+std::bad_weak_ptr::{dtor} this adjustor: 0
+std::bad_weak_ptr::__delDtor this adjustor: 0
+std::bad_weak_ptr::__vecDelDtor this adjustor: 0
+
+class std::_Ref_count_base	size(16):
+	+---
+ 0	| {vfptr}
+ 8	| _Uses
+12	| _Weaks
+	+---
+
+std::_Ref_count_base::$vftable@:
+	| &_Ref_count_base_meta
+	|  0
+ 0	| &std::_Ref_count_base::_Destroy 
+ 1	| &std::_Ref_count_base::_Delete_this 
+ 2	| &std::_Ref_count_base::{dtor} 
+ 3	| &std::_Ref_count_base::_Get_deleter 
+
+std::_Ref_count_base::_Destroy this adjustor: 0
+std::_Ref_count_base::_Delete_this this adjustor: 0
+std::_Ref_count_base::{dtor} this adjustor: 0
+std::_Ref_count_base::_Get_deleter this adjustor: 0
+std::_Ref_count_base::__delDtor this adjustor: 0
+std::_Ref_count_base::__vecDelDtor this adjustor: 0
+
+class std::_Ref_count_obj2<`template-type-parameter-1'>::<unnamed-tag>	size(0):
+	+---
+ 0	| ?$_Wrap@$RBAAB@ _Storage
+	+---
+
+class std::_Ref_count_obj_alloc3<`template-type-parameter-1',`template-type-parameter-2'>::<unnamed-tag>	size(0):
+	+---
+ 0	| ?$_Wrap@$RBAAB@ _Storage
+	+---
+
+class std::owner_less<void>	size(1):
+	+---
+	+---
+
+class std::_Shared_ptr_spin_lock	size(1):
+	+---
+	+---
+
+class Logger	size(32):
+	+---
+ 0	| String prefix
+24	| out
+	+---
+
+class Position	size(8):
+	+---
+ 0	| line
+ 4	| index
+	+---
+
+class _SETJMP_FLOAT128	size(16):
+	+---
+ 0	| Part
+	+---
+
+class _JUMP_BUFFER	size(256):
+	+---
+ 0	| Frame
+ 8	| Rbx
+16	| Rsp
+24	| Rbp
+32	| Rsi
+40	| Rdi
+48	| R12
+56	| R13
+64	| R14
+72	| R15
+80	| Rip
+88	| MxCsr
+92	| FpCsr
+94	| Spare
+96	| _SETJMP_FLOAT128 Xmm6
+112	| _SETJMP_FLOAT128 Xmm7
+128	| _SETJMP_FLOAT128 Xmm8
+144	| _SETJMP_FLOAT128 Xmm9
+160	| _SETJMP_FLOAT128 Xmm10
+176	| _SETJMP_FLOAT128 Xmm11
+192	| _SETJMP_FLOAT128 Xmm12
+208	| _SETJMP_FLOAT128 Xmm13
+224	| _SETJMP_FLOAT128 Xmm14
+240	| _SETJMP_FLOAT128 Xmm15
+	+---
+
+class __m64	size(8):
+	+---
+ 0	| m64_u64
+ 0	| m64_f32
+ 0	| m64_i8
+ 0	| m64_i16
+ 0	| m64_i32
+ 0	| m64_i64
+ 0	| m64_u8
+ 0	| m64_u16
+ 0	| m64_u32
+	+---
+
+class __m128	size(16):
+	+---
+ 0	| m128_f32
+ 0	| m128_u64
+ 0	| m128_i8
+ 0	| m128_i16
+ 0	| m128_i32
+ 0	| m128_i64
+ 0	| m128_u8
+ 0	| m128_u16
+ 0	| m128_u32
+	+---
+
+class __m128i	size(16):
+	+---
+ 0	| m128i_i8
+ 0	| m128i_i16
+ 0	| m128i_i32
+ 0	| m128i_i64
+ 0	| m128i_u8
+ 0	| m128i_u16
+ 0	| m128i_u32
+ 0	| m128i_u64
+	+---
+
+class __m128d	size(16):
+	+---
+ 0	| m128d_f64
+	+---
+
+class __m256	size(32):
+	+---
+ 0	| m256_f32
+	+---
+
+class __m256d	size(32):
+	+---
+ 0	| m256d_f64
+	+---
+
+class __m256i	size(32):
+	+---
+ 0	| m256i_i8
+ 0	| m256i_i16
+ 0	| m256i_i32
+ 0	| m256i_i64
+ 0	| m256i_u8
+ 0	| m256i_u16
+ 0	| m256i_u32
+ 0	| m256i_u64
+	+---
+
+class __m512	size(64):
+	+---
+ 0	| m512_f32
+	+---
+
+class __m512d	size(64):
+	+---
+ 0	| m512d_f64
+	+---
+
+class __m512i	size(64):
+	+---
+ 0	| m512i_i8
+ 0	| m512i_i16
+ 0	| m512i_i32
+ 0	| m512i_i64
+ 0	| m512i_u8
+ 0	| m512i_u16
+ 0	| m512i_u32
+ 0	| m512i_u64
+	+---
+
+class rmp_seg	size(16):
+	+---
+ 0	| rmp_gpa
+ 8	| rmp_entry
+ 9	| rmp_pageSize
+10	| rmp_pageMark
+11	| rmp_reserved
+12	| rmp_ASID
+	+---
+
+class meow_state	size(432):
+	+---
+ 0	| __m128i xmm0
+16	| __m128i xmm1
+32	| __m128i xmm2
+48	| __m128i xmm3
+64	| __m128i xmm4
+80	| __m128i xmm5
+96	| __m128i xmm6
+112	| __m128i xmm7
+128	| TotalLengthInBytes
+136	| BufferLen
+140	| Buffer
+  	| <alignment member> (size=4)
+400	| Pad
+	+---
+
+class Token::<unnamed-tag>	size(24):
+	+---
+ 0	| String name
+ 0	| boolean
+ 0	| integer
+ 0	| _float32
+ 0	| _float64
+ 0	| String value
+	+---
+
+class Token	size(80):
+	+---
+ 0	| type
+ 2	| kind
+ 4	| Position start_position
+12	| Position end_position
+  	| <alignment member> (size=12)
+32	| __m128i hash
+48	| String name
+48	| boolean
+48	| integer
+48	| _float32
+48	| _float64
+48	| String value
+  	| <alignment member> (size=8)
+	+---
+
+class LexerStateConfigs	size(1):
+	+---
+ 0	| ignore_comments
+	+---
+
+class LexerState	size(64):
+	+---
+ 0	| String input
+24	| input_cursor
+32	| current_line_number
+36	| current_char_index
+40	| Arena strings
+56	| LexerStateConfigs config
+  	| <alignment member> (size=7)
+	+---
+
+class __vcrt_va_list_is_reference<struct String>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<struct String>	size(1):
+	+---
+	+---
+
+class Ast	size(8):
+	+---
+ 0	| nodes
+	+---
+
+class Ast_Node	size(96):
+	+---
+ 0	| type
+ 2	| kind
+  	| <alignment member> (size=12)
+16	| Token token
+	+---
+
+class Ast_Block	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| statements
+104	| scope
+	+---
+
+class Ast_Expression	size(96):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+	+---
+
+class Ast_Literal	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| literal_kind
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Primary	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| priamry_kind
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Unary	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| child
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Proc_Call	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| arguments
+104	| procedure
+	+---
+
+class Ast_Member_Access	size(192):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| Token member
+176	| _struct
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Subscript	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| exp
+104	| value
+	+---
+
+class Ast_Binary	size(128):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| op
+104	| left
+112	| right
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Type	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| size
+100	| alignment
+104	| is_signed
+  	| <alignment member> (size=7)
+	+---
+
+class Predefined_Type	size(128):
+	+---
+ 0	| key
+  	| <alignment member> (size=8)
+16	| Ast_Type value
+	+---
+
+class Ast_Return	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| expressions
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Declaration	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| scope
+104	| constant
+105	| inforced_type
+  	| <alignment member> (size=6)
+	+---
+
+class Ast_Proc_Declaration	size(128):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+96	| | scope
+104	| | constant
+105	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+112	| return_type
+120	| body
+	+---
+
+class Ast_Var_Declaration	size(128):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+96	| | scope
+104	| | constant
+105	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+112	| data_type
+120	| body
+	+---
+
+class Ast_Struct_Declaration	size(128):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+96	| | scope
+104	| | constant
+105	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+112	| decls
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_If	size(128):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| exp
+104	| statement
+112	| next
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Scope	size(40):
+	+---
+ 0	| variables
+ 8	| procedures
+16	| structs
+24	| parent
+32	| children
+	+---
+
+class Ast_Note	size(96):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+	+---
+
+class Ast_Directive	size(96):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+	+---
+
+class Ast_Directive_Import	size(272):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| Token filename
+176	| isAs
+  	| <alignment member> (size=15)
+192	| Token as
+	+---
+
+class <unnamed-tag>	size(32):
+	+---
+ 0	| length
+ 8	| capacity
+16	| hash_table
+24	| temp
+	+---
+
+class stbds_string_block	size(16):
+	+---
+ 0	| next
+ 8	| storage
+	+---
+
+class stbds_string_arena	size(24):
+	+---
+ 0	| storage
+ 8	| remaining
+16	| block
+17	| mode
+  	| <alignment member> (size=6)
+	+---
+
+class <unnamed-tag>	size(128):
+	+---
+ 0	| hash
+64	| index
+	+---
+
+class <unnamed-tag>	size(104):
+	+---
+ 0	| temp_key
+ 8	| slot_count
+16	| used_count
+24	| used_count_threshold
+32	| used_count_shrink_threshold
+40	| tombstone_count
+48	| tombstone_count_threshold
+56	| seed
+64	| slot_count_log2
+72	| stbds_string_arena string
+96	| storage
+	+---
+
+class Arguments	size(32):
+	+---
+ 0	| inputFile
+ 8	| outputFile
+16	| structureFile
+24	| isSet
+  	| <alignment member> (size=7)
+	+---
+
+class Memory	size(24):
+	+---
+ 0	| size
+ 8	| count
+16	| data
+	+---
+
+class MemorySlot	size(24):
+	+---
+ 0	| size
+ 8	| data
+16	| parent
+	+---
+
+class GenerateStringsCommand	size(32):
+	+---
+ 0	| String name
+24	| array
+	+---
+[Meta]: Parsing lex.h Started
+Filename lex.h
+Name: LexerState
+	{ offsetof(LexerState, input), member_size(LexerState, input) },
+	{ offsetof(LexerState, input_cursor), member_size(LexerState, input_cursor) },
+	{ offsetof(LexerState, current_line_number), member_size(LexerState, current_line_number) },
+	{ offsetof(LexerState, current_char_index), member_size(LexerState, current_char_index) },
+	{ offsetof(LexerState, strings), member_size(LexerState, strings) },
+	{ offsetof(LexerState, config), member_size(LexerState, config) },
+[Meta]: Parsing constants.h Started
+[Meta]: Parsing ast.h Started
+Filename ast.h
+Filename ast.h
+main.cpp
+
+class _PMD	size(12):
+	+---
+ 0	| mdisp
+ 4	| pdisp
+ 8	| vdisp
+	+---
+
+class _TypeDescriptor	size(16):
+	+---
+ 0	| pVFTable
+ 8	| spare
+16	| name
+	+---
+
+class _s__CatchableType	size(36):
+	+---
+ 0	| properties
+ 4	| pType
+12	| _PMD thisDisplacement
+24	| sizeOrOffset
+28	| copyFunction
+	+---
+
+class _s__CatchableTypeArray	size(4):
+	+---
+ 0	| nCatchableTypes
+ 4	| arrayOfCatchableTypes
+	+---
+
+class _s__ThrowInfo	size(28):
+	+---
+ 0	| attributes
+ 4	| pmfnUnwind
+12	| pForwardCompat
+20	| pCatchableTypeArray
+	+---
+
+class _s__RTTIBaseClassDescriptor	size(36):
+	+---
+ 0	| pTypeDescriptor
+ 8	| numContainedBases
+12	| _PMD where
+24	| attributes
+28	| pClassDescriptor
+	+---
+
+class _s__RTTIBaseClassArray	size(1):
+	+---
+ 0	| arrayOfBaseClassDescriptors
+	+---
+
+class _s__RTTIClassHierarchyDescriptor	size(20):
+	+---
+ 0	| signature
+ 4	| attributes
+ 8	| numBaseClasses
+12	| pBaseClassArray
+	+---
+
+class _s__RTTICompleteObjectLocator2	size(36):
+	+---
+ 0	| signature
+ 4	| offset
+ 8	| cdOffset
+12	| pTypeDescriptor
+20	| pClassDescriptor
+28	| pSelf
+	+---
+
+class __s_GUID	size(16):
+	+---
+ 0	| Data1
+ 4	| Data2
+ 6	| Data3
+ 8	| Data4
+	+---
+
+class __noop_coroutine_frame_standard	size(24):
+	+---
+ 0	| resume
+ 8	| destroy
+16	| promise
+  	| <alignment member> (size=7)
+	+---
+
+class __noop_coroutine_frame_legacy	size(16):
+	+---
+ 0	| resume
+ 8	| flag
+12	| index
+	+---
+
+class __vc_attributes::helper_attributes::default_valueAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helper_attributes::attributeAttribute	size(8):
+	+---
+ 0	| ValidOn
+ 4	| AllowMultiple
+ 5	| Inherited
+  	| <alignment member> (size=2)
+	+---
+
+class __vc_attributes::helper_attributes::source_annotation_attributeAttribute	size(8):
+	+---
+ 0	| ValidOn
+ 4	| AllowMultiple
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::helper_attributes::v1_earlyAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::v1_nameAttribute	size(8):
+	+---
+ 0	| name
+	+---
+
+class __vc_attributes::helper_attributes::v1_alttypeAttribute	size(4):
+	+---
+ 0	| type_e type
+	+---
+
+class __vc_attributes::helper_attributes::usageAttribute	size(4):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helper_attributes::repeatableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::as_stringAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::process_earlyAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::notify_atlprovAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::help_stringAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helper_attributes::requires_valueAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::helper_attributes::multi_valueAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::event_receiverAttribute	size(8):
+	+---
+ 0	| type_e type
+ 4	| layout_dependent
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::no_injected_textAttribute	size(1):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::emitidlAttribute	size(8):
+	+---
+ 0	| value
+ 4	| defaultimports
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::exportAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::idl_moduleAttribute	size(56):
+	+---
+ 0	| name
+ 8	| dllname
+16	| version
+24	| uuid
+32	| helpstring
+40	| helpstringcontext
+44	| helpcontext
+48	| hidden
+49	| restricted
+  	| <alignment member> (size=6)
+	+---
+
+class __vc_attributes::idl_quoteAttribute	size(8):
+	+---
+ 0	| text
+	+---
+
+class __vc_attributes::implementsAttribute	size(16):
+	+---
+ 0	| interfaces
+ 8	| dispinterfaces
+	+---
+
+class __vc_attributes::importidlAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::includelibAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::library_blockAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::satypeAttribute	size(8):
+	+---
+ 0	| type
+	+---
+
+class __vc_attributes::propgetAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::propputAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::propputrefAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::providerAttribute	size(24):
+	+---
+ 0	| name
+ 8	| uuid
+16	| cookies
+  	| <alignment member> (size=4)
+	+---
+
+class __vc_attributes::coclassAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::controlAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::customAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::dispinterfaceAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::dualAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::lcidAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::objectAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::progidAttribute	size(8):
+	+---
+ 0	| name
+	+---
+
+class __vc_attributes::threadingAttribute	size(4):
+	+---
+ 0	| threading_e value
+	+---
+
+class __vc_attributes::uuidAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::versionAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::vi_progidAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::moduleAttribute	size(96):
+	+---
+ 0	| type_e type
+  	| <alignment member> (size=4)
+ 8	| name
+16	| version
+24	| uuid
+32	| lcid
+36	| control
+  	| <alignment member> (size=3)
+40	| helpstring
+48	| helpstringcontext
+  	| <alignment member> (size=4)
+56	| helpstringdll
+64	| helpfile
+72	| helpcontext
+76	| hidden
+77	| restricted
+  	| <alignment member> (size=2)
+80	| custom
+88	| resource_name
+	+---
+
+class __vc_attributes::aggregatableAttribute	size(4):
+	+---
+ 0	| type_e type
+	+---
+
+class __vc_attributes::appobjectAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::async_uuidAttribute	size(8):
+	+---
+ 0	| uuid
+	+---
+
+class __vc_attributes::bindableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::call_asAttribute	size(8):
+	+---
+ 0	| local_proc
+	+---
+
+class __vc_attributes::caseAttribute	size(4):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::cpp_quoteAttribute	size(8):
+	+---
+ 0	| string
+	+---
+
+class __vc_attributes::defaultAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::defaultbindAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::defaultcollelemAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::defaultvalueAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::defaultvtableAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::displaybindAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::entryAttribute	size(8):
+	+---
+ 0	| entry_id
+	+---
+
+class __vc_attributes::first_isAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::helpcontextAttribute	size(8):
+	+---
+ 0	| helpcontext_value
+	+---
+
+class __vc_attributes::helpfileAttribute	size(8):
+	+---
+ 0	| filename
+	+---
+
+class __vc_attributes::helpstringAttribute	size(8):
+	+---
+ 0	| help_text_string
+	+---
+
+class __vc_attributes::helpstringcontextAttribute	size(4):
+	+---
+ 0	| contextid
+	+---
+
+class __vc_attributes::helpstringdllAttribute	size(8):
+	+---
+ 0	| dllname
+	+---
+
+class __vc_attributes::hiddenAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::idAttribute	size(4):
+	+---
+ 0	| id_num
+	+---
+
+class __vc_attributes::iid_isAttribute	size(8):
+	+---
+ 0	| limited_expression
+	+---
+
+class __vc_attributes::immediatebindAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::importAttribute	size(8):
+	+---
+ 0	| idl_file
+	+---
+
+class __vc_attributes::importlibAttribute	size(8):
+	+---
+ 0	| tlb_file
+	+---
+
+class __vc_attributes::inAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::includeAttribute	size(8):
+	+---
+ 0	| include_file
+	+---
+
+class __vc_attributes::last_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::length_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::licensedAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::localAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::max_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::ms_unionAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::nonbrowsableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::noncreatableAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::nonextensibleAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::odlAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::oleautomationAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::optionalAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::outAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::pointer_defaultAttribute	size(4):
+	+---
+ 0	| type_e type
+	+---
+
+class __vc_attributes::pragmaAttribute	size(8):
+	+---
+ 0	| token_sequence
+	+---
+
+class __vc_attributes::ptrAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::publicAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::rangeAttribute	size(8):
+	+---
+ 0	| low_val
+ 4	| high_val
+	+---
+
+class __vc_attributes::readonlyAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::refAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::requesteditAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::restrictedAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::retvalAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::size_isAttribute	size(8):
+	+---
+ 0	| expression
+	+---
+
+class __vc_attributes::stringAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::sourceAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::switch_isAttribute	size(8):
+	+---
+ 0	| limited_expression
+	+---
+
+class __vc_attributes::switch_typeAttribute	size(8):
+	+---
+ 0	| switch_type_specifier
+	+---
+
+class __vc_attributes::transmit_asAttribute	size(8):
+	+---
+ 0	| xmit_type
+	+---
+
+class __vc_attributes::uidefaultAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::uniqueAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::usesgetlasterrorAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::v1_enumAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::varargAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::wire_marshalAttribute	size(8):
+	+---
+ 0	| wire_type
+	+---
+
+class __vc_attributes::event_sourceAttribute	size(12):
+	+---
+ 0	| type_e type
+ 4	| optimize_e optimize
+ 8	| decorate
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::hookAttribute	size(32):
+	+---
+ 0	| event
+ 8	| source
+16	| handler
+24	| receiver
+	+---
+
+class __vc_attributes::unhookAttribute	size(32):
+	+---
+ 0	| event
+ 8	| source
+16	| handler
+24	| receiver
+	+---
+
+class __vc_attributes::atl::synchronizeAttribute	size(1):
+	+---
+	+---
+
+class __vc_attributes::atl::soap_handlerAttribute	size(40):
+	+---
+ 0	| name
+ 8	| namespace
+16	| protocol
+24	| style
+32	| use
+	+---
+
+class __vc_attributes::atl::soap_methodAttribute	size(8):
+	+---
+ 0	| name
+	+---
+
+class __vc_attributes::atl::soap_headerAttribute	size(16):
+	+---
+ 0	| value
+ 8	| required
+ 9	| in
+10	| out
+  	| <alignment member> (size=5)
+	+---
+
+class __vc_attributes::atl::soap_namespaceAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::com_interface_entryAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::support_error_infoAttribute	size(8):
+	+---
+ 0	| error_interface
+	+---
+
+class __vc_attributes::atl::aggregatesAttribute	size(8):
+	+---
+ 0	| clsid
+	+---
+
+class __vc_attributes::atl::implements_categoryAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::requires_categoryAttribute	size(8):
+	+---
+ 0	| value
+	+---
+
+class __vc_attributes::atl::rdxAttribute	size(24):
+	+---
+ 0	| key
+ 8	| valuename
+16	| regtype
+	+---
+
+class __vc_attributes::atl::registration_scriptAttribute	size(8):
+	+---
+ 0	| script
+	+---
+
+class __vc_attributes::atl::db_sourceAttribute	size(24):
+	+---
+ 0	| source
+ 8	| name
+16	| hresult
+	+---
+
+class __vc_attributes::atl::db_commandAttribute	size(48):
+	+---
+ 0	| command
+ 8	| name
+16	| source_name
+24	| hresult
+32	| bindings
+40	| bulk_fetch
+	+---
+
+class __vc_attributes::atl::db_tableAttribute	size(40):
+	+---
+ 0	| table
+ 8	| name
+16	| source_name
+24	| hresult
+32	| bulk_fetch
+	+---
+
+class __vc_attributes::atl::db_accessorAttribute	size(8):
+	+---
+ 0	| id
+ 4	| auto_
+  	| <alignment member> (size=3)
+	+---
+
+class __vc_attributes::atl::db_columnAttribute	size(48):
+	+---
+ 0	| ordinal
+ 8	| dbtype
+16	| precision
+24	| scale
+32	| status
+40	| length
+	+---
+
+class __vc_attributes::atl::db_paramAttribute	size(56):
+	+---
+ 0	| ordinal
+ 8	| paramtype
+16	| dbtype
+24	| precision
+32	| scale
+40	| status
+48	| length
+	+---
+
+class __vc_attributes::atl::tag_nameAttribute	size(16):
+	+---
+ 0	| name
+ 8	| parse_func
+	+---
+
+class __vc_attributes::atl::request_handlerAttribute	size(16):
+	+---
+ 0	| name
+ 8	| sdl
+	+---
+
+class __vc_attributes::atl::perfmonAttribute	size(16):
+	+---
+ 0	| name
+ 8	| register
+  	| <alignment member> (size=7)
+	+---
+
+class __vc_attributes::atl::perf_objectAttribute	size(48):
+	+---
+ 0	| name_res
+ 4	| help_res
+ 8	| namestring
+16	| helpstring
+24	| detail
+28	| no_instances
+  	| <alignment member> (size=3)
+32	| class_
+40	| maxinstnamelen
+  	| <alignment member> (size=4)
+	+---
+
+class __vc_attributes::atl::perf_counterAttribute	size(56):
+	+---
+ 0	| namestring
+ 8	| helpstring
+16	| name_res
+20	| help_res
+24	| countertype
+28	| defscale
+32	| default_counter
+  	| <alignment member> (size=3)
+36	| detail
+40	| max_counter_size
+  	| <alignment member> (size=4)
+48	| countertype_string
+	+---
+
+class String::<unnamed-tag>	size(8):
+	+---
+ 0	| length
+ 0	| size
+	+---
+
+class String::<unnamed-tag>	size(8):
+	+---
+ 0	| str
+ 0	| str_char
+	+---
+
+class String::Iterator	size(16):
+	+---
+ 0	| str
+ 8	| index
+	+---
+
+class String	size(24):
+	+---
+ 0	| length
+ 0	| size
+ 8	| str
+ 8	| str_char
+16	| isNullTerminated
+  	| <alignment member> (size=7)
+	+---
+
+class Region	size(24):
+	+---
+ 0	| next
+ 8	| capacity
+16	| size
+24	| buffer
+	+---
+
+class Arena	size(16):
+	+---
+ 0	| first
+ 8	| last
+	+---
+
+class __crt_locale_data_public	size(16):
+	+---
+ 0	| _locale_pctype
+ 8	| _locale_mb_cur_max
+12	| _locale_lc_codepage
+	+---
+
+class __crt_locale_pointers	size(16):
+	+---
+ 0	| locinfo
+ 8	| mbcinfo
+	+---
+
+class _Mbstatet	size(8):
+	+---
+ 0	| _Wchar
+ 4	| _Byte
+ 6	| _State
+	+---
+
+class std::nothrow_t	size(1):
+	+---
+	+---
+
+class _CrtMemState	size(104):
+	+---
+ 0	| pBlockHeader
+ 8	| lCounts
+48	| lSizes
+88	| lHighWaterCount
+96	| lTotalCount
+	+---
+
+class std::_Lockit	size(4):
+	+---
+ 0	| _Locktype
+	+---
+
+class std::_Init_locks	size(1):
+	+---
+	+---
+
+class std::integral_constant<bool,0>	size(1):
+	+---
+	+---
+
+class _exception	size(40):
+	+---
+ 0	| type
+  	| <alignment member> (size=4)
+ 8	| name
+16	| arg1
+24	| arg2
+32	| retval
+	+---
+
+class _complex	size(16):
+	+---
+ 0	| x
+ 8	| y
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| _Sh
+ 0	| _Val
+	+---
+
+class <unnamed-tag>	size(4):
+	+---
+ 0	| _Sh
+ 0	| _Val
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| _Sh
+ 0	| _Val
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| _Word
+ 0	| _Float
+ 0	| _Double
+ 0	| _Long_double
+	+---
+
+class _Combined_type<float,double>	size(1):
+	+---
+	+---
+
+class _Combined_type<float,long double>	size(1):
+	+---
+	+---
+
+class _Real_widened<float,float>	size(1):
+	+---
+	+---
+
+class _Real_widened<float,double>	size(1):
+	+---
+	+---
+
+class _Real_widened<double,float>	size(1):
+	+---
+	+---
+
+class _Real_widened<double,double>	size(1):
+	+---
+	+---
+
+class _Real_type<float>	size(1):
+	+---
+	+---
+
+class _Real_type<long double>	size(1):
+	+---
+	+---
+
+class _div_t	size(8):
+	+---
+ 0	| quot
+ 4	| rem
+	+---
+
+class _ldiv_t	size(8):
+	+---
+ 0	| quot
+ 4	| rem
+	+---
+
+class _lldiv_t	size(16):
+	+---
+ 0	| quot
+ 8	| rem
+	+---
+
+class <unnamed-tag>	size(10):
+	+---
+ 0	| ld
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| x
+	+---
+
+class <unnamed-tag>	size(4):
+	+---
+ 0	| f
+	+---
+
+class <unnamed-tag>	size(8):
+	+---
+ 0	| x
+	+---
+
+class <unnamed-tag>	size(12):
+	+---
+ 0	| ld12
+	+---
+
+class std::plus<void>	size(1):
+	+---
+	+---
+
+class std::minus<void>	size(1):
+	+---
+	+---
+
+class std::multiplies<void>	size(1):
+	+---
+	+---
+
+class std::equal_to<void>	size(1):
+	+---
+	+---
+
+class std::not_equal_to<void>	size(1):
+	+---
+	+---
+
+class std::greater<void>	size(1):
+	+---
+	+---
+
+class std::less<void>	size(1):
+	+---
+	+---
+
+class std::greater_equal<void>	size(1):
+	+---
+	+---
+
+class std::less_equal<void>	size(1):
+	+---
+	+---
+
+class std::integral_constant<bool,1>	size(1):
+	+---
+	+---
+
+class std::_Select<0>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<1>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<2>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<4>	size(1):
+	+---
+	+---
+
+class std::_Make_signed2<8>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<1>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<2>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<4>	size(1):
+	+---
+	+---
+
+class std::_Make_unsigned2<8>	size(1):
+	+---
+	+---
+
+class std::integral_constant<unsigned __int64,0>	size(1):
+	+---
+	+---
+
+class std::_Maximum<>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<unsigned __int64,0>)
+	| +---
+	+---
+
+class std::common_type<>	size(1):
+	+---
+	+---
+
+class std::_Invoker_functor	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmf_object	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmf_refwrap	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmf_pointer	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmd_object	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmd_refwrap	size(1):
+	+---
+	+---
+
+class std::_Invoker_pmd_pointer	size(1):
+	+---
+	+---
+
+class std::hash<float>	size(1):
+	+---
+	+---
+
+class std::hash<double>	size(1):
+	+---
+	+---
+
+class std::hash<long double>	size(1):
+	+---
+	+---
+
+class std::hash<std::nullptr_t>	size(1):
+	+---
+	+---
+
+class _heapinfo	size(24):
+	+---
+ 0	| _pentry
+ 8	| _size
+16	| _useflag
+  	| <alignment member> (size=4)
+	+---
+
+class __std_exception_data	size(16):
+	+---
+ 0	| _What
+ 8	| _DoFree
+  	| <alignment member> (size=7)
+	+---
+
+class std::exception	size(24):
+	+---
+ 0	| {vfptr}
+ 8	| __std_exception_data _Data
+	+---
+
+std::exception::$vftable@:
+	| &exception_meta
+	|  0
+ 0	| &std::exception::{dtor} 
+ 1	| &std::exception::what 
+
+std::exception::{dtor} this adjustor: 0
+std::exception::what this adjustor: 0
+std::exception::__delDtor this adjustor: 0
+std::exception::__vecDelDtor this adjustor: 0
+
+class std::bad_exception	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_exception::$vftable@:
+	| &bad_exception_meta
+	|  0
+ 0	| &std::bad_exception::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_exception::{dtor} this adjustor: 0
+std::bad_exception::__delDtor this adjustor: 0
+std::bad_exception::__vecDelDtor this adjustor: 0
+
+class std::bad_alloc	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_alloc::$vftable@:
+	| &bad_alloc_meta
+	|  0
+ 0	| &std::bad_alloc::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_alloc::{dtor} this adjustor: 0
+std::bad_alloc::__delDtor this adjustor: 0
+std::bad_alloc::__vecDelDtor this adjustor: 0
+
+class std::bad_array_new_length	size(24):
+	+---
+ 0	| +--- (base class std::bad_alloc)
+ 0	| | +--- (base class std::exception)
+ 0	| | | {vfptr}
+ 8	| | | __std_exception_data _Data
+	| | +---
+	| +---
+	+---
+
+std::bad_array_new_length::$vftable@:
+	| &bad_array_new_length_meta
+	|  0
+ 0	| &std::bad_array_new_length::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_array_new_length::{dtor} this adjustor: 0
+std::bad_array_new_length::__delDtor this adjustor: 0
+std::bad_array_new_length::__vecDelDtor this adjustor: 0
+
+class std::exception_ptr	size(16):
+	+---
+ 0	| _Data1
+ 8	| _Data2
+	+---
+
+class std::nested_exception	size(24):
+	+---
+ 0	| {vfptr}
+ 8	| exception_ptr _Exc
+	+---
+
+std::nested_exception::$vftable@:
+	| &nested_exception_meta
+	|  0
+ 0	| &std::nested_exception::{dtor} 
+
+std::nested_exception::{dtor} this adjustor: 0
+std::nested_exception::__delDtor this adjustor: 0
+std::nested_exception::__vecDelDtor this adjustor: 0
+
+class _iobuf	size(8):
+	+---
+ 0	| _Placeholder
+	+---
+
+class __vcrt_va_list_is_reference<struct __crt_locale_pointers * const>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<struct __crt_locale_pointers * const>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<wchar_t const * const>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<wchar_t const * const>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<wchar_t const *>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<wchar_t const *>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<struct __crt_locale_pointers *>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<struct __crt_locale_pointers *>	size(1):
+	+---
+	+---
+
+class __vcrt_va_list_is_reference<char const * const>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<char const * const>	size(1):
+	+---
+	+---
+
+class _wfinddata32_t	size(540):
+	+---
+ 0	| attrib
+ 4	| time_create
+ 8	| time_access
+12	| time_write
+16	| size
+20	| name
+	+---
+
+class _wfinddata32i64_t	size(544):
+	+---
+ 0	| attrib
+ 4	| time_create
+ 8	| time_access
+12	| time_write
+16	| size
+24	| name
+	+---
+
+class _wfinddata64i32_t	size(560):
+	+---
+ 0	| attrib
+  	| <alignment member> (size=4)
+ 8	| time_create
+16	| time_access
+24	| time_write
+32	| size
+36	| name
+  	| <alignment member> (size=4)
+	+---
+
+class _wfinddata64_t	size(560):
+	+---
+ 0	| attrib
+  	| <alignment member> (size=4)
+ 8	| time_create
+16	| time_access
+24	| time_write
+32	| size
+40	| name
+	+---
+
+class tm	size(36):
+	+---
+ 0	| tm_sec
+ 4	| tm_min
+ 8	| tm_hour
+12	| tm_mday
+16	| tm_mon
+20	| tm_year
+24	| tm_wday
+28	| tm_yday
+32	| tm_isdst
+	+---
+
+class _stat32	size(36):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+20	| st_size
+24	| st_atime
+28	| st_mtime
+32	| st_ctime
+	+---
+
+class _stat32i64	size(48):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+  	| <alignment member> (size=4)
+24	| st_size
+32	| st_atime
+36	| st_mtime
+40	| st_ctime
+  	| <alignment member> (size=4)
+	+---
+
+class _stat64i32	size(48):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+20	| st_size
+24	| st_atime
+32	| st_mtime
+40	| st_ctime
+	+---
+
+class _stat64	size(56):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+  	| <alignment member> (size=4)
+24	| st_size
+32	| st_atime
+40	| st_mtime
+48	| st_ctime
+	+---
+
+class stat	size(48):
+	+---
+ 0	| st_dev
+ 4	| st_ino
+ 6	| st_mode
+ 8	| st_nlink
+10	| st_uid
+12	| st_gid
+  	| <alignment member> (size=2)
+16	| st_rdev
+20	| st_size
+24	| st_atime
+32	| st_mtime
+40	| st_ctime
+	+---
+
+class __std_type_info_data	size(16):
+	+---
+ 0	| _UndecoratedName
+ 8	| _DecoratedName
+  	| <alignment member> (size=7)
+	+---
+
+class type_info	size(24):
+	+---
+ 0	| {vfptr}
+ 8	| __std_type_info_data _Data
+	+---
+
+type_info::$vftable@:
+	| &type_info_meta
+	|  0
+ 0	| &type_info::{dtor} 
+
+type_info::{dtor} this adjustor: 0
+type_info::__delDtor this adjustor: 0
+type_info::__vecDelDtor this adjustor: 0
+
+class std::bad_cast	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_cast::$vftable@:
+	| &bad_cast_meta
+	|  0
+ 0	| &std::bad_cast::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_cast::{dtor} this adjustor: 0
+std::bad_cast::__delDtor this adjustor: 0
+std::bad_cast::__vecDelDtor this adjustor: 0
+
+class std::bad_typeid	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_typeid::$vftable@:
+	| &bad_typeid_meta
+	|  0
+ 0	| &std::bad_typeid::{dtor} 
+ 1	| &std::exception::what 
+
+std::bad_typeid::{dtor} this adjustor: 0
+std::bad_typeid::__delDtor this adjustor: 0
+std::bad_typeid::__vecDelDtor this adjustor: 0
+
+class std::__non_rtti_object	size(24):
+	+---
+ 0	| +--- (base class std::bad_typeid)
+ 0	| | +--- (base class std::exception)
+ 0	| | | {vfptr}
+ 8	| | | __std_exception_data _Data
+	| | +---
+	| +---
+	+---
+
+std::__non_rtti_object::$vftable@:
+	| &__non_rtti_object_meta
+	|  0
+ 0	| &std::__non_rtti_object::{dtor} 
+ 1	| &std::exception::what 
+
+std::__non_rtti_object::{dtor} this adjustor: 0
+std::__non_rtti_object::__delDtor this adjustor: 0
+std::__non_rtti_object::__vecDelDtor this adjustor: 0
+
+class std::_Num_base	size(1):
+	+---
+	+---
+
+class std::_Num_int_base	size(1):
+	+---
+ 0	| +--- (base class std::_Num_base)
+	| +---
+	+---
+
+class std::_Num_float_base	size(1):
+	+---
+ 0	| +--- (base class std::_Num_base)
+	| +---
+	+---
+
+class std::numeric_limits<bool>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<char>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<signed char>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned char>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<char16_t>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<char32_t>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<wchar_t>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<short>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<int>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<long>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<__int64>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned short>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned int>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned long>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<unsigned __int64>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_int_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<float>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_float_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<double>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_float_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::numeric_limits<long double>	size(1):
+	+---
+ 0	| +--- (base class std::_Num_float_base)
+ 0	| | +--- (base class std::_Num_base)
+	| | +---
+	| +---
+	+---
+
+class std::piecewise_construct_t	size(1):
+	+---
+	+---
+
+class std::integral_constant<unsigned __int64,2>	size(1):
+	+---
+	+---
+
+class std::in_place_t	size(1):
+	+---
+	+---
+
+class std::_Unused_parameter	size(1):
+	+---
+	+---
+
+class std::input_iterator_tag	size(1):
+	+---
+	+---
+
+class std::output_iterator_tag	size(1):
+	+---
+	+---
+
+class std::forward_iterator_tag	size(1):
+	+---
+ 0	| +--- (base class std::input_iterator_tag)
+	| +---
+	+---
+
+class std::bidirectional_iterator_tag	size(1):
+	+---
+ 0	| +--- (base class std::forward_iterator_tag)
+ 0	| | +--- (base class std::input_iterator_tag)
+	| | +---
+	| +---
+	+---
+
+class std::random_access_iterator_tag	size(1):
+	+---
+ 0	| +--- (base class std::bidirectional_iterator_tag)
+ 0	| | +--- (base class std::forward_iterator_tag)
+ 0	| | | +--- (base class std::input_iterator_tag)
+	| | | +---
+	| | +---
+	| +---
+	+---
+
+class std::_Distance_unknown	size(1):
+	+---
+	+---
+
+class std::_Default_sentinel	size(1):
+	+---
+	+---
+
+class std::_False_copy_cat	size(1):
+	+---
+	+---
+
+class std::_Is_character<char>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character<signed char>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character<unsigned char>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character_or_byte_or_bool<enum std::byte>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Is_character_or_byte_or_bool<bool>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Lex_compare_check_element_types_helper<enum std::byte,enum std::byte,enum std::byte>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::_Lex_compare_check_element_types_helper<enum std::byte,enum std::byte,void>	size(1):
+	+---
+ 0	| +--- (base class std::integral_constant<bool,1>)
+	| +---
+	+---
+
+class std::allocator_arg_t	size(1):
+	+---
+	+---
+
+class std::_Float_traits<float>	size(1):
+	+---
+	+---
+
+class std::_Nontrivial_dummy_type	size(1):
+	+---
+	+---
+
+class std::_Default_allocate_traits	size(1):
+	+---
+	+---
+
+class std::_Equal_allocators	size(1):
+	+---
+	+---
+
+class std::allocator<void>	size(1):
+	+---
+	+---
+
+class std::_Fake_allocator	size(1):
+	+---
+	+---
+
+class std::_Container_base0	size(1):
+	+---
+	+---
+
+class std::_Iterator_base0	size(1):
+	+---
+	+---
+
+class std::_Container_proxy	size(16):
+	+---
+ 0	| _Mycont
+ 8	| _Myfirstiter
+	+---
+
+class std::_Container_base12	size(8):
+	+---
+ 0	| _Myproxy
+	+---
+
+class std::_Iterator_base12	size(16):
+	+---
+ 0	| _Myproxy
+ 8	| _Mynextiter
+	+---
+
+class std::_Leave_proxy_unbound	size(1):
+	+---
+	+---
+
+class std::_Fake_proxy_ptr_impl	size(1):
+	+---
+	+---
+
+class std::_Basic_container_proxy_ptr12	size(8):
+	+---
+ 0	| _Ptr
+	+---
+
+class std::_Zero_then_variadic_args_t	size(1):
+	+---
+	+---
+
+class std::_One_then_variadic_args_t	size(1):
+	+---
+	+---
+
+class std::_Move_allocator_tag	size(1):
+	+---
+	+---
+
+class std::_Alloc_temporary<`template-type-parameter-1'>::<unnamed-tag>	size(0):
+	+---
+ 0	| ?$_Wrap@$_Alloc@BAAB@:value_type: _Storage
+	+---
+
+class std::bad_weak_ptr	size(24):
+	+---
+ 0	| +--- (base class std::exception)
+ 0	| | {vfptr}
+ 8	| | __std_exception_data _Data
+	| +---
+	+---
+
+std::bad_weak_ptr::$vftable@:
+	| &bad_weak_ptr_meta
+	|  0
+ 0	| &std::bad_weak_ptr::{dtor} 
+ 1	| &std::bad_weak_ptr::what 
+
+std::bad_weak_ptr::what this adjustor: 0
+std::bad_weak_ptr::{dtor} this adjustor: 0
+std::bad_weak_ptr::__delDtor this adjustor: 0
+std::bad_weak_ptr::__vecDelDtor this adjustor: 0
+
+class std::_Ref_count_base	size(16):
+	+---
+ 0	| {vfptr}
+ 8	| _Uses
+12	| _Weaks
+	+---
+
+std::_Ref_count_base::$vftable@:
+	| &_Ref_count_base_meta
+	|  0
+ 0	| &std::_Ref_count_base::_Destroy 
+ 1	| &std::_Ref_count_base::_Delete_this 
+ 2	| &std::_Ref_count_base::{dtor} 
+ 3	| &std::_Ref_count_base::_Get_deleter 
+
+std::_Ref_count_base::_Destroy this adjustor: 0
+std::_Ref_count_base::_Delete_this this adjustor: 0
+std::_Ref_count_base::{dtor} this adjustor: 0
+std::_Ref_count_base::_Get_deleter this adjustor: 0
+std::_Ref_count_base::__delDtor this adjustor: 0
+std::_Ref_count_base::__vecDelDtor this adjustor: 0
+
+class std::_Ref_count_obj2<`template-type-parameter-1'>::<unnamed-tag>	size(0):
+	+---
+ 0	| ?$_Wrap@$RBAAB@ _Storage
+	+---
+
+class std::_Ref_count_obj_alloc3<`template-type-parameter-1',`template-type-parameter-2'>::<unnamed-tag>	size(0):
+	+---
+ 0	| ?$_Wrap@$RBAAB@ _Storage
+	+---
+
+class std::owner_less<void>	size(1):
+	+---
+	+---
+
+class std::_Shared_ptr_spin_lock	size(1):
+	+---
+	+---
+
+class Logger	size(32):
+	+---
+ 0	| String prefix
+24	| out
+	+---
+
+class Position	size(8):
+	+---
+ 0	| line
+ 4	| index
+	+---
+
+class _SETJMP_FLOAT128	size(16):
+	+---
+ 0	| Part
+	+---
+
+class _JUMP_BUFFER	size(256):
+	+---
+ 0	| Frame
+ 8	| Rbx
+16	| Rsp
+24	| Rbp
+32	| Rsi
+40	| Rdi
+48	| R12
+56	| R13
+64	| R14
+72	| R15
+80	| Rip
+88	| MxCsr
+92	| FpCsr
+94	| Spare
+96	| _SETJMP_FLOAT128 Xmm6
+112	| _SETJMP_FLOAT128 Xmm7
+128	| _SETJMP_FLOAT128 Xmm8
+144	| _SETJMP_FLOAT128 Xmm9
+160	| _SETJMP_FLOAT128 Xmm10
+176	| _SETJMP_FLOAT128 Xmm11
+192	| _SETJMP_FLOAT128 Xmm12
+208	| _SETJMP_FLOAT128 Xmm13
+224	| _SETJMP_FLOAT128 Xmm14
+240	| _SETJMP_FLOAT128 Xmm15
+	+---
+
+class __m64	size(8):
+	+---
+ 0	| m64_u64
+ 0	| m64_f32
+ 0	| m64_i8
+ 0	| m64_i16
+ 0	| m64_i32
+ 0	| m64_i64
+ 0	| m64_u8
+ 0	| m64_u16
+ 0	| m64_u32
+	+---
+
+class __m128	size(16):
+	+---
+ 0	| m128_f32
+ 0	| m128_u64
+ 0	| m128_i8
+ 0	| m128_i16
+ 0	| m128_i32
+ 0	| m128_i64
+ 0	| m128_u8
+ 0	| m128_u16
+ 0	| m128_u32
+	+---
+
+class __m128i	size(16):
+	+---
+ 0	| m128i_i8
+ 0	| m128i_i16
+ 0	| m128i_i32
+ 0	| m128i_i64
+ 0	| m128i_u8
+ 0	| m128i_u16
+ 0	| m128i_u32
+ 0	| m128i_u64
+	+---
+
+class __m128d	size(16):
+	+---
+ 0	| m128d_f64
+	+---
+
+class __m256	size(32):
+	+---
+ 0	| m256_f32
+	+---
+
+class __m256d	size(32):
+	+---
+ 0	| m256d_f64
+	+---
+
+class __m256i	size(32):
+	+---
+ 0	| m256i_i8
+ 0	| m256i_i16
+ 0	| m256i_i32
+ 0	| m256i_i64
+ 0	| m256i_u8
+ 0	| m256i_u16
+ 0	| m256i_u32
+ 0	| m256i_u64
+	+---
+
+class __m512	size(64):
+	+---
+ 0	| m512_f32
+	+---
+
+class __m512d	size(64):
+	+---
+ 0	| m512d_f64
+	+---
+
+class __m512i	size(64):
+	+---
+ 0	| m512i_i8
+ 0	| m512i_i16
+ 0	| m512i_i32
+ 0	| m512i_i64
+ 0	| m512i_u8
+ 0	| m512i_u16
+ 0	| m512i_u32
+ 0	| m512i_u64
+	+---
+
+class rmp_seg	size(16):
+	+---
+ 0	| rmp_gpa
+ 8	| rmp_entry
+ 9	| rmp_pageSize
+10	| rmp_pageMark
+11	| rmp_reserved
+12	| rmp_ASID
+	+---
+
+class meow_state	size(432):
+	+---
+ 0	| __m128i xmm0
+16	| __m128i xmm1
+32	| __m128i xmm2
+48	| __m128i xmm3
+64	| __m128i xmm4
+80	| __m128i xmm5
+96	| __m128i xmm6
+112	| __m128i xmm7
+128	| TotalLengthInBytes
+136	| BufferLen
+140	| Buffer
+  	| <alignment member> (size=4)
+400	| Pad
+	+---
+
+class Token::<unnamed-tag>	size(24):
+	+---
+ 0	| String name
+ 0	| boolean
+ 0	| integer
+ 0	| _float32
+ 0	| _float64
+ 0	| String value
+	+---
+
+class Token	size(80):
+	+---
+ 0	| type
+ 2	| kind
+ 4	| Position start_position
+12	| Position end_position
+  	| <alignment member> (size=12)
+32	| __m128i hash
+48	| String name
+48	| boolean
+48	| integer
+48	| _float32
+48	| _float64
+48	| String value
+  	| <alignment member> (size=8)
+	+---
+
+class LexerStateConfigs	size(1):
+	+---
+ 0	| ignore_comments
+	+---
+
+class LexerState	size(64):
+	+---
+ 0	| String input
+24	| input_cursor
+32	| current_line_number
+36	| current_char_index
+40	| Arena strings
+56	| LexerStateConfigs config
+  	| <alignment member> (size=7)
+	+---
+
+class __vcrt_va_list_is_reference<struct String>	size(1):
+	+---
+	+---
+
+class __vcrt_assert_va_start_is_not_reference<struct String>	size(1):
+	+---
+	+---
+
+class Ast	size(8):
+	+---
+ 0	| nodes
+	+---
+
+class Ast_Node	size(96):
+	+---
+ 0	| type
+ 2	| kind
+  	| <alignment member> (size=12)
+16	| Token token
+	+---
+
+class Ast_Block	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| statements
+104	| scope
+	+---
+
+class Ast_Expression	size(96):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+	+---
+
+class Ast_Literal	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| literal_kind
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Primary	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| priamry_kind
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Unary	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| child
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Proc_Call	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| arguments
+104	| procedure
+	+---
+
+class Ast_Member_Access	size(192):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| Token member
+176	| _struct
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Subscript	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| exp
+104	| value
+	+---
+
+class Ast_Binary	size(128):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| op
+104	| left
+112	| right
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Type	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| size
+100	| alignment
+104	| is_signed
+  	| <alignment member> (size=7)
+	+---
+
+class Predefined_Type	size(128):
+	+---
+ 0	| key
+  	| <alignment member> (size=8)
+16	| Ast_Type value
+	+---
+
+class Ast_Return	size(112):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+	| +---
+96	| expressions
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Declaration	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| scope
+104	| constant
+105	| inforced_type
+  	| <alignment member> (size=6)
+	+---
+
+class Ast_Proc_Declaration	size(128):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+96	| | scope
+104	| | constant
+105	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+112	| return_type
+120	| body
+	+---
+
+class Ast_Var_Declaration	size(128):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+96	| | scope
+104	| | constant
+105	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+112	| data_type
+120	| body
+	+---
+
+class Ast_Struct_Declaration	size(128):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | type
+ 2	| | | kind
+  	| | | <alignment member> (size=12)
+16	| | | Token token
+	| | +---
+96	| | scope
+104	| | constant
+105	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+112	| decls
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_If	size(128):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| exp
+104	| statement
+112	| next
+  	| <alignment member> (size=8)
+	+---
+
+class Ast_Scope	size(40):
+	+---
+ 0	| variables
+ 8	| procedures
+16	| structs
+24	| parent
+32	| children
+	+---
+
+class Ast_Note	size(96):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+	+---
+
+class Ast_Directive	size(96):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+	+---
+
+class Ast_Directive_Import	size(272):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | type
+ 2	| | kind
+  	| | <alignment member> (size=12)
+16	| | Token token
+	| +---
+96	| Token filename
+176	| isAs
+  	| <alignment member> (size=15)
+192	| Token as
+	+---
+
+class <unnamed-tag>	size(32):
+	+---
+ 0	| length
+ 8	| capacity
+16	| hash_table
+24	| temp
+	+---
+
+class stbds_string_block	size(16):
+	+---
+ 0	| next
+ 8	| storage
+	+---
+
+class stbds_string_arena	size(24):
+	+---
+ 0	| storage
+ 8	| remaining
+16	| block
+17	| mode
+  	| <alignment member> (size=6)
+	+---
+
+class <unnamed-tag>	size(128):
+	+---
+ 0	| hash
+64	| index
+	+---
+
+class <unnamed-tag>	size(104):
+	+---
+ 0	| temp_key
+ 8	| slot_count
+16	| used_count
+24	| used_count_threshold
+32	| used_count_shrink_threshold
+40	| tombstone_count
+48	| tombstone_count_threshold
+56	| seed
+64	| slot_count_log2
+72	| stbds_string_arena string
+96	| storage
+	+---
+
+class Arguments	size(32):
+	+---
+ 0	| inputFile
+ 8	| outputFile
+16	| structureFile
+24	| isSet
+  	| <alignment member> (size=7)
+	+---
+
+class Memory	size(24):
+	+---
+ 0	| size
+ 8	| count
+16	| data
+	+---
+
+class MemorySlot	size(24):
+	+---
+ 0	| size
+ 8	| data
+16	| parent
+	+---
+
+class Type	size(32):
+	+---
+ 0	| size
+ 4	| alignment
+ 8	| name
+16	| aliases
+24	| children
+	+---
+
+class Type_Map	size(40):
+	+---
+ 0	| key
+ 8	| Type value
+	+---
+
+class SourceFile	size(40):
+	+---
+ 0	| String name
+24	| size
+32	| tree
+	+---
+
+class SourceCode	size(40):
+	+---
+ 0	| String code
+24	| size
+32	| tree
+	+---
+
+class SourceUnit::<unnamed-tag>	size(40):
+	+---
+ 0	| SourceFile file
+ 0	| SourceCode code
+	+---
+
+class SourceUnit	size(48):
+	+---
+ 0	| isFile
+  	| <alignment member> (size=7)
+ 8	| SourceFile file
+ 8	| SourceCode code
+	+---
+
+class Parser	size(128):
+	+---
+ 0	| Logger logger
+32	| LexerState lexer
+96	| Arena ast_arena
+112	| scopes
+120	| current_scope
+	+---
+
+class Graph_Label	size(64):
+	+---
+ 0	| String str
+  	| <alignment member> (size=8)
+32	| __m128i hash
+48	| Shape_Type type
+  	| <alignment member> (size=12)
+	+---
+
+class tracy::Color	size(1):
+	+---
+	+---
+
+class Instruction	size(1):
+	+---
+ 0	| opcode
+	+---
+
+class Inst1OP	size(16):
+	+---
+ 0	| +--- (base class Instruction)
+ 0	| | opcode
+	| +---
+  	| <alignment member> (size=7)
+ 8	| operand
+	+---
+
+class Inst2OP	size(24):
+	+---
+ 0	| +--- (base class Instruction)
+ 0	| | opcode
+	| +---
+  	| <alignment member> (size=7)
+ 8	| operand1
+16	| operand2
+	+---
+
+class Padding	size(16):
+	+---
+ 0	| offset
+ 8	| size
+	+---

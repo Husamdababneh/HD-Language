@@ -8,7 +8,7 @@
 
 #include "common.h"
 
-constexpr static u64 MAX_POOL_SIZE = 100;
+constexpr static U64 MAX_POOL_SIZE = 100;
 
 template<typename T>
 struct Pool {

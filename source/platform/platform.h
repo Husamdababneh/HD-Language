@@ -7,8 +7,10 @@
 
 #pragma once
 
-#ifdef _WIN32
+#ifdef OS_WINDOWS
 #include "os_windows.h"
-#else
+#elif OS_LINUX
 #include "os_linux.h"
+#else
+#errror Unsupported Operation System
 #endif

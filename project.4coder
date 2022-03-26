@@ -1,4 +1,4 @@
-version(1);
+version(2);
 project_name = "HD Langauge";
 
 patterns = {
@@ -14,57 +14,53 @@ patterns = {
 	"*.hd",
 	"*.jai",
 };
-
 blacklist_patterns = {
-	"submodules\\**.*",
+	"submodules\*.*",
 	".*",
 };
 
-load_paths_custom = {
-	{".\\source"},
-	{".\\meta-source"},
-	{".\\samples"},
-};
-
 load_paths = {
-	{ load_paths_custom, .os = "win"  },
-	{ load_paths_custom, .os = "linux"},
-	{ load_paths_custom, .os = "mac"  },
+	.win = {
+		{ .path = ".\source", .recursive = true, .relative = true, },
+		{ .path = ".\samples", .recursive = true, .relative = true, },
+	},
+};
+
+commands = {
+	.build_debug = {
+		.win = "build.bat debug",
+		.out = "*compilation*",
+		.footer_panel = true,
+		.save_dirty_files = true,
+	},
+	.build_release = {
+		.win = "build.bat release",
+		.out = "*compilation*",
+		.footer_panel = true,
+		.save_dirty_files = true,
+		.cursor_at_end = false,
+	},
+	.build_tracy = {
+		.win = "build.bat tracy",
+		.out = "*compilation*",
+		.footer_panel = true,
+		.save_dirty_files = true,
+		.cursor_at_end = false,
+	},
+	.run_test = {
+		.win = "bin\hd.exe samples\first.hd",
+		.out = "*run*",
+		.footer_panel = false,
+		.save_dirty_files = false,
+		.cursor_at_end = true,
+	},
+};
+
+fkey_command = {
+	.F1 = "build_debug",
+	.F2 = "build_release",
+	.F3 = "build_tracy",
+	.F5 = "run_test",
 };
 
 
-build_debug_win32 = "misc\\build.bat debug";
-build_debug_linux = "misc\\build.sh debug";
-build_release_win32 = "misc\\build.bat release";
-build_release_linux = "misc\\build.sh release";
-build_tracy_win32 = "misc\\build.bat tracy";
-build_tracy_linux = "misc\\build.sh tracy";
-
-command_list = {
- { 
-	.name = "build debug",
-	.out = "*compilation*", .footer_panel = true, .save_dirty_files = true,
-	.cmd = { {build_debug_win32, .os ="win"  },
-			 {build_debug_linux, .os ="linux"  },
-			}, 
- },
- { 
-	.name = "build release",
-	.out = "*compilation*", .footer_panel = true, .save_dirty_files = true,
-	.cmd = { {build_release_win32, .os ="win"  },
-			 {build_release_linux, .os ="linux"  },
-			}, 
- },
- { 
-	.name = "build tracy",
-	.out = "*compilation*", .footer_panel = true, .save_dirty_files = true,
-	.cmd = { {build_tracy_win32, .os ="win"  },
-			 {build_tracu_linux, .os ="linux"  },
-			}, 
- },
-};
-
-fkey_command[1] = "build debug";
-fkey_command[2] = "build release";
-fkey_command[3] = "build tracy";
-fkey_command[4] = "clean";

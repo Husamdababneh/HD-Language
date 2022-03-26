@@ -2,11 +2,12 @@
 $File: TODO.txt
 $Date: December 15th 2020 6:12 am 
 $Creator: Husam 
-$Desc:  
 =========================================================================*/
 
 
-
+[ ] Context
+[ ] Allocators
+[ ] Basic data-structures (eg: Array, Stack, Queue, HashMap) 
 
 1 - See if this is important 
 static void 

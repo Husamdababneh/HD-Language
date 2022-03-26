@@ -24,9 +24,9 @@
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -35,10 +35,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -49,10 +49,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -90,9 +90,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -101,10 +101,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -115,10 +115,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -156,9 +156,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -167,10 +167,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -181,10 +181,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -222,9 +222,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -233,10 +233,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -247,10 +247,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -288,9 +288,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -299,10 +299,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -313,10 +313,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -354,9 +354,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -365,10 +365,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -379,10 +379,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -420,9 +420,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -431,10 +431,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -445,10 +445,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -486,9 +486,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -497,10 +497,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -511,10 +511,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -552,9 +552,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -563,10 +563,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -577,10 +577,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -618,9 +618,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -629,10 +629,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -643,10 +643,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -684,9 +684,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -695,10 +695,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -709,10 +709,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -750,9 +750,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -761,10 +761,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -775,10 +775,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -816,9 +816,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -827,10 +827,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -841,10 +841,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -882,9 +882,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -893,10 +893,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -907,10 +907,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -948,9 +948,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -959,10 +959,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -973,10 +973,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1014,9 +1014,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1025,10 +1025,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1039,10 +1039,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1080,9 +1080,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1091,10 +1091,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1105,10 +1105,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1146,9 +1146,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1157,10 +1157,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1171,10 +1171,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1212,9 +1212,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1223,10 +1223,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1237,10 +1237,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1278,9 +1278,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1289,10 +1289,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1303,10 +1303,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1344,9 +1344,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1355,10 +1355,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1369,10 +1369,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1410,9 +1410,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1421,10 +1421,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1435,10 +1435,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1476,9 +1476,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1487,10 +1487,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1501,10 +1501,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1542,9 +1542,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1553,10 +1553,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1567,10 +1567,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1608,9 +1608,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1619,10 +1619,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1633,10 +1633,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1674,9 +1674,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1685,10 +1685,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1699,10 +1699,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1740,9 +1740,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1751,10 +1751,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1765,10 +1765,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1806,9 +1806,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1817,10 +1817,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1831,10 +1831,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1872,9 +1872,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1883,10 +1883,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1897,10 +1897,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -1938,9 +1938,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -1949,10 +1949,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -1963,10 +1963,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2004,9 +2004,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2015,10 +2015,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2029,10 +2029,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2070,9 +2070,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2081,10 +2081,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2095,10 +2095,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2136,9 +2136,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2147,10 +2147,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2161,10 +2161,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2202,9 +2202,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2213,10 +2213,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2227,10 +2227,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2268,9 +2268,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2279,10 +2279,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2293,10 +2293,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2334,9 +2334,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2345,10 +2345,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2359,10 +2359,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2400,9 +2400,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2411,10 +2411,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2425,10 +2425,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2466,9 +2466,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2477,10 +2477,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2491,10 +2491,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2532,9 +2532,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2543,10 +2543,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2557,10 +2557,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2598,9 +2598,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2609,10 +2609,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2623,10 +2623,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2664,9 +2664,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2675,10 +2675,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2689,10 +2689,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2730,9 +2730,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2741,10 +2741,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2755,10 +2755,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2796,9 +2796,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2807,10 +2807,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2821,10 +2821,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2862,9 +2862,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2873,10 +2873,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2887,10 +2887,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2928,9 +2928,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -2939,10 +2939,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -2953,10 +2953,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -2994,9 +2994,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3005,10 +3005,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3019,10 +3019,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3060,9 +3060,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3071,10 +3071,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3085,10 +3085,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3126,9 +3126,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3137,10 +3137,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3151,10 +3151,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3192,9 +3192,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3203,10 +3203,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3217,10 +3217,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3258,9 +3258,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3269,10 +3269,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3283,10 +3283,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3324,9 +3324,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3335,10 +3335,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3349,10 +3349,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3390,9 +3390,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3401,10 +3401,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3415,10 +3415,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3456,9 +3456,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3467,10 +3467,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3481,10 +3481,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };
@@ -3522,9 +3522,9 @@ code :: () {
 
 Header :: struct {
 	Tag     : [4] #char = "PAK"; // first 3 characters are constants 
-	IDK     : u32;
-	Version : u32;
-	ResNum  : u32;
+	IDK     : U32;
+	Version : U32;
+	ResNum  : U32;
 }
 			/* aa */
 			
@@ -3533,10 +3533,10 @@ Header :: struct {
 FilesHeaders : [Header.ResNum] {
 	Filename	: [..] #char;
 	Null		: #char = "\0" ; // this is a constant 
-	ROFF		: u32;
-	Size		: u32;
-	Unknown1	: u32;
-	Unknown2	: u32;
+	ROFF		: U32;
+	Size		: U32;
+	Unknown1	: U32;
+	Unknown2	: U32;
 };
 
 // variable size
@@ -3547,10 +3547,10 @@ FilesData :: [Header.ResNum]
 	}
 	
 	IF Header.Tag[3]== "C" {
-	   PackedBlockSize = Read sizeof(u32);
-	   UnpackedBlockSize = Read sizeof(u32);
+	   PackedBlockSize = Read sizeof(U32);
+	   UnpackedBlockSize = Read sizeof(U32);
 	   PackedData = Read PackedBlockSize;
-	   UnpackedData : [UnpackedBlockSize]u8 ;
+	   UnpackedData : [UnpackedBlockSize]U8 ;
 	   decompress(data,PackedBlockSize, UnpackedData);
 	}
 };

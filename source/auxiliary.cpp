@@ -5,57 +5,66 @@
    $Description: see auxiliary.h
    ========================================================================*/
 
-#include "pch.h"
-
 #include "platform/platform.h"
 
 
-u64 read_entire_file(FILE* file, void** data_return)
+// NOTE(Husam): HD-Specific read_entire_file, 
+//              usually when reading a file we should return a pointer to the data not an object 
+// NOTE(Husam): In this case "String" is a light wieght object "Length and Pointer"
+
+String read_entire_file(FILE* file)
 {
-	assert(file);
+	// assert(file);
 	int descriptor = fileno(file);
 	
 	struct stat file_stats;
 	int result = fstat(descriptor, &file_stats);
-	if (result == -1) return -1;
+	if (result == -1) return {0};
 	
-	u64 length = file_stats.st_size;
+	U64 length = file_stats.st_size;
 	
 	unsigned char* data = new unsigned char[length];
 	
 	fseek(file, 0, SEEK_SET);
-	u64 success = fread((void*)data, length, 1, file);
+	U64 success = fread((void*)data, length, 1, file);
 	if (success < 1) {
 		delete[] data;
-		return -1;
+		return {0};
 	}
 	
-	*data_return = data;
-	return length;
+	
+	return CStringToString((char*)data, length);
 }
 
-u64 read_entire_file(const char* filepath, void** data_return)
+String read_entire_file(const char* filepath)
 {
 	open_file(file, filepath, "rb");
 	
 	if (!file)
 	{
 		printf("Couldn't find file [%s]\n", filepath);
-		return false;
+		return {};
 	}
 	
-	u64 result = read_entire_file(file, data_return);
+	String data = read_entire_file(file);
 	fclose(file);
-	return result;
+	return data;
 }
 
-u64 read_entire_file(const String& filename, void** data_return)
+String read_entire_file(const StringView& filename)
 {
-	assert(filename.count <= 255);
+	// assert(filename.count <= 255);
 	char name[256];
 	
-	memcpy((void*)name, (void*)filename.data, filename.count);
-	name[filename.count] = '\0';
-	return read_entire_file(name, data_return);
+	memcpy((void*)name, (void*)filename.str, filename.length);
+	name[filename.length] = '\0';
+	return read_entire_file(name);
 	
 }
+
+StringView readEntireFileToStringView(const StringView& filename)
+{
+	return read_entire_file(filename);
+}
+
+//StringView readEntireFile()

@@ -1,51 +1,42 @@
 
-a :: struct {
-	a : int = 5;
-	b : int ;
-	c : int ;
-};
 
 
+// Scope Level 0
+//a :: false;
 
-//a :: #type (u16 , u8) -> void 
+// Scope Level 0
 
-funcSig :: proc (a : u16  = 2, a : u8) -> void
+/*
+data :: struct
 {
+	// No-scope / Scope Level 1 // i'm not sure if i want to add these to scopes 
+	firstname : String;
+	lastname  : String;
+}
 
+*/
+
+// Scope Level 0
+main :: proc () -> U64
+{
+	// Scope Level 1
+	b:: 1;
 	{
-		a := 5;
-		b :: (5 * 2);
+		// Scope Level 2
+		b:: 1;
+	}
+
+	// Scope Level 1
+	function :: proc () -> U64
+	{
+
+	}
+	
+	// Scope Level 1
+	data :: struct
+	{
+		firstname : String;
+		lastname  : String;
 	}
 }
 
-
-
-//(a[1] * -g(1, 2, a[3*5 - 2 /5]) - (5 + b) )
-//a[1]
-
-
-
-/*
-/*
-Entity : struct : {
-	
-};
-
-main : funcSig : { }
-main :: proc ( a : u16  = s , a : u8) -> void  {
-	
-	b : u16 = 12;
-	
-	Sybmbol :: 1;
-	Sybmbol2 := 2;
-	scopeope : u16;
-	
-	//func(a[]);
-}
-
-__x :: (_af : s8 : __r) -> u8, s64, bool, s32
-{
-}
-
-*/
-*/

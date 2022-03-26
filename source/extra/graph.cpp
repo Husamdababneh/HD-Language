@@ -8,7 +8,7 @@ $Desc:
 #if ENABLE_GRAPH_PRINTING == 1
 #include "graph.h"
 
-String Shape_Names [] = {
+StringView Shape_Names [] = {
 	"box"_s,
 	"polygon"_s,
 	"ellipse"_s,
@@ -45,209 +45,354 @@ String Shape_Names [] = {
 	"component"_s,	
 };
 
-static Array<Graph_Label> labels = init_array<Graph_Label>(50);
+static Graph_Label* labels = nullptr;
 static void 	
-output_labels(Logger* logger)
+output_labels()
 {
-	for(u64 i = 0; i < labels.occupied; i++)
+	for(U64 i = 0; i < arrlenu(labels); i++)
 	{
 		auto& label = labels[i];
-		logger->print("T_%x [shape=\"%s\" label=\"%s\"];\n"_s, label.hash, Shape_Names[(u64)label.type], 
-					  label.str);
+		printf("T_%x [shape=\"%.*s\" label=\"%.*s\"];\n", 
+			   label.hash,
+			   SV_PRINT(Shape_Names[(U64)label.type]), 
+			   SV_PRINT(label.str));
 	}
 	
-	labels.occupied = 0;
+	arrfree(labels);
 	
 }
 static void
-output_graph_v2(Ast_Node* node, Logger* logger)
+output_graph(Ast_Node* node)
 {
 	if (node == nullptr) return; 
-	if (node->type == AST_UKNOWN) return;
+	if (node->type == AST_UKNOWN) assert(false);
 	
-	meow_u128 hash = node->token.hash;
-	//auto hash = MeowU32From(full_hash, 3);
+	if (node->kind == AST_KIND_UNKNOWN)
+	{
+		printf("Unknown Node Kind\n");
+		printf("Node Token (%.*s)\n", SV_PRINT(node->token.name));
+		printf("Node type (%d)\n", node->type);
+	}
+	
+	
+	U32 hash = MeowU32From(node->token.hash, 3);
 	switch(node->type)
 	{
-		case AST_BINARY_EXP:
+		case AST_UKNOWN:
 		{
-			Ast_Binary* bin = (Ast_Binary*)node;
-			logger->print("T_%x -> { "_s, hash);
-			
-			if (bin->left != nullptr){
-				logger->print("T_%x "_s, bin->left->token.hash);
-			}
-			
-			if (bin->right!= nullptr){
-				logger->print("T_%x "_s, bin->right->token.hash);
-			}
-			logger->print("}\n"_s);
-			
-			output_graph_v2(bin->left, logger);
-			output_graph_v2(bin->right, logger);
-			array_add<Graph_Label>(&labels, { hash, Shape_Type::DIAMOND,
-									   bin->token.name });
+			printf("Unknown Type Or Kind\n");
 			break;
+		}
+		case AST_EXPRESSION:
+		{
+			
+			if (node->kind == AST_KIND_EXP_BINARY){
+				
+				Ast_Binary* bin = (Ast_Binary*)node;
+				printf("T_%x -> { ", hash);
+				
+				if (bin->left != nullptr){
+					printf("T_%x ", MeowU32From(bin->left->token.hash, 3));
+				}
+				
+				if (bin->right!= nullptr){
+					printf("T_%x ", MeowU32From(bin->right->token.hash, 3));
+				}
+				printf("}\n");
+				
+				output_graph(bin->left);
+				output_graph(bin->right);
+				
+				Graph_Label label = { bin->token.name ,  hash, Shape_Type::GRAPH_DIAMOND};
+				arrput(labels, label);
+				break;
+			}
+			
+			else if (node->kind == AST_KIND_EXP_UNARY)
+			{
+				Ast_Unary* unary = (Ast_Unary*)node;
+				printf("T_%x -> { ", hash);
+				
+				if (unary->child != nullptr){
+					printf("T_%x ", MeowU32From(unary->child->token.hash, 3));
+				}
+				
+				printf("}\n");
+				
+				output_graph(unary->child);
+				
+				Graph_Label label = { unary->token.name,  hash, Shape_Type::GRAPH_DIAMOND};
+				arrput(labels, label);
+				break;
+			}
+			else if (node->kind == AST_KIND_LITERAL_NUMBER || 
+					 node->kind == AST_KIND_LITERAL_STRING || 
+					 node->kind == AST_KIND_PRIMARY_IDENTIFIER)
+			{
+				Ast_Primary* primary = (Ast_Primary*) node;
+				Graph_Label label = { primary->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+				arrput(labels, label);
+				break;
+			}
+			else if (node->kind == AST_KIND_EXP_LITERAL)
+			{
+				Ast_Literal * literal = (Ast_Literal*) node;
+				// TODO : if AST_KIND_LITERAL_STRING escape charachters 
+				Graph_Label label = { literal->token.name,  hash, Shape_Type::GRAPH_BOX};
+				arrput(labels, label);
+				break;
+			}
+			else if (node->kind == AST_KIND_EXP_RETURN)
+			{
+				Ast_Return* _return =  (Ast_Return*) node;
+				printf("T_%x -> { ", hash);
+				
+				for(U64 i = 0; i < arrlenu(_return->expressions); i++){
+					printf("T_%x ", MeowU32From(_return->expressions[i]->token.hash, 3));
+				}
+				
+				printf("}\n");
+				
+				for(U64 i = 0; i < arrlenu(_return->expressions); i++){
+					output_graph(_return->expressions[i]);
+				}
+				
+				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+				arrput(labels, label);
+				
+				break;
+			}
+			else if (node->kind == AST_KIND_EXP_PROC_CALL)
+			{
+				Ast_Proc_Call* call =  (Ast_Proc_Call*) node;
+				printf("T_%x -> { ", hash);
+				
+				for(U64 i = 0; i < arrlenu(call->arguments); i++){
+					printf("T_%x ", MeowU32From(call->arguments[i]->token.hash, 3));
+				}
+				
+				printf("T_%x ", MeowU32From(call->procedure->token.hash, 3));
+				
+				
+				printf("}\n");
+				
+				for(U64 i = 0; i < arrlenu(call->arguments); i++){
+					output_graph(call->arguments[i]);
+				}
+				output_graph(call->procedure);
+				
+				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+				arrput(labels, label);
+				
+			}
+			else if (node->kind == AST_KIND_EXP_MEM_ACC)
+			{
+				auto mem = (Ast_Member_Access*) node;
+				printf("T_%x -> { ", hash);
+				
+				printf("T_%x ", MeowU32From(mem->_struct->token.hash, 3));
+				
+				printf("T_%x ", MeowU32From(mem->member.hash,3 ));
+				
+				printf("}\n");
+				
+				//printf("T_%x -> T_%x\n", mem->_struct->token.hash, mem->member.hash);
+				
+				output_graph(mem->_struct);
+				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+				Graph_Label label2= { mem->member.name ,  (U32)MeowU32From(mem->member.hash, 3), Shape_Type::GRAPH_INVTRIANGLE};
+				arrput(labels, label);
+				arrput(labels, label2);
+			}
+			else if (node->kind == AST_KIND_EXP_SUBSCRIPT)
+			{
+				auto sub = (Ast_Subscript* )node;
+				printf("T_%x -> { ", hash);
+				
+				printf("T_%x ", MeowU32From(sub->exp->token.hash, 3));
+				printf("T_%x ", MeowU32From(sub->value->token.hash, 3));
+				printf("}\n");
+				
+				output_graph(sub->exp);
+				output_graph(sub->value);
+				Graph_Label label = { node->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+				arrput(labels, label);
+			}
+			else {
+				printf("node->type = %d\n", node->type);
+				printf("node->kind = %d\n", node->kind);
+				assert(false && "Not supported Expression type");
+			}
+			break;
+			//assert(false);
 		}
 		case AST_DECLARATION:
 		{
-			Ast_Declaration* decl =  (Ast_Declaration*) node;
-			logger->print("T_%x -> { "_s, hash);
 			
-			if (decl->data_type) {
-				logger->print("T_%x "_s, decl->data_type->token.hash);
+			if (node->kind == AST_KIND_DECL_STRUCT)
+			{
+				Ast_Struct_Declaration* _struct = (Ast_Struct_Declaration*)node;
+				printf("T_%x -> { ", hash);
+				
+				if (_struct->decls != nullptr && arrlenu(_struct->decls) > 0){
+					for (U64 i = 0; i < arrlenu(_struct->decls); i++)
+						printf("T_%x ", MeowU32From(_struct->decls[i]->token.hash,3));
+				}
+				
+				printf("}\n");
+				
+				if (_struct->decls != nullptr && arrlenu(_struct->decls) > 0){
+					for (U64 i = 0; i < arrlenu(_struct->decls); i++)
+						output_graph(_struct->decls[i]);
+				}
+				
+				Graph_Label label = { _struct->token.name ,  hash, Shape_Type::GRAPH_PENTAGON};
+				arrput(labels, label);
+				break;
 			}
 			
-			if (decl->params){
-				logger->print("T_%x "_s, decl->params->token.hash);
+			if (node->kind == AST_KIND_DECL_PROCEDURE)
+			{
+				Ast_Proc_Declaration * decl = (Ast_Proc_Declaration*) node; 
+				printf("T_%x -> { ", hash);
+				
+				if (decl->return_type != nullptr && arrlenu(decl->return_type) > 0){
+					for (U64 i = 0; i < arrlenu(decl->return_type); i++)
+						printf("T_%x ", MeowU32From(decl->return_type[i]->token.hash, 3));
+				}
+				//&& arrlenu(decl->body->statements) > 0
+				if (decl->body ){
+					printf("T_%x ", MeowU32From(decl->body->token.hash,3));
+				}
+				
+				printf("}\n");
+				
+				output_graph(decl->body);
+				if (decl->return_type != nullptr && arrlenu(decl->return_type) > 0){
+					for (U64 i = 0; i < arrlenu(decl->return_type); i++)
+						output_graph(decl->return_type[i]);
+				}
+				
+				Graph_Label label = { decl->token.name ,  hash, Shape_Type::GRAPH_PENTAGON};
+				arrput(labels, label);
+				break;
 			}
 			
-			if (decl->body){
-				logger->print("T_%x "_s, decl->body->token.hash);
+			if (node->kind == AST_KIND_DECL_VARIABLE)
+			{
+				Ast_Var_Declaration* decl = (Ast_Var_Declaration *) node; 
+				
+				if (decl->data_type || decl->body){
+					printf("T_%x -> { ", hash);
+					
+					if (decl->data_type){
+						printf("T_%x ", MeowU32From(decl->data_type->token.hash, 3));
+					}
+					
+					if (decl->body){
+						printf("T_%x ", MeowU32From(decl->body->token.hash, 3));
+					}
+					
+					printf("}\n");
+					output_graph(decl->body);
+					output_graph(decl->data_type);
+				}
+				Graph_Label label = { decl->token.name ,  hash, Shape_Type::GRAPH_PENTAGON};
+				arrput(labels, label);
+				break;
 			}
 			
-			logger->print("}\n"_s);
-			
-			output_graph_v2(decl->data_type, logger);
-			output_graph_v2(decl->params, logger);
-			output_graph_v2(decl->body, logger);
-			array_add<Graph_Label>(&labels, { hash, Shape_Type::PENTAGON,
-									   decl->token.name });
-			break;
-		}
-		case AST_IDENT:
-		{
-			Ast_Ident* ident = (Ast_Ident*) node;
-			array_add(&labels, { hash, Shape_Type::SQUARE, ident->token.name});
-			break;
-		}
-		case AST_LITERAL:
-		{
-			Ast_Literal * literal = (Ast_Literal*) node;
-			array_add(&labels, { hash, Shape_Type::BOX, literal->token.name});
-			break;
-		}
-		case AST_ASSIGN:
-		{
-			logger->print("Node Type AST_ASSIGN is not supported yet\n"_s);
-			break;
-		}
-		case AST_PORCDECLARATION:
-		{
-			logger->print("Node Type AST_PORCDECLARATION is not supported yet\n"_s);
 			break;
 		}
 		case AST_TYPE:
 		{
-			logger->print("Node Type AST_TYPE is not supported yet\n"_s);
+			Ast_Type* type = (Ast_Type*) node;
+			Graph_Label label = { type->token.name,  hash, Shape_Type::GRAPH_BOX};
+			arrput(labels, label);
 			break;
 		}
 		case AST_BLOCK:
 		{
 			Ast_Block* block =  (Ast_Block*) node;
-			logger->print("T_%x -> { "_s, hash);
 			
-			for(u64 i = 0; i < block->statements.occupied; i++){
-				logger->print("T_%x "_s, block->statements[i]->token.hash);
-				
+			if (arrlenu(block->statements) <= 0)
+				break;
+			printf("T_%x -> { ", hash);
+			
+			
+			for(U64 i = 0; i < arrlenu(block->statements); i++){
+				printf("T_%x ", MeowU32From(block->statements[i]->token.hash,3));
 			}
 			
-			logger->print("}\n"_s);
 			
-			for(u64 i = 0; i < block->statements.occupied; i++){
-				output_graph_v2(block->statements[i], logger);
+			printf("}\n");
+			
+			
+			for(U64 i = 0; i < arrlenu(block->statements); i++){
+				output_graph(block->statements[i]);
 			}
-			//logger->print("Node Type AST_BLOCK is not supported yet\n"_s);
-			array_add(&labels, { hash, Shape_Type::INVTRIANGLE, "Block"_s });
-			break;
-		}
-		case AST_DEFINETION:
-		{
-			logger->print("Node Type AST_DEFINETION is not supported yet\n"_s);
+			
+			Graph_Label label =  { block->token.name ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+			//{ "Block"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+			arrput(labels, label);
 			break;
 		}
 		case AST_IF:
 		{
-			logger->print("Node Type AST_IF is not supported yet\n"_s);
+			Ast_If* ifnode =  (Ast_If *) node;
+			printf("T_%x -> { ", hash);
+			
+			if (ifnode->exp)
+				printf("T_%x ", MeowU32From(ifnode->exp->token.hash, 3));
+			
+			if (ifnode->statement)
+				printf("T_%x ", MeowU32From(ifnode->statement->token.hash, 3));
+			
+			if (ifnode->next)
+			{
+				for(U64 i = 0; i < arrlenu(ifnode->next); i++){
+					printf("T_%x ", MeowU32From(ifnode->next[i]->token.hash, 3));
+				}
+			}
+			
+			printf("}\n");
+			
+			if (ifnode->exp)
+				output_graph(ifnode->exp);
+			
+			
+			if (ifnode->statement)
+				output_graph(ifnode->statement);
+			
+			
+			if (ifnode->next)
+			{
+				for(U64 i = 0; i < arrlenu(ifnode->next); i++){
+					output_graph(ifnode->next[i]);
+				}
+			}
+			
+			Graph_Label label = {"If Statment"_s ,  hash, Shape_Type::GRAPH_INVTRIANGLE};
+			arrput(labels, label);
 			break;
 		}
 		case AST_WHILE:
 		{
-			logger->print("Node Type AST_WHILE is not supported yet\n"_s);
-			break;
-		}
-		case AST_UNARY_EXP:
-		{
-			logger->print("Node Type AST_UNARY_EXP is not supported yet\n"_s);
-			break;
-		}
-		case AST_FUNCALL:
-		{
-			logger->print("Node Type AST_FUNCALL is not supported yet\n"_s);
-			break;
-		}
-		case AST_ARGUMENT:
-		{
-			logger->print("Node Type AST_ARGUMENT is not supported yet\n"_s);
-			break;
-		}
-		case AST_PARMETER:
-		{
-			logger->print("Node Type AST_PARMETER is not supported yet\n"_s);
-			break;
-		}
-		case AST_FACTOR:
-		{
-			logger->print("Node Type AST_FACTOR is not supported yet\n"_s);
-			break;
-		}
-		case AST_PROC:
-		{
-			logger->print("Node Type AST_PROC is not supported yet\n"_s);
-			break;
-		}
-		case AST_STRUCT:
-		{
-			logger->print("Node Type AST_STRUCT is not supported yet\n"_s);
-			break;
-		}
-		case AST_SUBSCRIPT:
-		{
-			logger->print("Node Type AST_SUBSCRIPT is not supported yet\n"_s);
-			break;
-		}
-		case AST_LIST:
-		{
-			Ast_List* list = (Ast_List*)node;
-			logger->print("T_%x -> { "_s, hash);
-			
-			for(u64 a = 0; a < list->list.occupied; a++ )
-			{
-				logger->print("T_%x "_s,list->list[a]->token.hash);
-			}
-			
-			logger->print("}\n"_s);
-			
-			for(u64 a = 0; a < list->list.occupied; a++ )
-			{
-				output_graph_v2(list->list[a], logger);
-			}
-			
-			array_add(&labels, { hash, Shape_Type::STAR, list->token.name });
-			//logger->print("Node Type AST_LIST is not supported yet\n"_s);
+			printf("//Node Type AST_WHILE is not supported yet\n");
 			break;
 		}
 		default:
 		{
-			//output_graph_v2(node, logger);
-			logger->print("Unknown Node Type ?? \n"_s);
+			//output_graph(node, logger);
+			printf("[Graph] Unhandled Node Type [%d] Token name [%d]\n", node->type, node->kind);
+			//printf("[Graph] Unhandled Node Type [%*s] Token name [%.*s]\n", //SV_PRINT(ast_kind_to_string(node->type)), SV_PRINT(node->token.name));
 			break;
 		}
 	}
 	return;
 }
 
-#define PRINT_GRAPH(node, logger)  labels.occupied = 0; output_graph_v2(node, logger); output_labels(logger);
+#define PRINT_GRAPH(node)  output_graph(node); output_labels();
 #else
 #define PRINT_GRAPH(node, logger)
 #endif

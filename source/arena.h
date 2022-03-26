@@ -7,17 +7,24 @@ $Desc:
 
 #pragma once
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4200)
+#endif
 
 struct Region {
     Region* next;
     size_t  capacity;
     size_t  size;
-    u8      buffer[];
+    U8      buffer[];
 };
+#ifdef _MSC_VER
+#pragma warning(default: 4200)
+#endif
+
 
 Region *region_create(size_t capacity);
 
-#define ARENA_DEFAULT_CAPACITY (500 * 1024) // 0.5 MB
+#define ARENA_DEFAULT_CAPACITY MB(500)
 
 struct Arena {
     Region* first;

@@ -7,52 +7,6 @@ workspace "HD-Project"
 	configurations { "Debug", "Release", "Tracy" }
 	startproject "HDLang"
 
-rule "MetaGeneratorWindows"
-	display "Generating Files"
-	fileextension ".cpp"
-
-	buildmessage 'Generating MetaData %(Filename) With CL'
-	buildcommands 'CL /EP %(FullPath) > ../generated-source/%(Filename).i'
-	buildoutputs  '../bin'
-	
-rule "MetaGeneratorLinux"
-	display "Generate Files"
-	fileextension ".cpp"
-
-	buildmessage 'Generating MetaData %(Filename) With G++'
-	buildcommands 'g++ -E -P %(FullPath) > ../generated-source/%(Filename).i'
-	buildoutputs  '../bin'
-
-project "MetaProgram"
-	kind "Utility"
-	targetdir "bin/"
-
-	files {
-		"meta-source/enum.cpp",
-		"meta-source/string.cpp"
-	}
-
-	includedirs {
-		"source"
-	}
-
-
-	if os.host() == "windows" then 
-		prebuildcommands {
-			"[ -d ..\\generated-source ] || mkdir ..\\generated-source",
-		}
-
-		rules { "MetaGeneratorWindows" }
-
-	elseif os.host() == "linux" then 
-		prebuildcommands {
-			"mkdir -p ..\\generated-source",
-		}
-		
-		buildcommands { 'g++ -E -P %(FullPath) > ../generated-source/%(Filename).i' }
-		rules { "MetaGeneratorLinux" }
-	end
-
 project "HDLang"
 	kind "ConsoleApp"
 
@@ -73,6 +27,7 @@ project "HDLang"
 	excludes {
 		"source/extra/graph.cpp",
 		"source/extra/graph.h",
+		"source/generator.cpp"
 	}
 
 	pchheader "pch.h"
@@ -80,15 +35,17 @@ project "HDLang"
 
 	includedirs {
 		"source/meow_hash",
-		"generated-source",
 		"source"
 	}
 
-	links { "MetaProgram" }	
 
 	filter  "system:windows" 
 		editandcontinue "on"
+		--buildoptions {
+		--	"/GF"
+		--}
 	
+
 	filter "system:linux"
 		links { "pthread", "dl" }
 		buildoptions {
@@ -119,6 +76,9 @@ project "HDLang"
 	filter "files:**TracyClient.cpp"
 	    flags {"NoPCH"}
 	
+	filter "files:**stb_*.cpp"
+	    flags {"NoPCH"}
+
 	defines { define_table } 
 -- Clean Function --
 newaction {
@@ -130,10 +90,6 @@ newaction {
 		os.rmdir("./bin-int")
 		os.rmdir("./.vs")
 		os.rmdir("./generated")
-		os.rmdir("./generated-source")
-		os.remove("MetaGenerator.props")
-		os.remove("MetaGenerator.targets")
-		os.remove("MetaGenerator.xml")
 		print("done.")
 	end
 }

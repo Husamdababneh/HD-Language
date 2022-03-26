@@ -12,8 +12,8 @@ template<typename T>
 struct Stack 
 {
 	T*  data;
-	u64 cap;
-	u64 count;
+	U64 cap;
+	U64 count;
 	
 	// TODO(Husam) : Add methods here ?? 
 	// constructors ?? maybe no
@@ -47,7 +47,7 @@ struct Stack
 
 template<typename T>
 Stack<T>
-make_stack(u64 size)
+make_stack(U64 size)
 {
 	Stack<T> result;
 	result.data = new T[size];

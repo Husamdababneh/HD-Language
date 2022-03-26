@@ -4,12 +4,11 @@ HD Programming language is a project for learning
 
 
 ## TODO: 
-- [ ] Lexer
-  - [ ] Tokens
-  - [ ] Pre-Lexer
-  
-- [ ] Parser
-  - [ ] AST
-  
-- [x] Profiling -> We are using Tracy Profiler as a submodule (Recomended)
-- [x] Build On linux (Early Stage)
+- [ ] Add comments, return statement , for, while, if 
+- [ ] More cases to test the compiler 
+- [ ] Type Checking
+- [ ] Simple Code generation
+- [ ] Struct defs
+
+- [x] Profiling -> We are using Tracy Profiler as a submodule (Recommended)
+- [ ] Build On linux (Early Stage)
