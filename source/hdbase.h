@@ -277,15 +277,19 @@ S8 CompareStrings(String left, String right)
 -    -1 -> left is smaller
 -    -2 -> same size but not the same string 
 */
-	
-	if (left.length != right.length) return left.size > right.size ? -1 : 1;
+
+	auto llength = left.length - (U8) left.isNullTerminated;
+	auto rlength = right.length - (U8) right.isNullTerminated;
+
+	if (llength != rlength) return left.size > right.size ? -1 : 1;
 	
 	// Check if both have the same pointer 
 	if (left.str == right.str) return 0;
 	
-	for(auto s : left){
-		if (*s.str != right[s.index]) return -2;
+	for(U64 it = 0; it < rlength; it++){
+		if (left[it] != right[it]) return -2;
 	}
+	
 	return 0;
 }
 

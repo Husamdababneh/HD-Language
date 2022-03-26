@@ -117,31 +117,31 @@ register_predefined_types(MemoryArena* arena, Parser& parser)
 
 	sh_new_arena(types);
 	
-	Ast_Type* type = create_type(arena, 1, 1, false, "U8"_s); _U8 = type;
+	_U8 = create_type(arena, 1, 1, false, "U8"_s);
 	add_type_to_map(_U8);
 	
-	type = create_type(arena, 2, 2, false, "U16"_s); _U16 = type;
+	_U16 = create_type(arena, 2, 2, false, "U16"_s);
 	add_type_to_map(_U16);
 	
-	type = create_type(arena, 4, 4, false, "U32"_s); _U32 = type;
+	_U32 = create_type(arena, 4, 4, false, "U32"_s);
 	add_type_to_map(_U32);
 	
-	type = create_type(arena, 8, 8, false, "U64"_s); _U64 = type;
+	_U64 = create_type(arena, 8, 8, false, "U64"_s);
 	add_type_to_map(_U64);
 	
-	type = create_type(arena, 1, 1, true, "S8"_s); _S8 = type;
+	_S8 = create_type(arena, 1, 1, true, "S8"_s);
 	add_type_to_map(_S8);
 	
-	type = create_type(arena, 2, 2, true, "S16"_s); _S16 = type;
+	_S16 = create_type(arena, 2, 2, true, "S16"_s);
 	add_type_to_map(_S16);
 	
-	type = create_type(arena, 4, 4, true, "S32"_s); _S32 = type;
+	_S32 = create_type(arena, 4, 4, true, "S32"_s);
 	add_type_to_map(_S32);
 	
-	type = create_type(arena, 8, 8, true, "S64"_s); _S64 = type;
+	_S64 = create_type(arena, 8, 8, true, "S64"_s);
 	add_type_to_map(_S64);
 
-	type = create_type(arena, 16, 16, true, "String"_s); _string = type;
+	_string = create_type(arena, 16, 16, true, "String"_s);
 	add_type_to_map(_string);
 
 	// TODO: Add all predefined types here
@@ -232,7 +232,7 @@ static Ast_Type* type_expression(Ast_Expression* node)
 	  default:
 	  {
 		  // @Unreachable:
-		  printf("Unknown Node Type in TypeCheckExpression: [%.*s], AST Kind: [%d]",
+		  printf("Unknown Node Type in TypeCheckExpression: [%.*s], AST Kind: [%d]\n",
 				 SV_PRINT(node->token.name), node->kind);
 		  UNREACHABLE;
 		  break;
