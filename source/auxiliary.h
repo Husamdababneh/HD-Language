@@ -10,27 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common.h"
-//#include "string_view.h"
-
-
-//extern constexpr int MAX_ARG_COUNT = 5 + 1; // + 1 for executable call string
-#define BINARY "binary:"
-#define INPUT  "input:"
-#define OUTPUT "output:"
-
-struct Arguments
-{
-	char* inputFile;
-	char* outputFile;
-	char* structureFile;
-	bool isSet = false;
-};
-
-//Arguments ParseArguments(int argc, char** argv);
-String read_entire_file(FILE* file, void** data_return);
-String read_entire_file(const char* file, void** data_return);
-String read_entire_file(const StringView& filename, void** data_return);
 
 template <typename F>
 struct Defer

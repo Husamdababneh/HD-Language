@@ -7,6 +7,8 @@
 
 #include "typer.h"
 
+
+
 #define UNREACHABLE assert(false && "Unreachable Code");
 
 /*
@@ -261,10 +263,10 @@ static void type_check_declaration(Ast_Declaration* decl)
 			var_decl->data_type = type_expression(var_decl->body);
 			assert(var_decl->data_type && "Where is the type" );
 
-			printf("Variable Declaration: Name[%.*s], Type[%.*s]\n",
-				   SV_PRINT(var_decl->token.name),
-				   SV_PRINT(var_decl->data_type->token.name));
 		}
+		printf("Variable Declaration: Name[%.*s], Type[%.*s]\n",
+			   SV_PRINT(var_decl->token.name),
+			   SV_PRINT(var_decl->data_type->token.name));
 	}
 }
 

@@ -2,7 +2,7 @@
 
 
 // Scope Level 0
-//a :: false;
+a : String ;
 
 // Scope Level 0
 
@@ -14,7 +14,6 @@ data :: struct
 	lastname  : String;
 }
 
-*/
 
 // Scope Level 0
 main :: proc () -> U64
@@ -40,3 +39,4 @@ main :: proc () -> U64
 	}
 }
 
+*/

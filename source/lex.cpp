@@ -11,9 +11,7 @@ $Description: Defines Lexer functionality & Data Structures
 #define LEXER_ENABLE_C_CHAR_TOKEN 0
 #endif
 
-#include "common.h"
 #include "auxiliary.h"
-#include "stack.h"
 
 
 // NOTE(Husam Dababneh): Forward Declaration of basic procedures
@@ -36,7 +34,6 @@ get_current_position(LexerState& lex)
 /*
 TODO(Husam Dababneh): I want to change the way the lexer works, but just after finishing the base
 */
-
 
 
 // TODO : Remove them from reserved[]  

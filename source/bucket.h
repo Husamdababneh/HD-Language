@@ -7,8 +7,6 @@ $Description: Single Header Implementation for a bucket
 #ifndef BUCKET_H
 #define BUCKET_H
 
-#include "common.h"
-
 template<typename T, U64 BucketCap>
 struct Bucket {
 	Bucket* next = nullptr;

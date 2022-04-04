@@ -88,6 +88,8 @@ enum AST_BINARY_TYPE : U16 {
 struct Ast_Node;
 struct Ast_Scope;
 struct Ast_Type;
+struct Ast_Declaration;
+
 
 struct Ast {
 	Ast_Node** nodes;
@@ -151,6 +153,7 @@ struct Ast_Type : public Ast_Node {
 	U32 size;
 	U32 alignment;
 	bool is_signed;
+	Ast_Declaration* variables;
 };
 
 struct Predefined_Type {

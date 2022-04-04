@@ -8,7 +8,7 @@
 #pragma once
 
 #define Note(...) 
-Note(GenerateStrings, token_type)
+
 enum HDTokenType : U16 {
 	TOKEN_NONE = 0,
 	TOKEN_SEMI_COLON = ';',
@@ -81,7 +81,6 @@ struct Token
 	Position 	start_position;
 	StringView   name;
 	meow_u128    hash;
-	
 };
 
 struct LexerStateConfigs {

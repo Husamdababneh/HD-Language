@@ -25,6 +25,7 @@ struct Type_Map {
 
 //extern Type_Map* types;
 
-
+/*
+*/
 
 #endif //TYPER_H

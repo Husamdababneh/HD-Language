@@ -16,6 +16,15 @@ struct MemoryArena
 	Size used;
 };
 
+
+template<typename T>
+struct RegionalMemory
+{
+	U64 indecies;
+	T*  base;
+};
+
+
 #if !defined(PushStruct) || !defined(PushArray)
 #define PushStruct(arena, type) (type*) PushSize(arena, sizeof(type));
 #define PushArray(arena, type, count)  (type*) PushSize(arena, sizeof(type)*count);

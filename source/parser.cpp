@@ -16,7 +16,7 @@
 #include <extra/graph.cpp>
 
 
-#include "generator.cpp"
+//#include "generator.cpp"
 
 Ast_Node** flaten_ast = NULL;
 

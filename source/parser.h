@@ -6,10 +6,10 @@ $Description: parser
 ========================================================================*/
 #pragma once
 
-//#include "Ast.h"
+#include "Ast.h"
 #include "lex.h"
 #include "typer.h"
-
+/*
 struct SourceFile {
 	StringView name;
 	U64 size;
@@ -30,7 +30,7 @@ struct SourceUnit {
 		SourceCode code;
 	};
 };
-
+*/
 
 struct Parser {
 	// TODO(Husam): Make a list of global Loggers and then call the one you need when you want ?? 

@@ -105,6 +105,7 @@ AllocateNodeEx(Ast_Type* node)
 	AllocateNodeEx((Ast_Node*) node);
 	node->type = AST_TYPE;
 	node->kind = AST_KIND_TYPE;
+	node->variables = nullptr;
 }
 
 static inline void
