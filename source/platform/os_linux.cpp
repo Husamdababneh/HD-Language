@@ -1,25 +1,15 @@
 /* ========================================================================
-   $File: platfrom.h
-   $Date: November 12th 2020 10:09 pm
+   $File: os_linux.h
+   $Date: 2020-12-18
+   $Revision: : @Incomplete
    $Creator: Husam Dababneh
-   $Description: main function
-   ========================================================================*/
-
+   $Description: 
+    ========================================================================*/
 #pragma once
 
-// String read_entire_file(FILE* file, void** data_return);
-// String read_entire_file(const char* file, void** data_return);
-// String read_entire_file(const StringView& filename, void** data_return);
 
 
-#ifdef OS_WINDOWS
-#include "os_windows.h"
-#elif OS_LINUX
-#include "os_linux.h"
-#else
-#errror Unsupported Operation System
-#endif
-
+#define open_file(handle, path, mode) FILE* handle; handle = fopen(path,mode);
 
 String read_entire_file(FILE* file)
 {
@@ -40,8 +30,7 @@ String read_entire_file(FILE* file)
 		delete[] data;
 		return {0};
 	}
-	
-	
+
 	return CStringToString((char*)data, length);
 }
 
@@ -68,8 +57,7 @@ String read_entire_file(const StringView& filename)
 	name[filename.length] = '\0';
 	return read_entire_file(name);
 }
-
-StringView readEntireFileToStringView(const StringView& filename)
+String readEntireFileToStringView(const StringView& filename)
 {
 	return read_entire_file(filename);
 }

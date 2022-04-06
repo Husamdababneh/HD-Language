@@ -87,11 +87,10 @@ struct LexerStateConfigs {
 	bool ignore_comments;
 };
 
-padding_check
 struct LexerState
 {
-	StringView filename;
-	StringView input;
+	String filename;
+	String input;
 	U64 input_cursor;
 	U32 current_line_number;
 	U32 current_char_index; 
@@ -99,6 +98,4 @@ struct LexerState
 };
 
 bool isKeyword(StringView& string);
-//bool operator==(HDTokenType left, HDTokenType right);
-//bool operator!=(HDTokenType left, HDTokenType right);
 

@@ -34,6 +34,11 @@ TODO(Husam Dababneh): Architectures
 #define stringify_with_quotes( x ) stringify_expanded( stringify_expanded( x ) )
 #define contact(x, y) #x ": " stringify_with_quotes(y)
 
+// custom assert :)
+// TODO: msg
+#define assert(x, ...) { if (!(x)) (*((int*)(0)) = 1);}
+
+
 #ifdef offsetof
 #undef offsetof
 #define offsetof(a,b) ((U64)(&(((a*)(0))->b)))
@@ -207,7 +212,7 @@ typedef size_t Size;
 struct String {
 	// Anonymous Union Because we don't want to deal with str.<union name>.<field name>
 	union {U64 length; U64 size;};
-	union {S8* str; char* str_char;}; // why the fuck this is S8* ?? 
+	union {PTR data; S8* str; char* str_char;}; // why the fuck this is S8* ?? 
 	
 	// NOTE(Husam Dababneh): When this is true, the string (in memory) has a size of length + 1
 	B8 isNullTerminated;
@@ -248,19 +253,21 @@ B8      EqualStrings(String left, String right);
 
 #if defined(HD_BASE_IMPL)
 //#define HD_BASE_IMPL
+static inline
 String operator ""_s(const char* string, U64 length)
 {
 	String str = {length + 1, (S8*)string, true}; 
 	return str;
 }
 
-
+static inline
 String CStringToString(char* string, U64 length)
 {
 	String str = {length, (S8*)string, true}; 
 	return str;
 };
 
+static inline
 String CStringToString(char* string)
 {
 	U64 len = 0;
@@ -269,6 +276,9 @@ String CStringToString(char* string)
 	return CStringToString(string, len + 1); 
 }
 
+// Add StringToCString 
+
+static inline
 S8 CompareStrings(String left, String right)
 {
 	/** 

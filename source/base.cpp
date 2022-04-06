@@ -15,20 +15,15 @@ $Description: TODO
 
 #include "hdbase.h"
 
-#include "defines.h"
-
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <assert.h>
+#include "hdarena.cpp"
 
+#include "platform/platform.cpp"
 
-#include "platform/platform.h"
-#include "arena.h"
-#include "vendor/stb_ds.h"  // Do i need this or i should create my own ?? 
+// @TEMP: I will create my own
+#define STB_DS_IMPLEMENTATION
+#include "vendor/stb_ds.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4505 )
@@ -36,12 +31,4 @@ $Description: TODO
 #include <meow_hash\meow_hash.h> 
 #pragma warning( pop )
 
-#define STB_DS_IMPLEMENTATION
-#include "vendor/stb_ds.h"
-
-#include "hdarena.cpp"
-#define introspect(x)
-#define padding_check
-
-// TODO: Remove this ?? 
 

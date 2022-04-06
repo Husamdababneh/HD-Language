@@ -11,8 +11,6 @@ $Description: Defines Lexer functionality & Data Structures
 #define LEXER_ENABLE_C_CHAR_TOKEN 0
 #endif
 
-#include "auxiliary.h"
-
 
 // NOTE(Husam Dababneh): Forward Declaration of basic procedures
 Token eat_token(LexerState&);
@@ -37,7 +35,7 @@ TODO(Husam Dababneh): I want to change the way the lexer works, but just after f
 
 
 // TODO : Remove them from reserved[]  
-StringView predefined_types [] = {
+String predefined_types [] = {
 	
 	// TODO(Husam Dababneh): Do I need Uppercase version of these ?? 
 	// types
@@ -52,7 +50,7 @@ StringView predefined_types [] = {
 	"void"_s
 };
 
-StringView keywords[] = {
+String keywords[] = {
 	// loop
 	"for"_s,
 	
@@ -121,7 +119,7 @@ static inline bool isLiteralChar(U8 ch){
 	return false;
 }
 
-bool isKeyword(StringView& string)
+bool isKeyword(String& string)
 {
 	// TODO: Generate Hashmap for the keywords
 	for(int a = 0; a < KEYWORDS_COUNT; a++){
@@ -130,7 +128,7 @@ bool isKeyword(StringView& string)
 	return false;
 }
 
-bool isHDtype(StringView& string)
+bool isHDtype(String& string)
 {
 	// TODO: Generate Hashmap for the keywords
 	for(int a = 0; a < PREDEFINED_TYPES_COUNT; a++){
@@ -488,11 +486,13 @@ Token process_token(LexerState& lex)
 	
 	return token;
 	
-	
-	
-	
 }
 
+
+Token* process_file(LexerState* lex)
+{
+	return nullptr;
+}
 
 Token eat_token(LexerState& lex)
 {

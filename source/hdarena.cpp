@@ -31,7 +31,14 @@ static inline PTR
 PushSize(MemoryArena* arena, Size size)
 {
 	// TODO(Husam) Create custom assert
-	assert(arena->used + size <= arena->size);
+#if 0
+	printf("Arena Size = %lld\nRequested Size = %lld\nUsed = %lld\nFlag = %s\n",
+		   arena->size,
+		   size,
+		   arena->used,
+		   (arena->size - size >= arena->used) ? "true" : "false");
+#endif	
+	assert(arena->size - size >= arena->used);
 	
 	// Stupid C/C++ -_-
 	// (void*)((char*)
@@ -40,3 +47,4 @@ PushSize(MemoryArena* arena, Size size)
 	
 	return result;
 }
+
