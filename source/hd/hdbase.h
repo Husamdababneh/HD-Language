@@ -160,8 +160,24 @@ TODO(Husam Dababneh): Architectures
 // NOTE(Husam Dababneh): The whole purpose of this defines are to make sure the user
 //                       know his working environment to take action based on his situation.
 #if !defined(OS)
-#error Could npt detect Operating System (You may diable this error if you know what you are doing)
+#error Could not detect Operating System (You may diable this error if you know what you are doing)
 #endif
+
+// we may need this in the future 
+#if 0
+template <typename F>
+struct Defer
+{
+	Defer(F f) : f(f) {}
+	~Defer() { f(); }
+	F f;
+};
+
+#define CONCAT0(a, b) a##b
+#define CONCAT(a, b) CONCAT0(a, b)
+#define defer(body) Defer CONCAT(defer, __LINE__)([&]() { body; })
+#endif
+
 
 //~ Basic Types
 
