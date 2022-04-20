@@ -10,12 +10,12 @@
 // String read_entire_file(FILE* file, void** data_return);
 // String read_entire_file(const char* file, void** data_return);
 // String read_entire_file(const StringView& filename, void** data_return);
-
+#include "hdbase.h"
 
 #ifdef OS_WINDOWS
-#include "os_windows.cpp"
+#include "platforms/os_windows.cpp"
 #elif OS_LINUX
-#include "os_linux.h"
+#include "platforms/os_linux.h"
 #else
 #errror Unsupported Operating System
 #endif
@@ -29,7 +29,6 @@
 
  *** IT IS YOUR RESPONSABILTTY TO CLEAN WHAT YOU GET FROM THE PLATFORM ***
 
- 
 */
 
 
@@ -44,8 +43,8 @@
 */
 
 #ifdef OS_WINDOWS
-#define GET_NEW_ARENA_AT_ADDRESS(size, baseAdd) windows_request_arena(size, baseAdd)
-#define GET_NEW_ARENA(size) windows_request_arena(size, 0)
+#define GET_NEW_ARENA_AT_ADDRESS(size, baseAdd) InitializeMemoryArena(size,windows_request_memory(size, baseAdd));
+#define GET_NEW_ARENA(size) GET_NEW_ARENA_AT_ADDRESS(size, 0)
 #define RELEASE_ARENA(arena) windows_release_arena(arena)
 
 #define READ_ENTIRE_FILE(filename) windows_read_entire_file(filename)
@@ -53,5 +52,9 @@
 #else
 #errror Unsupported Operating System
 #endif
+
+
+// END OF INTERFACE
+// WRITE YOUR CODE BELLOW THIS LINE
 
 

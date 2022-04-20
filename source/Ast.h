@@ -97,9 +97,9 @@ struct Ast {
 
 
 struct Ast_Node {
+	Token   token;
 	AstType type;
 	AstKind kind;
-	Token   token;
 };
 
 struct Ast_Block : Ast_Node {

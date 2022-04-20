@@ -26,7 +26,7 @@ Token create_token(StringView name)
 	Token token = {0};
 	token.name = name;
 	token.start_position = {id+22, id+9};
-	token.hash = MHash(token);
+	//token.hash = MHash(token);
 	
 	return token;
 }
@@ -85,7 +85,9 @@ add_type_to_map(Ast_Type* type)
 	char temp[MAX_NUMBER];
 	String& type_name = type->token.name;
 	memcpy(temp, type_name.str, type_name.length);
-	if (!type_name.isNullTerminated) temp[type_name.length] = 0;
+
+	//printf("--%.*s, size = %lld\n", SV_PRINT(type_name), type_name.size);
+	if (!type_name.isNullTerminated()) temp[type_name.length] = 0;
 
 	shput(types, temp, type);
 }
@@ -107,7 +109,7 @@ get_type_from_map(String type_name)
 	constexpr U64 MAX_NUMBER = 256;
 	U8 temp[MAX_NUMBER];
 	memcpy(temp, type_name.str, type_name.length);
-	if (!type_name.isNullTerminated) temp[type_name.length] = 0;	
+	if (!type_name.isNullTerminated()) temp[type_name.length] = 0;	
 	return get_type_from_map(temp);
 }
 

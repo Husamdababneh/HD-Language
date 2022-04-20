@@ -119,6 +119,7 @@ static inline bool isLiteralChar(U8 ch){
 	return false;
 }
 
+static inline 
 bool isKeyword(String& string)
 {
 	// TODO: Generate Hashmap for the keywords
@@ -128,6 +129,7 @@ bool isKeyword(String& string)
 	return false;
 }
 
+static inline 
 bool isHDtype(String& string)
 {
 	// TODO: Generate Hashmap for the keywords
@@ -139,25 +141,28 @@ bool isHDtype(String& string)
 	return false;
 }
 
+static inline 
 S8 peek_next_character(LexerState& lex)
 {
 	// bounds check
 	return peek_character(lex);
 }
 
+static inline 
 S8 peek_character(LexerState& lex, U64 lookAhead /* = 0 */)
 {
 	if (lex.input_cursor + lookAhead >= lex.input.size) return -1;
 	return lex.input[lex.input_cursor + lookAhead];
 }
 
-// TODO(Husam Dababneh): Merge this with the basic one
+static inline 
 void eat_characters(LexerState& lex, U64 count)
 {
 	for(int a = 0; a < count; a++)
 		if (eat_character(lex) == -1) break;
 }
 
+static inline 
 S8 eat_until_character(LexerState& lex)
 {
 	while(true)
@@ -169,30 +174,20 @@ S8 eat_until_character(LexerState& lex)
 	}
 }
 
-
-#if 0
-S8 eat_until(LexerState& lex, S8 charr)
-{
-	while(peek_character(lex) != charr) eat_character(lex);
-	return eat_character(lex);
-}
-#endif
-
-
-inline 
+static inline 
 void eat_until_whitespace(LexerState& lex)
 {
 	while(!isWhiteSpace(peek_character(lex))) eat_character(lex);
 }
 
-inline 
+static inline 
 void eat_ident(LexerState& lex)
 {
 	while(isLiteralChar(peek_character(lex)))
 		eat_character(lex);
 }
 
-
+static inline
 S8 eat_character(LexerState& lex)
 {
 	// TODO: Check for end of file
@@ -213,6 +208,7 @@ S8 eat_character(LexerState& lex)
 	return lex.input[lex.input_cursor - 1];
 }
 
+static inline
 void handleComments(LexerState& lex, Token& token)
 {
 	auto ch = eat_character(lex);
@@ -248,7 +244,7 @@ void handleComments(LexerState& lex, Token& token)
 	}
 }
 
-#define Hash(token) MeowHash(MeowDefaultSeed, sizeof(Token),(void*)&token); 
+static 
 Token process_token(LexerState& lex)
 {
 	//static int COUTNER = 1;
@@ -264,73 +260,43 @@ Token process_token(LexerState& lex)
 	//HDTokenType type  = (HDTokenType)ch;
 	U64 temp = lex.input_cursor - 1;
 	token.start_position = get_current_position(lex);
+
+	auto next = peek_character(lex);
 	switch(ch)
 	{
 		case '/':
 		{
-			// Move this to somewhere else
-			U8 next = peek_character(lex);
 			if (next == '/' || next == '*') handleComments(lex, token);
 			else                            token.type = (HDTokenType)ch;
-			break;
+			return process_token(lex);
 		}
 		break;
 		case '+': case '*': case ';': 
 		case '`': case '|': case '$':
 		case ',': case '%': case '^':
-		case '~': case '!': case '\\':
-		case '&': case '?': 
-		{
-			token.type = (HDTokenType)ch;
-			break;
-		}
-		
-#if LEXER_ENABLE_C_CHAR_TOKEN == 0
-		case '\'':
-		{
-			token.type = (HDTokenType)ch;
-			break;
-		}
-#endif
-		case '[': 
-		case '{': 
-		case '(': 
-		{
-			token.type = (HDTokenType)ch;
-			break;
-		}
-		case ']': 
-		{
-			token.type = (HDTokenType)ch;
-			break;
-		}
-		case '}':
-		{
-			token.type = (HDTokenType)ch;
-			break;
-		}
-		case ')': 
+		case '~': case '!': case '{': 
+		case '&': case '?': case '[': 
+		case '(': case ']': case '}':
+		case ')': case '\\':
 		{
 			token.type = (HDTokenType)ch;
 			break;
 		}
 		case '-':
 		{
-			auto next = peek_character(lex);
-			if (next == '>'){ 
+			if (next != '>') token.type = (HDTokenType)ch;
+			else
+			{
 				token.type = HDTokenType::TOKEN_ARROW;
 				eat_character(lex);
-			} else {
-				token.type = (HDTokenType)ch;
-			}
-			break;
-			
+			} 
+			break;	
 		}
 		// Notes 
 		case '@': 
 		{
 			//TODO : Notes
-			token.type = HDTokenType::TOKEN_DIRECTIVE;
+			token.type = HDTokenType::TOKEN_NOTE;
 			eat_until_whitespace(lex);
 			break;
 		}
@@ -343,7 +309,6 @@ Token process_token(LexerState& lex)
 		}
 		case '=':
 		{
-			auto next = peek_character(lex);
 			if (next == '='){
 				eat_character(lex);
 				token.type = HDTokenType::TOKEN_EQL;
@@ -355,7 +320,6 @@ Token process_token(LexerState& lex)
 		}
 		case '<':
 		{
-			auto next = peek_character(lex);
 			if (next == '='){
 				eat_character(lex);
 				token.type = HDTokenType::TOKEN_LT_OR_EQL;
@@ -369,7 +333,6 @@ Token process_token(LexerState& lex)
 		}
 		case '>':
 		{
-			auto next = peek_character(lex);
 			if (next == '='){
 				eat_character(lex);
 				token.type = HDTokenType::TOKEN_GT_OR_EQL;
@@ -383,7 +346,6 @@ Token process_token(LexerState& lex)
 		}
 		case '.':
 		{
-			auto next = peek_character(lex);
 			if (next == '.') {
 				eat_character(lex);
 				token.type = HDTokenType::TOKEN_DOUBLEDOT;
@@ -393,9 +355,12 @@ Token process_token(LexerState& lex)
 			}
 			break;
 		}
-#if LEXER_ENABLE_C_CHAR_TOKEN == 1
 		case '\'':
-#endif
+		{
+			printf("['] is unused lexeme\n");
+			exit(-1);
+			break;
+		}
 		case '"':
 		{
 			// @Cleanup: We could check the prev instead ?? wont it be easer ??
@@ -417,21 +382,20 @@ Token process_token(LexerState& lex)
 		}
 		case ':':
 		{
-			if (peek_character(lex) == ':')
+			if (next == ':')
 			{
 				eat_character(lex);
 				token.type = HDTokenType::TOKEN_DOUBLE_COLON;
 			}
-			else if (peek_character(lex) == '='){
-				token.type = HDTokenType::TOKEN_COLON_EQUAL;
+			else if (next == '='){
 				eat_character(lex);
+				token.type = HDTokenType::TOKEN_COLON_EQUAL;
 			}
 			else {
 				token.type = HDTokenType::TOKEN_COLON;
 			}
 			break;
 		}
-		break;
 		case '\0':
 		{
 			token.type = HDTokenType::TOKEN_EOFA;
@@ -440,13 +404,20 @@ Token process_token(LexerState& lex)
 		default:
 		{
 			if (isAlphabet(ch) || ch == '_'){
-				//eat_until_whitespace();
 				eat_ident(lex);
 				token.name = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
 				token.type = HDTokenType::TOKEN_IDENT;
 				
-				if (EqualStrings(token.name, "true"_s) || EqualStrings(token.name, "true"_s))
+				if (EqualStrings(token.name, "true"_s))
+				{
 					token.type = HDTokenType::TOKEN_BOOLEAN;
+					token.kind = TokenKind::TOKEN_KIND_BOOL_TRUE;
+				}
+				else if (EqualStrings(token.name, "false"_s))
+				{
+					token.type = HDTokenType::TOKEN_BOOLEAN;
+					token.kind = TokenKind::TOKEN_KIND_BOOL_FALSE;
+				}
 				else if (isKeyword(token.name))
 					token.type = HDTokenType::TOKEN_KEYWORD;
 			}
@@ -464,34 +435,32 @@ Token process_token(LexerState& lex)
 				//tokenize_number(lex)
 				while (isDigit(peek_character(lex))) eat_character(lex);
 				
-			} 
+			}
+			else {
+				assert(false && "What happend here?");
+			}
+			
 			break;
 		}
 	}
-	//token.end_position = get_current_position(lex);
-	assert(token.type != HDTokenType::TOKEN_NONE);
-	token.name = {lex.input_cursor  - temp, (S8*)lex.input.str_char + temp, false};
-	// CStringToString((lex.input.str_char + temp), lex.input_cursor  - temp);
-	token.hash = Hash(token);
 	
-	// Do we need a mechanesim to bundle the comment with statments ? 
-	// or we just ignore them altogather
-	if (lex.config.ignore_comments && 
-		(token.type == HDTokenType::TOKEN_COMMENT || 
-		 token.type == HDTokenType::TOKEN_MULTILINE_COMMENT)
+	assert(token.type != HDTokenType::TOKEN_NONE);
+	token.name = {lex.input_cursor  - temp, (S8*)lex.input.str_char + temp};
+	
+	if (token.type == HDTokenType::TOKEN_COMMENT || 
+		 token.type == HDTokenType::TOKEN_MULTILINE_COMMENT
 		)
 	{
 		return process_token(lex);
 	}
 	
 	return token;
-	
 }
 
 
-Token* process_file(LexerState* lex)
+B8 process_file(LexerState* lex)
 {
-	return nullptr;
+	return false;
 }
 
 Token eat_token(LexerState& lex)

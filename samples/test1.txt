@@ -1,0 +1,24 @@
+	printf("Sizeof(TokenKind) : %lld\n", sizeof(TokenKind));
+	printf("OffsetOf(kind) : %lld\n", offsetof(Token,kind));
+	printf("Sizeof(HDTokenType) : %lld\n", sizeof(HDTokenType));
+	printf("OffsetOf(type) : %lld\n", offsetof(Token,type));
+	printf("Sizeof(String) : %lld\n", sizeof(String));
+	printf("OffsetOf(name) : %lld\n", offsetof(Token,name));
+	printf("Sizeof(Position) : %lld\n", sizeof(Position));
+	printf("OffsetOf(start_position) : %lld\n", offsetof(Token,start_position));
+	printf("Sizeof(meow_u128) : %lld\n", sizeof(meow_u128));
+	printf("OffsetOf(hash) : %lld\n", offsetof(Token,hash));
+	
+
+	String first = "Hello"_s;
+	char _second[5] = {'H', 'e', 'l', 'l', 'o'};
+	String second = {5, _second};
+
+
+	const char * CString = "Hello World";
+	auto a = CStringToString((char*)CString);
+	printf("CString len: %lld\n", strlen(CString));
+	printf("CString len: %lld\n", a.size);
+
+	printf("Equals ? : %s\n", EqualStrings(a, "Hello World"_s) ? "true": "false");
+	

@@ -7,8 +7,6 @@
 
 #pragma once
 
-#define Note(...) 
-
 enum HDTokenType : U16 {
 	TOKEN_NONE = 0,
 	TOKEN_SEMI_COLON = ';',
@@ -27,6 +25,7 @@ enum HDTokenType : U16 {
 	TOKEN_COLON_EQUAL,
 	TOKEN_OPERATOR,
 	TOKEN_DIRECTIVE,
+	TOKEN_NOTE,
 	TOKEN_DOUBLEDOT,
 	TOKEN_ARROW,
 	TOKEN_ASSIGN,
@@ -63,6 +62,11 @@ enum TokenKind : U16 {
 	//
 	TOKEN_KIND_IDENT_HDTYPE,
 	TOKEN_KIND_IDENT_KEYWORD,
+
+
+	TOKEN_KIND_BOOL_TRUE,
+	TOKEN_KIND_BOOL_FALSE,
+
 	
 };
 
@@ -71,20 +75,15 @@ struct Position
 {
 	U32 line, index;
 };
-#include <meow_hash\meow_hash.h> 
+//#include <meow_hash\meow_hash.h> 
 struct Token
 {
 	// TODO : Add string_in_source
+	String        name;
+	Position      start_position;
+	TokenKind     kind;
 	HDTokenType   type;
-	TokenKind   kind;
-	// this is just so we don't recalculate the line&index into the file, but do i actually need it ?? 
-	Position 	start_position;
-	StringView   name;
-	meow_u128    hash;
-};
-
-struct LexerStateConfigs {
-	bool ignore_comments;
+	char          unused[4];
 };
 
 struct LexerState
@@ -93,8 +92,8 @@ struct LexerState
 	String input;
 	U64 input_cursor;
 	U32 current_line_number;
-	U32 current_char_index; 
-	LexerStateConfigs config;
+	U32 current_char_index;
+
 };
 
 bool isKeyword(StringView& string);

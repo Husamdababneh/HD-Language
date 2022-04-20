@@ -42,7 +42,7 @@ void printSystemInfo()
 }
 
 
-
+static inline
 void make_minidump(EXCEPTION_POINTERS* e)
 {
     auto hDbgHelp = LoadLibraryA("dbghelp");
@@ -86,12 +86,14 @@ void make_minidump(EXCEPTION_POINTERS* e)
     return;
 }
 
+static inline
 LONG CALLBACK unhandled_handler(EXCEPTION_POINTERS* e)
 {
     make_minidump(e);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
+static inline
 void PrintLastWin32Error()
 {
     //Get the error message ID, if any.
@@ -179,7 +181,7 @@ String windows_read_entire_file(char* path)
 static inline 
 String windows_read_entire_file(String filename)
 {
-	if (filename.isNullTerminated) return windows_read_entire_file(filename.str_char);
+	if (filename.isNullTerminated()) return windows_read_entire_file(filename.str_char);
 	char temp[256] = {};
 	memcpy(temp, filename.str_char, filename.size);
 	temp[filename.size] = 0;
@@ -195,19 +197,17 @@ void windows_free_filedata(String filedata)
 }
 
 
-struct MemoryArena;
-static inline 
-MemoryArena windows_request_arena(Size size, LPVOID baseAddress)
+// TODO: Better Error handleing 
+static inline PTR
+windows_request_memory(Size size, LPVOID baseAddress)
 {
-	
 	PTR memory = VirtualAlloc(baseAddress, size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 	if (memory == nullptr) 
 	{
 		PrintLastWin32Error();
 		exit(-1);
 	}
-	
-	return InitializeMemoryArena(size, memory);
+	return memory;
 }
 
 static inline 

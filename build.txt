@@ -1,0 +1,287 @@
+main.cpp
+
+class Ast_Node	size(40):
+	+---
+ 0	| Token token
+32	| AstType type
+34	| AstKind kind
+  	| <alignment member> (size=4)
+	+---
+
+class Ast_Block	size(56):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+40	| statements
+48	| scope
+	+---
+
+class Ast_Expression	size(48):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+40	| resulting_type
+	+---
+
+class Ast_Literal	size(48):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+	+---
+
+class Ast_Primary	size(48):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+	+---
+
+class Ast_Unary	size(56):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+48	| child
+	+---
+
+class Ast_Proc_Call	size(64):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+48	| arguments
+56	| procedure
+	+---
+
+class Ast_Member_Access	size(88):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+48	| Token member
+80	| _struct
+	+---
+
+class Ast_Subscript	size(64):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+48	| exp
+56	| value
+	+---
+
+class Ast_Binary	size(72):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+48	| AST_BINARY_TYPE op
+  	| <alignment member> (size=6)
+56	| left
+64	| right
+	+---
+
+class Ast_Type	size(64):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+40	| size
+44	| alignment
+48	| is_signed
+  	| <alignment member> (size=7)
+56	| variables
+	+---
+
+class Ast_Return	size(56):
+	+---
+ 0	| +--- (base class Ast_Expression)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | resulting_type
+	| +---
+48	| expressions
+	+---
+
+class Ast_Declaration	size(56):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+40	| scope
+48	| constant
+49	| inforced_type
+  	| <alignment member> (size=6)
+	+---
+
+class Ast_Proc_Declaration	size(72):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | scope
+48	| | constant
+49	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+56	| return_type
+64	| body
+	+---
+
+class Ast_Var_Declaration	size(72):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | scope
+48	| | constant
+49	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+56	| data_type
+64	| body
+	+---
+
+class Ast_Struct_Declaration	size(64):
+	+---
+ 0	| +--- (base class Ast_Declaration)
+ 0	| | +--- (base class Ast_Node)
+ 0	| | | Token token
+32	| | | AstType type
+34	| | | AstKind kind
+  	| | | <alignment member> (size=4)
+	| | +---
+40	| | scope
+48	| | constant
+49	| | inforced_type
+  	| | <alignment member> (size=6)
+	| +---
+56	| decls
+	+---
+
+class Ast_If	size(64):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+40	| exp
+48	| statement
+56	| next
+	+---
+
+class Ast_Scope	size(40):
+	+---
+ 0	| variables
+ 8	| procedures
+16	| structs
+24	| parent
+32	| children
+	+---
+
+class Ast_Note	size(40):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+	+---
+
+class Ast_Directive	size(40):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+	+---
+
+class Ast_Directive_Import	size(112):
+	+---
+ 0	| +--- (base class Ast_Node)
+ 0	| | Token token
+32	| | AstType type
+34	| | AstKind kind
+  	| | <alignment member> (size=4)
+	| +---
+40	| Token filename
+72	| isAs
+  	| <alignment member> (size=7)
+80	| Token as
+	+---
+   Creating library ..\..\bin\hd.lib and object ..\..\bin\hd.exp

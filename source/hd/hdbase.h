@@ -213,13 +213,15 @@ struct String {
 	// Anonymous Union Because we don't want to deal with str.<union name>.<field name>
 	union {U64 length; U64 size;};
 	union {PTR data; S8* str; char* str_char;}; // why the fuck this is S8* ?? 
-	
-	// NOTE(Husam Dababneh): When this is true, the string (in memory) has a size of length + 1
-	B8 isNullTerminated;
-	
+
 	// TODO: Bounds check here
 	S8 operator[](U64 a){return str[a];}
-	
+
+	B8 isNullTerminated()
+	{
+		return str_char[length - 1] == 0;
+	}
+
 	struct Iterator {
 		S8* str;
 		U64 index;
@@ -253,17 +255,18 @@ B8      EqualStrings(String left, String right);
 
 #if defined(HD_BASE_IMPL)
 //#define HD_BASE_IMPL
-static inline
+#include <stdio.h>
+static inline //constexpr
 String operator ""_s(const char* string, U64 length)
 {
-	String str = {length + 1, (S8*)string, true}; 
+	String str = {length + 1, (S8*)string}; 
 	return str;
 }
 
 static inline
 String CStringToString(char* string, U64 length)
 {
-	String str = {length, (S8*)string, true}; 
+	String str = {length, (S8*)string}; 
 	return str;
 };
 
@@ -273,7 +276,7 @@ String CStringToString(char* string)
 	U64 len = 0;
 	char* str = string;
 	while(*(str++)) len++;
-	return CStringToString(string, len + 1); 
+	return CStringToString(string, len); 
 }
 
 // Add StringToCString 
@@ -288,18 +291,22 @@ S8 CompareStrings(String left, String right)
 -    -2 -> same size but not the same string 
 */
 
-	auto llength = left.length - (U8) left.isNullTerminated;
-	auto rlength = right.length - (U8) right.isNullTerminated;
+	if (left.str == right.str)	return 0;
+	
+	auto llength = left.length  - (U64)left.isNullTerminated();
+	auto rlength = right.length - (U64)right.isNullTerminated();
 
 	if (llength != rlength) return left.size > right.size ? -1 : 1;
-	
-	// Check if both have the same pointer 
-	if (left.str == right.str) return 0;
 	
 	for(U64 it = 0; it < rlength; it++){
 		if (left[it] != right[it]) return -2;
 	}
+
 	
+	printf("2- Compareing [%.*s, %lld, %lld] and [%.*s, %lld, %lld]\n",
+		   SV_PRINT(left), left.size, llength,
+		   SV_PRINT(right), right.size, rlength
+		);
 	return 0;
 }
 

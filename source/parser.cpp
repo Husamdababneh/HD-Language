@@ -9,17 +9,12 @@
 #include "parser.h"
 #include "Ast.cpp"
 
-#include <memory>
-
-#define ENABLE_GRAPH_PRINTING 1
+#define ENABLE_GRAPH_PRINTING 0
 #define GRAPH_SHOW_BLOCK_PARENT 0
-#include <extra/graph.cpp>
+#include <util/graph.cpp>
 
-
-//#include "generator.cpp"
 
 Ast_Node** flaten_ast = NULL;
-
 
 #include "typer.cpp"
 
@@ -196,7 +191,7 @@ Ast parse(MemoryArena* arena, Parser& parser)
 	Token token = {};
 	token.type = TOKEN_IDENT;
 	token.name = parser.lexer.filename;
-	token.hash = MHash(token);
+	//token.hash = MHash(token);
 	// TODO:  will this break ?? 
 	block->token = token; //create_token(peek_token(lexer).name);
 	

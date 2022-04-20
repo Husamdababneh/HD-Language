@@ -2,7 +2,9 @@
 
 
 // Scope Level 0
-a : String ;
+a : String = "Hello World1!;";
+
+//b : proc () -> U64;
 
 // Scope Level 0
 
@@ -40,3 +42,4 @@ main :: proc () -> U64
 }
 
 */
+b : Husam  = "Hello World1!;";

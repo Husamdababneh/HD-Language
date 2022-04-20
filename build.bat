@@ -13,12 +13,15 @@ set outputs=/Fp"%bin_int%\hd.pch" /Fo%bin_int%\ /Fd"%bin_int%\vc142.pdb"
 
 set common_flags=/nologo  /diagnostics:caret /D _UNICODE /D UNICODE 
 rem /GF
-set debug_flags=/Zi /JMC /W3 /WX- /Od /TP /FC /Gm- /EHs /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 /fsanitize=address
+set debug_flags=/Zi /JMC /W3 /WX- /Od /TP /FC /Gm- /EHs /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 /fsanitize=address /d1reportSingleClassLayoutToken
+rem /d1reportSingleClassLayoutAst_
+rem /d1reportSingleClassLayoutToken
 rem /d1reportAllClassLayout
+rem /d1reportSingleClassLayout<name>
 
 REM Once we get rid of all c/c++ headers, we will enable this to see the layout of the struct
 rem /d1reportAllClassLayout
-set release_flags=/Ox /std:c++17
+set release_flags=/Ox /std:c++17 
 
 set debug_link_option=/DEBUG:FULL /NOLOGO
 
