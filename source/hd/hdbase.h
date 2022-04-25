@@ -228,18 +228,19 @@ typedef size_t Size;
 struct String {
 	// Anonymous Union Because we don't want to deal with str.<union name>.<field name>
 	union {U64 length; U64 size;};
-	union {PTR data; S8* str; char* str_char;}; // why the fuck this is S8* ?? 
+	// TODO: make these const?? 
+	union {char* str_char; S8* str; }; // why the fuck this is S8* ?? 
 
 	// TODO: Bounds check here
-	S8 operator[](U64 a){return str[a];}
+	constexpr S8 operator[](U64 a){ return (S8)str_char[a];}
 
-	B8 isNullTerminated()
+	constexpr B8 isNullTerminated()
 	{
-		return str_char[length - 1] == 0;
+		return 0 == str_char[length - 1];
 	}
 
 	struct Iterator {
-		S8* str;
+		const S8* str;
 		U64 index;
 		
 		// NOTE(Husam Dababneh): Do we even support C ?? 
@@ -260,10 +261,10 @@ struct String {
 };
 
 // Forward Declarations  
-typedef String StringView;
-inline  String operator ""_s(const char* string, U64 length);
-inline  String CStringToString(char* string, U64 length);
-inline  String CStringToString(char* string);
+typedef   String StringView;
+constexpr String operator ""_s(const char* string, U64 length);
+inline    String CStringToString(char* string, U64 length);
+inline    String CStringToString(char* string);
 
 S8      CompareStrings(String left, String right);
 B8      EqualStrings(String left, String right);
@@ -272,17 +273,17 @@ B8      EqualStrings(String left, String right);
 #if defined(HD_BASE_IMPL)
 //#define HD_BASE_IMPL
 #include <stdio.h>
-static inline //constexpr
+
+constexpr //static inline
 String operator ""_s(const char* string, U64 length)
 {
-	String str = {length + 1, (S8*)string}; 
-	return str;
+	return String{length + 1, (char*)string}; 
 }
 
 static inline
 String CStringToString(char* string, U64 length)
 {
-	String str = {length, (S8*)string}; 
+	String str = {length, string}; 
 	return str;
 };
 
@@ -305,7 +306,7 @@ S8 CompareStrings(String left, String right)
 -     0 -> equal each other
 -    -1 -> left is smaller
 -    -2 -> same size but not the same string 
-*/
+	**/
 
 	if (left.str == right.str)	return 0;
 	

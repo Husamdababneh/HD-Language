@@ -52,3 +52,30 @@ Entity := <exp>
 = 									 [ASSIGN OPERATORS]
 
 
+
+
+Consider this
+
+
+ enum {} -> this should be parsed as anonymous enum
+ flag {} -> this should be parsed as anonymous flag set
+ struct {} -> this should be parsed as anonymous struct
+ proc ( <paramater-list> ) -> ( <return-types> ) this should be parsed as anonymous proc aka lambda
+
+ all of the above should be considered as a type ??
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

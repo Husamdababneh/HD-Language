@@ -1,45 +1,16 @@
 
 
 
-// Scope Level 0
+
+a :: proc (argc : U32) -> int {}
+
+Token :: struct
+{
+	// type : ;
+}
+
+
 a : String = "Hello World1!;";
-
-//b : proc () -> U64;
-
-// Scope Level 0
-
-/*
-data :: struct
-{
-	// No-scope / Scope Level 1 // i'm not sure if i want to add these to scopes 
-	firstname : String;
-	lastname  : String;
-}
-
-
-// Scope Level 0
-main :: proc () -> U64
-{
-	// Scope Level 1
-	b:: 1;
-	{
-		// Scope Level 2
-		b:: 1;
-	}
-
-	// Scope Level 1
-	function :: proc () -> U64
-	{
-
-	}
-	
-	// Scope Level 1
-	data :: struct
-	{
-		firstname : String;
-		lastname  : String;
-	}
-}
-
-*/
 b : Husam  = "Hello World1!;";
+
+

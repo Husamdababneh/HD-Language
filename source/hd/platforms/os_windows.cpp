@@ -121,7 +121,7 @@ void PrintLastWin32Error()
 }
 
 static inline 
-String windows_read_entire_file(char* path)
+String windows_read_entire_file(const char* path)
 {
     // Abstract the following to separate routine
 
@@ -175,7 +175,7 @@ String windows_read_entire_file(char* path)
 	
     CloseHandle(hFile);
 
-	return {(U64)fileSize.u.LowPart, data};
+	return {(U64)fileSize.u.LowPart, (char*)data};
 }
 
 static inline 
@@ -193,7 +193,7 @@ static inline
 void windows_free_filedata(String filedata)
 {
 	// TODO: check for errors
-	VirtualFree(filedata.data, 0, MEM_RELEASE);
+	VirtualFree((PTR)filedata.str, 0, MEM_RELEASE);
 }
 
 

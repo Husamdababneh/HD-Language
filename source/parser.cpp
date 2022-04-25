@@ -7,7 +7,7 @@
 
 
 #include "parser.h"
-#include "Ast.cpp"
+#include "ast.cpp"
 
 #define ENABLE_GRAPH_PRINTING 0
 #define GRAPH_SHOW_BLOCK_PARENT 0
@@ -78,24 +78,31 @@ inline
 Token _expect_and_eat(Parser* _this, U64 type, U64 line, const char* file)
 {
 	const Token& token = peek_token(_this->lexer);
-	if(token.type != type)
-	{
-		printf("expect_and_eat: %s %zd\n", file ,line);
+	if (token.type == type) return eat_token(_this->lexer);
 		
-		String token_type = "TODO : "_s;
-		// auto token_type = token_type_to_string(type); 
-		if(token_type.length <= 1){
-			printf("Expected: %.*s(\'%c\', %d)  got \"%.*s\" \n", SV_PRINT(token_type), (char)type, (int)type, SV_PRINT(token.name));
-		}else{
-			printf("Expected: %.*s(%d)  got \"%.*s\" \n", SV_PRINT(token_type), (int)type, SV_PRINT(token.name));
-		}
-		printf("Token[%.*s] Located in Line: %d, Col: %d \n", SV_PRINT(token.name), token.start_position.line, token.start_position.index);
-		
-		SyntaxError(token, "Expected Another Token Here"_s);
-		exit(-1);
-	}
-	return eat_token(_this->lexer);
 	
+	printf("expect_and_eat: %s %zd\n", file, line);
+
+	printf("Token[%.*s] Located in Line: %d, Col: %d \n",
+		   SV_PRINT(token.name),
+		   token.start_position.line,
+		   token.start_position.index);
+	
+	
+
+	if (type < 256)
+		printf("Expected: [%c] got \"%.*s\" \n",
+			   (char)type,
+			   SV_PRINT(token.name));
+
+	else
+		printf("Expected: [%d] got \"%.*s\" \n",
+			   (U16)type,
+			   SV_PRINT(token.name));
+
+	SyntaxError(token, "Expected Another Token Here"_s);
+	
+	return {};
 }
 #define expect_and_eat(x) _expect_and_eat(&parser, x, __LINE__, __FILE__)
 
@@ -278,7 +285,7 @@ parse_proc_header(MemoryArena* arena, Parser& parser)
 	// Parse Arguments
 	while(token.type != ')' && token.type != TOKEN_EOFA)
 	{
-		//Ast_Var_Declaration* var = parse_argument_def(parser);
+		Ast_Var_Declaration* var = parse_argument_def(arena, parser);
 		token = peek_token(lexer);
 		if (token.type != ')') expect_and_eat(',');
 	}
@@ -428,12 +435,11 @@ parse_const_def(MemoryArena* arena, Parser& parser)
 {
 	auto lexer = parser.lexer;
 	Token token = peek_token(lexer, 2); 
-	if      (EqualStrings(token.name, "proc"_s)) return parse_proc_def(arena, parser);
-	else if (EqualStrings(token.name, "struct"_s)) return parse_struct_def(arena, parser);
-	// NOTE (Husam): I need to justify the existance of this aproch
-	else if (EqualStrings(token.name, "template"_s)) assert(false && "Templates are Not Supported Yet");
-	else if (EqualStrings(token.name, "enum"_s)) assert(false && "Enums are Not Supported Yet");
-	else if (EqualStrings(token.name, "flag"_s)) assert(false && "Flags are Not Supported Yet");
+	if      (token.type == TOKEN_KEYWORD_PROC) return parse_proc_def(arena, parser);
+	else if (token.type == TOKEN_KEYWORD_STRUCT) return parse_struct_def(arena, parser);
+	else if (token.type == TOKEN_KEYWORD_TEMPLATE) assert(false && "Templates are Not Supported Yet");
+	else if (token.type == TOKEN_KEYWORD_ENUM) assert(false && "Enums are Not Supported Yet");
+	else if (token.type == TOKEN_KEYWORD_FLAG) assert(false && "Flags are Not Supported Yet");
 	// Check for compile time statements ?? 
 	else    return parse_var_def(arena, parser);
 	return nullptr;

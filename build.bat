@@ -13,7 +13,14 @@ set outputs=/Fp"%bin_int%\hd.pch" /Fo%bin_int%\ /Fd"%bin_int%\vc142.pdb"
 
 set common_flags=/nologo  /diagnostics:caret /D _UNICODE /D UNICODE 
 rem /GF
-set debug_flags=/Zi /JMC /W3 /WX- /Od /TP /FC /Gm- /EHs /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 /fsanitize=address /d1reportSingleClassLayoutToken
+set debug_flags=/Zi /JMC /W3 /WX- /Od /TP /FC /Gm- /EHs /RTC1 /MTd /GS /fp:precise /Zc:wchar_t   /Zc:forScope /Zc:inline /std:c++17 /fsanitize=address
+
+
+set clang_outputs=-o%bin_int%\main-clang.obj
+set clang_common_flags=-diagnostics:caret -D _UNICODE -D UNICODE 
+set clang_debug_flags= -Wno-everything -JMC -W4 -WX- -O0 -TP -FC -Gm--RTC1 -MTd -GS
+rem -fsanitize=address
+rem  -EHs -fp:precise -Zc:inline -Zc:wchar_t -Zc:forScope -Zi
 rem /d1reportSingleClassLayoutAst_
 rem /d1reportSingleClassLayoutToken
 rem /d1reportAllClassLayout
@@ -26,40 +33,28 @@ set release_flags=/Ox /std:c++17
 set debug_link_option=/DEBUG:FULL /NOLOGO
 
 
-set flags=%common_flags% %debug_flags% 
+set flags=%common_flags% %debug_flags%
+set clang_flags=%clang_common_flags% %clang_debug_flags% 
 IF /I "%1"=="release" ( set flags=%common_flags% %release_flags% ) 
 
-
-set INCLUDE_PATHS=/I./source/meow_hash /I./source/
+rem /I./source/meow_hash
+set INCLUDE_PATHS=/I./source/
 set source_files=.\source\main.cpp
 set object_files=.\main.obj
+set clang_object_files=.\main-clang.obj
 
-rem  /D _UNICODE /D UNICODE /Yu"pch.h"
-
-
-REM Compile And Link Meta
-REM cl /c %INCLUDE_PATHS% %flags% .\source\meta.cpp %outputs%
-REM IF %ERRORLEVEL% NEQ 0 (goto FINISH)
-
-
-REM pushd %bin_int%
-REM link .\meta.obj  /OUT:..\..\bin\meta.exe %debug_link_option% 
-REM IF %ERRORLEVEL% NEQ 0 (goto FINISH)
-REM popd
-REM pushd .\source\
-REM ..\bin\meta.exe
-REM IF %ERRORLEVEL% NEQ 0 (goto FINISH)
-REM popd
+set clang_INCLUDE_PATHS=-I./source/
 
 
 REM compile main
 cl /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
-rem clang /c  %INCLUDE_PATHS% %flags% .\source\main.cpp %outputs%
+rem clang -c  %clang_INCLUDE_PATHS% %clang_flags% .\source\main.cpp %clang_outputs%
 IF ERRORLEVEL 1 GOTO errorHandling
 
 REM LINK 
 pushd %bin_int%
 link %object_files% /NATVIS:..\..\misc\strings.natvis  /OUT:..\..\bin\hd.exe %debug_link_option%
+rem link %clang_object_files% msvcrt.lib  /NATVIS:..\..\misc\strings.natvis  /OUT:..\..\bin\hd-clang.exe %debug_link_option%
 popd
 
 :FINISH

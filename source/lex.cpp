@@ -1,9 +1,9 @@
 /* ========================================================================
-$File: cpp
-$Date: 2020-04-04
-$Creator: Husam Dababneh
-$Description: Defines Lexer functionality & Data Structures
-========================================================================*/ 
+   $File: cpp
+   $Date: 2020-04-04
+   $Creator: Husam Dababneh
+   $Description: Defines Lexer functionality & Data Structures
+   ========================================================================*/ 
 
 #include "lex.h"
 
@@ -30,15 +30,13 @@ get_current_position(LexerState& lex)
 	return {lex.current_line_number + 1, lex.current_char_index}; 
 }
 /*
-TODO(Husam Dababneh): I want to change the way the lexer works, but just after finishing the base
+  TODO(Husam Dababneh): I want to change the way the lexer works, but just after finishing the base
 */
 
 
 // TODO : Remove them from reserved[]  
+//constexpr
 String predefined_types [] = {
-	
-	// TODO(Husam Dababneh): Do I need Uppercase version of these ?? 
-	// types
 	"U8"_s , "S8"_s,
 	"u16"_s, "s16"_s,
 	"U32"_s, "s32"_s,
@@ -50,7 +48,8 @@ String predefined_types [] = {
 	"void"_s
 };
 
-String keywords[] = {
+constexpr
+static String keywords[] = {
 	// loop
 	"for"_s,
 	
@@ -83,11 +82,27 @@ String keywords[] = {
 	"false"_s,
 	
 	// Compiler Stuff
+	"proc"_s,
+	"enum"_s,
+	"flag"_s,
+	"struct"_s,
+	"template"_s,
+
+	// Libs
+	"import"_s,
+	"load"_s,
 	"as"_s,
-	
+
+	// Directives
+	"run"_s,
+	"cook"_s,
+
 	// not used
 	"no_inline"_s,
 };
+
+
+
 
 constexpr int PREDEFINED_TYPES_COUNT = sizeof(predefined_types) / sizeof(predefined_types[0]);
 constexpr int KEYWORDS_COUNT = sizeof(keywords) / sizeof(keywords[0]);
@@ -119,26 +134,49 @@ static inline bool isLiteralChar(U8 ch){
 	return false;
 }
 
-static inline 
-bool isKeyword(String& string)
+struct KeywordsMap
 {
-	// TODO: Generate Hashmap for the keywords
-	for(int a = 0; a < KEYWORDS_COUNT; a++){
-		if (EqualStrings(string, keywords[a])) return true;
+	S64 hash[KEYWORDS_COUNT];
+};
+
+
+constexpr
+auto computeKeywordsHashMap()
+{
+	KeywordsMap map{}; //[KEYWORDS_COUNT] = {};
+	for(U64 i = 0; i < KEYWORDS_COUNT; i++)
+		map.hash[i] = -1;
+	
+	for(U64 i = 0; i < KEYWORDS_COUNT; i++)
+	{
+		auto index = djb2(keywords[i]) % KEYWORDS_COUNT;
+		while(map.hash[index] != -1)
+		{
+			index = (index + 1) % KEYWORDS_COUNT;
+		}
+		map.hash[index] = i; 
 	}
-	return false;
+	return map;
 }
 
+constexpr static KeywordsMap keywordsHashes = computeKeywordsHashMap();
+
 static inline 
-bool isHDtype(String& string)
+HDTokenType isKeyword(String& string)
 {
 	// TODO: Generate Hashmap for the keywords
-	for(int a = 0; a < PREDEFINED_TYPES_COUNT; a++){
-		if(EqualStrings(string, predefined_types[a])) {
-			return true;
-		}
-	}
-	return false;
+	auto hasher = [](String str) { return keywordsHashes.hash[djb2(str) % KEYWORDS_COUNT]; } ;
+	auto hashOfStr = djb2(string) % KEYWORDS_COUNT;
+	auto index = keywordsHashes.hash[hashOfStr];
+	auto it = index;
+	do {
+		auto word = keywords[it];
+	 	it = (it + 1) % KEYWORDS_COUNT;
+		if (EqualStrings(string, word)) return static_cast<HDTokenType>(it + HDTokenType::TOKEN_KEYWORDS_START);
+		if (index == it) return TOKEN_NONE;
+	} while(index != it);
+		
+	return TOKEN_NONE;
 }
 
 static inline 
@@ -194,13 +232,13 @@ S8 eat_character(LexerState& lex)
 	if (lex.input_cursor >= lex.input.size) return -1;
 	switch(lex.input[lex.input_cursor])
 	{
-		case '\n':
-		lex.current_line_number++;
-		lex.current_char_index = 0;
-		break;
-		default:
-		lex.current_char_index++;
-		break;
+	  case '\n':
+		  lex.current_line_number++;
+		  lex.current_char_index = 0;
+		  break;
+	  default:
+		  lex.current_char_index++;
+		  break;
 	}
 	lex.input_cursor++;
 	if (lex.input_cursor >= lex.input.length) return -1;
@@ -264,191 +302,183 @@ Token process_token(LexerState& lex)
 	auto next = peek_character(lex);
 	switch(ch)
 	{
-		case '/':
-		{
-			if (next == '/' || next == '*') handleComments(lex, token);
-			else                            token.type = (HDTokenType)ch;
-			return process_token(lex);
-		}
-		break;
-		case '+': case '*': case ';': 
-		case '`': case '|': case '$':
-		case ',': case '%': case '^':
-		case '~': case '!': case '{': 
-		case '&': case '?': case '[': 
-		case '(': case ']': case '}':
-		case ')': case '\\':
-		{
-			token.type = (HDTokenType)ch;
-			break;
-		}
-		case '-':
-		{
-			if (next != '>') token.type = (HDTokenType)ch;
-			else
-			{
-				token.type = HDTokenType::TOKEN_ARROW;
-				eat_character(lex);
-			} 
-			break;	
-		}
-		// Notes 
-		case '@': 
-		{
-			//TODO : Notes
-			token.type = HDTokenType::TOKEN_NOTE;
-			eat_until_whitespace(lex);
-			break;
-		}
-		// Compiler Directives
-		case '#':
-		{
-			token.type = HDTokenType::TOKEN_DIRECTIVE;
-			eat_until_whitespace(lex);
-			break;
-		}
-		case '=':
-		{
-			if (next == '='){
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_EQL;
-			}
-			else {
-				token.type = (HDTokenType)ch;
-			}
-			break;
-		}
-		case '<':
-		{
-			if (next == '='){
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_LT_OR_EQL;
-			} else if (next == '<'){
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_SHIFT_LEFT;
-			} else {
-				token.type = HDTokenType::TOKEN_LT;
-			}
-			break;
-		}
-		case '>':
-		{
-			if (next == '='){
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_GT_OR_EQL;
-			} else if (next == '>'){
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_SHIFT_RIGHT;
-			} else {
-				token.type = HDTokenType::TOKEN_GT;
-			}
-			break;
-		}
-		case '.':
-		{
-			if (next == '.') {
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_DOUBLEDOT;
-			}
-			else {
-				token.type = (HDTokenType)ch;
-			}
-			break;
-		}
-		case '\'':
-		{
-			printf("['] is unused lexeme\n");
-			exit(-1);
-			break;
-		}
-		case '"':
-		{
-			// @Cleanup: We could check the prev instead ?? wont it be easer ??
-			// @TODO: Make sure this works ?? 
-			// U8 escape = 0;
-			const U8& cu = ch;
-			while(true) {
-				auto peeked = peek_character(lex);
-				auto ahead =  peek_character(lex, 1);
-				if (peeked == '\\' && ahead == cu){
-					eat_characters(lex, 2);
-				}
-				eat_character(lex);
-				if(peeked == cu) break;
-			}	  
-			token.type = HDTokenType::TOKEN_LITERAL;
-			token.kind = TOKEN_KIND_STRING_LITERAL;
-			break;	  
-		}
-		case ':':
-		{
-			if (next == ':')
-			{
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_DOUBLE_COLON;
-			}
-			else if (next == '='){
-				eat_character(lex);
-				token.type = HDTokenType::TOKEN_COLON_EQUAL;
-			}
-			else {
-				token.type = HDTokenType::TOKEN_COLON;
-			}
-			break;
-		}
-		case '\0':
-		{
-			token.type = HDTokenType::TOKEN_EOFA;
-			return token;
-		}
-		default:
-		{
-			if (isAlphabet(ch) || ch == '_'){
-				eat_ident(lex);
-				token.name = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
-				token.type = HDTokenType::TOKEN_IDENT;
+	  case '/':
+	  {
+		  if (next == '/' || next == '*') handleComments(lex, token);
+		  else                            token.type = (HDTokenType)ch;
+		  return process_token(lex);
+	  }
+	  break;
+	  case '+': case '*': case ';': 
+	  case '`': case '|': case '$':
+	  case ',': case '%': case '^':
+	  case '~': case '!': case '{': 
+	  case '&': case '?': case '[': 
+	  case '(': case ']': case '}':
+	  case ')': case '\\':
+	  {
+		  token.type = (HDTokenType)ch;
+		  break;
+	  }
+	  case '-':
+	  {
+		  if (next != '>') token.type = (HDTokenType)ch;
+		  else
+		  {
+			  token.type = HDTokenType::TOKEN_ARROW;
+			  eat_character(lex);
+		  } 
+		  break;	
+	  }
+	  // Notes 
+	  case '@': 
+	  {
+		  //TODO : Notes
+		  token.type = HDTokenType::TOKEN_NOTE;
+		  eat_until_whitespace(lex);
+		  break;
+	  }
+	  // Compiler Directives
+	  case '#':
+	  {
+		  token.type = HDTokenType::TOKEN_DIRECTIVE;
+		  eat_until_whitespace(lex);
+		  break;
+	  }
+	  case '=':
+	  {
+		  if (next == '='){
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_EQL;
+		  }
+		  else {
+			  token.type = (HDTokenType)ch;
+		  }
+		  break;
+	  }
+	  case '<':
+	  {
+		  if (next == '='){
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_LT_OR_EQL;
+		  } else if (next == '<'){
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_SHIFT_LEFT;
+		  } else {
+			  token.type = HDTokenType::TOKEN_LT;
+		  }
+		  break;
+	  }
+	  case '>':
+	  {
+		  if (next == '='){
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_GT_OR_EQL;
+		  } else if (next == '>'){
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_SHIFT_RIGHT;
+		  } else {
+			  token.type = HDTokenType::TOKEN_GT;
+		  }
+		  break;
+	  }
+	  case '.':
+	  {
+		  if (next == '.') {
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_DOUBLEDOT;
+		  }
+		  else {
+			  token.type = (HDTokenType)ch;
+		  }
+		  break;
+	  }
+	  case '\'':
+	  {
+		  printf("['] is unused lexeme\n");
+		  exit(-1);
+		  break;
+	  }
+	  case '"':
+	  {
+		  // @Cleanup: We could check the prev instead ?? wont it be easer ??
+		  // @TODO: Make sure this works ?? 
+		  // U8 escape = 0;
+		  const U8& cu = ch;
+		  while(true) {
+			  auto peeked = peek_character(lex);
+			  auto ahead =  peek_character(lex, 1);
+			  if (peeked == '\\' && ahead == cu){
+				  eat_characters(lex, 2);
+			  }
+			  eat_character(lex);
+			  if(peeked == cu) break;
+		  }	  
+		  token.type = HDTokenType::TOKEN_LITERAL;
+		  token.kind = TOKEN_KIND_STRING_LITERAL;
+		  break;	  
+	  }
+	  case ':':
+	  {
+		  if (next == ':')
+		  {
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_DOUBLE_COLON;
+		  }
+		  else if (next == '='){
+			  eat_character(lex);
+			  token.type = HDTokenType::TOKEN_COLON_EQUAL;
+		  }
+		  else {
+			  token.type = HDTokenType::TOKEN_COLON;
+		  }
+		  break;
+	  }
+	  case '\0':
+	  {
+		  token.type = HDTokenType::TOKEN_EOFA;
+		  return token;
+	  }
+	  default:
+	  {
+		  if (isAlphabet(ch) || ch == '_'){
+			  eat_ident(lex);
+			  token.name = CStringToString((lex.input.str_char+ temp), lex.input_cursor  - temp);
+			  token.type = HDTokenType::TOKEN_IDENT;
+
+			  auto keyWordTokenType = isKeyword(token.name);
+			  if (keyWordTokenType != TOKEN_NONE)
+				  token.type = keyWordTokenType;
+		  
+		  }
+		  else if (isDigit(ch))
+		  {
+			  // TODO: Handle floating points ... 
+			  // TODO: handle the real values instead of the string
+			  // We assume that this will be only numbers
+			  // (0x -> hex) (0b -> binary) (0c  -> Octal)
+			  // auto& pos = get_current_position();
+			  token.type = HDTokenType::TOKEN_LITERAL;
+			  token.kind = TOKEN_KIND_INT_LITERAL;
+			  //auto peeked = peek_character(lex);
+			  // if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character(lex);
+			  //tokenize_number(lex)
+			  while (isDigit(peek_character(lex))) eat_character(lex);
 				
-				if (EqualStrings(token.name, "true"_s))
-				{
-					token.type = HDTokenType::TOKEN_BOOLEAN;
-					token.kind = TokenKind::TOKEN_KIND_BOOL_TRUE;
-				}
-				else if (EqualStrings(token.name, "false"_s))
-				{
-					token.type = HDTokenType::TOKEN_BOOLEAN;
-					token.kind = TokenKind::TOKEN_KIND_BOOL_FALSE;
-				}
-				else if (isKeyword(token.name))
-					token.type = HDTokenType::TOKEN_KEYWORD;
-			}
-			else if (isDigit(ch))
-			{
-				// TODO: Handle floating points ... 
-				// TODO: handle the real values instead of the string
-				// We assume that this will be only numbers
-				// (0x -> hex) (0b -> binary) (0c  -> Octal)
-				// auto& pos = get_current_position();
-				token.type = HDTokenType::TOKEN_LITERAL;
-				token.kind = TOKEN_KIND_INT_LITERAL;
-				//auto peeked = peek_character(lex);
-				// if(peeked == 'x' ||  peeked == 'b' || peeked == 'c')  eat_character(lex);
-				//tokenize_number(lex)
-				while (isDigit(peek_character(lex))) eat_character(lex);
-				
-			}
-			else {
-				assert(false && "What happend here?");
-			}
+		  }
+		  else {
+			  assert(false && "What happend here?");
+		  }
 			
-			break;
-		}
+		  break;
+	  }
 	}
 	
 	assert(token.type != HDTokenType::TOKEN_NONE);
-	token.name = {lex.input_cursor  - temp, (S8*)lex.input.str_char + temp};
+	//token.name = {lex.input_cursor  - temp, (S8*)lex.input.str_char + temp};
 	
 	if (token.type == HDTokenType::TOKEN_COMMENT || 
-		 token.type == HDTokenType::TOKEN_MULTILINE_COMMENT
+		token.type == HDTokenType::TOKEN_MULTILINE_COMMENT
 		)
 	{
 		return process_token(lex);
